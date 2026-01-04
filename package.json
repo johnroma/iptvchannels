@@ -5,6 +5,11 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "dev": "dotenv -e env-profiles/local.env -- vite dev",
+    "dev:prod": "dotenv -e env-profiles/prod.env -- vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node .output/server/index.mjs",
     "db:generate": "dotenv -e env-profiles/local.env -- drizzle-kit generate",
     "db:migrate": "dotenv -e env-profiles/local.env -- drizzle-kit migrate",
     "db:push": "dotenv -e env-profiles/local.env -- drizzle-kit push",
@@ -21,15 +26,25 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-router": "^1.144.0",
+    "@tanstack/react-start": "^1.145.4",
     "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.7"
+    "postgres": "^3.4.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@tanstack/react-router-devtools": "^1.144.0",
     "@types/node": "^25.0.3",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.6.0",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.8",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^7.1.7",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
