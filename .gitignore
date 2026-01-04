@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Environment files with secrets
+env-profiles/*.env
+!env-profiles/.env.example
+
+# Legacy env files (should not exist)
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+.output/
+.vinxi/
+
+# Storybook
+storybook-static/
+
+# Drizzle
+drizzle/meta/
+
+# Supabase
+supabase/.temp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
