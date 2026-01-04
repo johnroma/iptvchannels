@@ -5,8 +5,9 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "dotenv -e env-profiles/local.env -- vite dev",
-    "dev:prod": "dotenv -e env-profiles/prod.env -- vite dev",
+    "predev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
+    "dev": "dotenv -e env-profiles/local.env -- vite dev --strictPort",
+    "dev:prod": "dotenv -e env-profiles/prod.env -- vite dev --strictPort",
     "build": "vite build",
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
