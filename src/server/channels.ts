@@ -27,3 +27,15 @@ export const getChannelById = createServerFn({ method: "GET" })
 
     return channelData
   })
+
+export const editChannelById = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => channelInputSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { id, ...updateData } = data
+    const result = await db
+      .update(channels)
+      .set(updateData)
+      .where(eq(channels.id, id))
+      .returning()
+    return result[0]
+  })

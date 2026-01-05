@@ -17,7 +17,10 @@ function RouteComponent() {
   const { tvgName, tvgId } = Route.useLoaderData()
   return (
     <div>
-      Hello "/channels/{tvgName} - {tvgId}!"
+      <h2>
+        {tvgName} - {tvgId}
+      </h2>
+      $ Hello "/channels/{tvgName} - {tvgId}!"
     </div>
   )
 }
