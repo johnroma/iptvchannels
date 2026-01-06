@@ -13,9 +13,10 @@ export const listChannels = createServerFn({ method: "GET" }).handler(
 )
 
 export const getChannelById = createServerFn({ method: "GET" })
-  .inputValidator(({ id }) => {
-    if (typeof id === "number" && !Number.isNaN(id)) {
-      return id
+  .inputValidator((data: string) => {
+    console.log("getChannelById inputValidator data:", data)
+    if (typeof data === "string") {
+      return data
     }
     return null
   })

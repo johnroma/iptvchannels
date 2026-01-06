@@ -5,6 +5,7 @@
 IPTV Channel Management system with:
 - **Frontend**: TanStack Start (React meta-framework with SSR)
 - **Backend**: Drizzle ORM + PostgreSQL
+- **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Local DB**: Homebrew PostgreSQL (not Docker)
 - **Production DB**: Supabase
 - **Deployment**: Vercel (planned)
@@ -14,26 +15,72 @@ IPTV Channel Management system with:
 ```
 iptvchannels/
 ├── src/
-│   ├── db/              # Drizzle ORM (schema, seed, client)
+│   ├── db/              # Drizzle ORM (schema, seed, reset, client)
 │   ├── server/          # Server functions (createServerFn)
-│   ├── components/      # Shared components (DefaultCatchBoundary, NotFound)
+│   ├── components/      # App components
 │   ├── routes/          # TanStack Start file-based routes
 │   │   ├── __root.tsx   # Root layout (document shell)
 │   │   ├── index.tsx    # Home page
 │   │   ├── channels.index.tsx  # Channel list
 │   │   └── channels.$id.tsx    # Channel detail
-│   ├── styles/          # CSS files
+│   ├── styles/          # CSS files (Tailwind)
 │   ├── router.tsx       # TanStack Router + React Query setup
 │   └── routeTree.gen.ts # Auto-generated route tree
+├── packages/ui/         # Shared UI components (shadcn/ui)
+│   ├── components/      # shadcn components (button, input, card, etc.)
+│   ├── lib/utils.ts     # cn() helper function
+│   ├── hooks/           # Shared hooks
+│   ├── styles/globals.css  # Tailwind + CSS variables
+│   └── components.json  # shadcn CLI config
 ├── env-profiles/        # Environment files (NOT .env.* at root)
 │   ├── local.env        # Local PostgreSQL connection
 │   ├── prod.env         # Supabase connection
 │   ├── supabase.env     # Supabase CLI token
 │   └── .env.example     # Template (only file committed)
-├── packages/ui/         # Storybook components (dev only, never deployed)
 ├── vite.config.ts
 ├── drizzle.config.ts
 └── pnpm-workspace.yaml
+```
+
+## Path Aliases
+
+```tsx
+import { db } from "~/db"           // ~/  → ./src/*
+import { cn } from "@/lib/utils"    // @/  → ./src/*
+import { Button } from "@ui/components/button"  // @ui/ → ./packages/ui/*
+```
+
+## Tailwind CSS v4 Setup
+
+Tailwind v4 uses the Vite plugin (no config file):
+
+```ts
+// vite.config.ts
+plugins: [
+  tsConfigPaths(),
+  tanstackStart(),
+  viteReact(),
+  tailwindcss(),  // @tailwindcss/vite plugin
+]
+```
+
+```css
+/* src/styles/app.css */
+@import 'tailwindcss';
+```
+
+## shadcn/ui Components
+
+Components are in `packages/ui/`. To add new components:
+
+```bash
+cd packages/ui
+pnpm dlx shadcn@latest add button
+```
+
+Import in app:
+```tsx
+import { Button } from "@ui/components/button"
 ```
 
 ## Critical TanStack Start Setup
@@ -75,15 +122,6 @@ export const Route = createRootRouteWithContext<{
   head: () => ({ meta: [...], links: [...] }),
   component: RootComponent,
 })
-```
-
-### vite.config.ts Order Matters:
-```ts
-plugins: [
-  tsConfigPaths(),
-  tanstackStart(),  // Start plugin FIRST
-  viteReact(),      // React plugin AFTER start
-]
 ```
 
 ## Server Functions Pattern
@@ -131,9 +169,16 @@ pnpm dev:prod         # Run with prod.env (Supabase data)
 # Database
 pnpm db:push          # Push schema to local DB
 pnpm db:push:prod     # Push schema to Supabase
+pnpm db:migrate       # Run migrations (local)
+pnpm db:migrate:prod  # Run migrations (Supabase)
 pnpm db:studio        # Drizzle Studio (local)
 pnpm db:studio:prod   # Drizzle Studio (Supabase)
-pnpm db:seed          # Seed local DB (mock data only)
+pnpm db:seed          # Seed local DB
+pnpm db:seed:prod     # Seed production DB
+pnpm db:reset         # Reset local DB (drop all data)
+pnpm db:reset:prod    # Reset production DB (careful!)
+pnpm db:psql          # Connect to local DB via psql
+pnpm db:psql:prod     # Connect to Supabase via psql
 
 # Supabase CLI
 pnpm supabase <cmd>   # Run Supabase CLI with token from supabase.env
@@ -147,10 +192,12 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 Located at `src/db/schema.ts`:
 - `channels` table with: tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps
 
+Validation schemas use Zod (see `src/db/schema.ts` for `channelInputSchema`).
+
 ## Key Patterns
 
 1. **Environment switching**: Use `dotenv -e env-profiles/<profile>.env --` prefix
-2. **Local = disposable**: Local seed creates 1 mock row. Production is source of truth.
+2. **Local = disposable**: Local DB can be reset. Production is source of truth.
 3. **Supabase CLI**: Always use `pnpm supabase` to ensure token is loaded
 4. **No Docker**: Uses local Homebrew PostgreSQL (`john@localhost:5432/iptvchannels`)
 
@@ -160,9 +207,9 @@ Located at `src/db/schema.ts`:
 2. Do NOT import HeadContent/Scripts from `@tanstack/react-start` - they're in `@tanstack/react-router`
 3. Do NOT put .env files at root - use `env-profiles/` directory
 4. Do NOT use Docker for local DB - use Homebrew PostgreSQL
-5. Do NOT seed production from local files - production has its own data
-6. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
-7. Do NOT run multiple vite dev servers - `predev` script handles this automatically
+5. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
+6. Do NOT run multiple vite dev servers - `predev` script handles this automatically
+7. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
 
 ## GitHub Repository
 
