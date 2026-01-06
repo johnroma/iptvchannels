@@ -25,7 +25,8 @@
     "db:psql": "dotenv -e env-profiles/local.env -- psql",
     "db:psql:prod": "dotenv -e env-profiles/prod.env -- psql",
     "supabase": "dotenv -e env-profiles/supabase.env -- supabase",
-    "sb:status": "dotenv -e env-profiles/supabase.env -- supabase inspect db table-stats --linked"
+    "sb:status": "dotenv -e env-profiles/supabase.env -- supabase inspect db table-stats --linked",
+    "ui:add": "pnpm -F ui ui:add"
   },
   "keywords": [
     "iptv",

@@ -21,12 +21,13 @@ function RouteComponent() {
         {data.map((channel) => (
           <li key={channel.id}>
             <span>{channel.tvgName}</span>
-            {" - "}
+            {" - "} {channel.name} <span> - </span>
             <Link
-              to="/channels/$id"
+              to="/edit/$id"
               params={{ id: channel.id.toString() }}
+              className="text-blue-600"
             >
-              View Channel {channel.id}
+              Edit
             </Link>
           </li>
         ))}
