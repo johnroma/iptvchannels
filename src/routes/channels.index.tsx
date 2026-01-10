@@ -1,15 +1,27 @@
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { listChannels } from "~/server/channels"
 
+// 1. BEST PRACTICE: Define options once.
+// This ensures your loader and component always use the exact same Key and Function.
+const channelsOptions = queryOptions({
+  queryKey: ["channels"],
+  queryFn: () => listChannels(),
+})
+
 export const Route = createFileRoute("/channels/")({
   component: RouteComponent,
-  loader: async () => {
-    return listChannels()
-  },
+  // 2. Fix: ensureQueryData takes an object in v5, not (key, fn).
+  // passing `channelsOptions` handles this automatically.
+  loader: ({ context: { queryClient } }) =>
+    queryClient.ensureQueryData(channelsOptions),
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData()
+  // 3. Fix: Use the same options object here.
+  // useSuspenseQuery guarantees `data` is defined (no undefined check needed).
+  const { data } = useSuspenseQuery(channelsOptions)
+
   if (data.length === 0) {
     return <div>No channels found.</div>
   }
