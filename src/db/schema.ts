@@ -35,6 +35,5 @@ export const channels = pgTable("channels", {
   updatedAt: timestamp("updated_at").defaultNow(),
 })
 
-// Type exports for use in the application
+// Type export for use in the application
 export type Channel = typeof channels.$inferSelect
-export type NewChannel = typeof channels.$inferInsert

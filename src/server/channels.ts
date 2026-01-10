@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
-import z from "zod"
-import { db } from "~/db"
-import { channels } from "~/db/schema"
+import { db, channels, channelSchema, channelUpdateSchema } from "~/db"
 
 export const listChannels = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -30,29 +28,32 @@ export const getChannelById = createServerFn({ method: "GET" })
   })
 
 export const updateChannelForId = createServerFn({ method: "POST" })
-  .inputValidator(
-    z.object({
-      id: z.string(),
-      name: z.string().min(6, "Name must be at least 6 characters"),
-    })
-  )
+  .inputValidator(channelUpdateSchema)
   .handler(async ({ data }) => {
+    const { id, ...updateData } = data
     const result = await db
       .update(channels)
-      .set({ name: data.name })
-      .where(eq(channels.id, data.id))
+      .set({
+        ...updateData,
+        tvgLogo: updateData.tvgLogo || null,
+        streamUrl: updateData.streamUrl || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(channels.id, id))
       .returning()
     return result[0]
   })
 
-// export const editChannelById = createServerFn({ method: "POST" })
-//   .inputValidator((data: unknown) => channelInputSchema.parse(data))
-//   .handler(async ({ data }) => {
-//     const { id, ...updateData } = data
-//     const result = await db
-//       .update(channels)
-//       .set(updateData)
-//       .where(eq(channels.id, id))
-//       .returning()
-//     return result[0]
-//   })
+export const createChannel = createServerFn({ method: "POST" })
+  .inputValidator(channelSchema)
+  .handler(async ({ data }) => {
+    const result = await db
+      .insert(channels)
+      .values({
+        ...data,
+        tvgLogo: data.tvgLogo || null,
+        streamUrl: data.streamUrl || null,
+      })
+      .returning()
+    return result[0]
+  })

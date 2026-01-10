@@ -11,7 +11,7 @@ import * as React from "react"
 import type { QueryClient } from "@tanstack/react-query"
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary"
 import { NotFound } from "~/components/NotFound"
-import appCss from "~/styles/app.css?url"
+import globalCss from "@ui/styles/globals.css?url"
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -26,7 +26,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [{ rel: "stylesheet", href: globalCss }],
   }),
   errorComponent: (props) => {
     return (
@@ -54,7 +54,32 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        <main>{children}</main>
+        <header className="m-10">
+          <nav className="mb-4">
+            <a
+              href="/"
+              className="text-blue-600"
+            >
+              Home
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/channels"
+              className="text-blue-600"
+            >
+              Channels
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/channels/new"
+              className="text-blue-600"
+            >
+              Add Channel
+            </a>
+          </nav>
+          <h1 className="text-3xl font-bold">IPTV Channels Management</h1>
+        </header>
+        <main className="m-10">{children}</main>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

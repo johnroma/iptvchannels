@@ -19,13 +19,12 @@ function PageEditChannel() {
   const navigate = useNavigate()
 
   return (
-    <div>
-      <ChannelForm
-        channel={channel}
-        onChannelUpdate={(updated) => {
-          navigate({ to: "/channels/$id", params: { id: updated.id } })
-        }}
-      />
-    </div>
+    <ChannelForm
+      mode="edit"
+      channel={channel}
+      onChannelSave={(updated) => {
+        navigate({ to: "/channels/$id", params: { id: updated.id } })
+      }}
+    />
   )
 }
