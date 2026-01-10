@@ -12,7 +12,11 @@ export default defineConfig({
     tsConfigPaths({
       projects: ['./tsconfig.json', './packages/ui/tsconfig.json'],
     }),
-    tanstackStart(),
+    tanstackStart({
+      server: {
+        preset: 'vercel',
+      },
+    }),
     viteReact(),
     tailwindcss(),
   ],
