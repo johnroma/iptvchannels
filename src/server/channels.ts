@@ -1,15 +1,30 @@
+import { queryOptions } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
-import { eq } from "drizzle-orm"
+import { asc, eq } from "drizzle-orm"
 import { db, channels, channelSchema, channelUpdateSchema } from "~/db"
 
 export const listChannels = createServerFn({ method: "GET" }).handler(
   async () => {
     const result = await db.query.channels.findMany({
-      columns: { id: true, tvgName: true, name: true },
+      columns: {
+        id: true,
+        tvgName: true,
+        name: true,
+        active: true,
+        favourite: true,
+        countryCode: true,
+      },
+      orderBy: [asc(channels.createdAt)],
     })
     return result
   }
 )
+
+export const channelsQueryOptions = () =>
+  queryOptions({
+    queryKey: ["channels"],
+    queryFn: () => listChannels(),
+  })
 
 export const getChannelById = createServerFn({ method: "GET" })
   .inputValidator((data: string) => {
@@ -55,5 +70,16 @@ export const createChannel = createServerFn({ method: "POST" })
         streamUrl: data.streamUrl || null,
       })
       .returning()
+    return result[0]
+  })
+
+export const toggleChannelActive = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string; active: boolean }) => data)
+  .handler(async ({ data }) => {
+    const result = await db
+      .update(channels)
+      .set({ active: data.active, updatedAt: new Date() })
+      .where(eq(channels.id, data.id))
+      .returning({ id: channels.id, active: channels.active })
     return result[0]
   })
