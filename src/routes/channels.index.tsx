@@ -1,10 +1,12 @@
+import { useState } from "react"
 import { z } from "zod"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { channelsQueryOptions } from "~/server/channels"
+import { channelsQueryOptions, exportActiveChannelsYaml } from "~/server/channels"
 import { Checkbox } from "@ui/components/checkbox"
 import { Label } from "@ui/components/label"
 import { Button } from "@ui/components/button"
+import { Spinner } from "@ui/components/spinner"
 import { ChannelRow } from "~/components/ChannelRow"
 
 const channelsSearchSchema = z.object({
@@ -25,6 +27,48 @@ function RouteComponent() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const { data } = useSuspenseQuery(channelsQueryOptions())
+  const [isExporting, setIsExporting] = useState(false)
+
+  async function handleExport() {
+    setIsExporting(true)
+    try {
+      const result = await exportActiveChannelsYaml()
+
+      // Show feedback about what was exported
+      if (result.count === 0) {
+        const reasons = result.skipped
+          .map((s) => `• ${s.channel}: ${s.reason}`)
+          .join("\n")
+        alert(
+          `No channels exported.\n\nChannels need both 'scriptAlias' and 'contentId' to be exported.\n\nSkipped channels:\n${reasons || "No active channels found"}`
+        )
+        return
+      }
+
+      // Create and download the file
+      const blob = new Blob([result.yaml], { type: "text/yaml" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "channels.yaml"
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      // Show success with any skipped channels
+      if (result.skipped.length > 0) {
+        const reasons = result.skipped
+          .map((s) => `• ${s.channel}: ${s.reason}`)
+          .join("\n")
+        alert(
+          `Exported ${result.count} channel(s).\n\nSkipped ${result.skipped.length} channel(s):\n${reasons}`
+        )
+      }
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   const uniqueCountries = [...new Set(data.map((c) => c.countryCode).filter(Boolean))].sort() as string[]
 
@@ -91,6 +135,24 @@ function RouteComponent() {
             }}
           >
             Name {sortDirection === "asc" ? "A-Z" : "Z-A"}
+          </Button>
+        </div>
+
+        <div className="flex items-center space-x-2 border-l pl-4 ml-auto">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleExport}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <>
+                <Spinner className="mr-2" />
+                Exporting...
+              </>
+            ) : (
+              "Export YAML"
+            )}
           </Button>
         </div>
       </div>

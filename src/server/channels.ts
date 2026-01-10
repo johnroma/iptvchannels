@@ -83,3 +83,23 @@ export const toggleChannelActive = createServerFn({ method: "POST" })
       .returning({ id: channels.id, active: channels.active })
     return result[0]
   })
+
+export const exportActiveChannelsYaml = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const { generateHomeAssistantYaml } = await import("~/lib/yaml-export")
+
+    const activeChannels = await db.query.channels.findMany({
+      where: eq(channels.active, true),
+      columns: {
+        scriptAlias: true,
+        name: true,
+        tvgName: true,
+        contentId: true,
+        tvgLogo: true,
+      },
+      orderBy: [asc(channels.name)],
+    })
+
+    return generateHomeAssistantYaml(activeChannels)
+  }
+)
