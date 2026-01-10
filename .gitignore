@@ -45,3 +45,6 @@ pnpm-debug.log*
 
 # Test coverage
 coverage/
+.vercel
+.output
+dist
