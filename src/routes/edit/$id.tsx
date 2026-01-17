@@ -23,7 +23,12 @@ function PageEditChannel() {
       mode="edit"
       channel={channel}
       onChannelSave={(updated) => {
-        navigate({ to: "/channels/$id", params: { id: updated.id } })
+        // Go back in history if there's somewhere to go, otherwise navigate to channel
+        if (window.history.length > 1) {
+          window.history.back()
+        } else {
+          navigate({ to: "/channels/$id", params: { id: updated.id } })
+        }
       }}
     />
   )

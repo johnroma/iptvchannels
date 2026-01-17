@@ -1,8 +1,16 @@
-import { useState } from "react"
 import { z } from "zod"
-import { useSuspenseQuery } from "@tanstack/react-query"
+import {
+  useMutation,
+  useSuspenseQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { channelsQueryOptions, exportActiveChannelsYaml } from "~/server/channels"
+import {
+  channelsQueryOptions,
+  exportActiveChannelsYaml,
+  exportActiveChannelsM3u,
+  syncKodiContentIds,
+} from "~/server/channels"
 import { Checkbox } from "@ui/components/checkbox"
 import { Label } from "@ui/components/label"
 import { Button } from "@ui/components/button"
@@ -23,18 +31,27 @@ export const Route = createFileRoute("/channels/")({
   component: RouteComponent,
 })
 
+function downloadFile(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
+}
+
 function RouteComponent() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
+  const queryClient = useQueryClient()
   const { data } = useSuspenseQuery(channelsQueryOptions())
-  const [isExporting, setIsExporting] = useState(false)
 
-  async function handleExport() {
-    setIsExporting(true)
-    try {
-      const result = await exportActiveChannelsYaml()
-
-      // Show feedback about what was exported
+  const exportYamlMutation = useMutation({
+    mutationFn: exportActiveChannelsYaml,
+    onSuccess: (result) => {
       if (result.count === 0) {
         const reasons = result.skipped
           .map((s) => `• ${s.channel}: ${s.reason}`)
@@ -45,18 +62,8 @@ function RouteComponent() {
         return
       }
 
-      // Create and download the file
-      const blob = new Blob([result.yaml], { type: "text/yaml" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "channels.yaml"
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      downloadFile(result.yaml, "channels.yaml", "text/yaml")
 
-      // Show success with any skipped channels
       if (result.skipped.length > 0) {
         const reasons = result.skipped
           .map((s) => `• ${s.channel}: ${s.reason}`)
@@ -65,17 +72,50 @@ function RouteComponent() {
           `Exported ${result.count} channel(s).\n\nSkipped ${result.skipped.length} channel(s):\n${reasons}`
         )
       }
-    } finally {
-      setIsExporting(false)
-    }
-  }
+    },
+  })
 
-  const uniqueCountries = [...new Set(data.map((c) => c.countryCode).filter(Boolean))].sort() as string[]
+  const exportM3uMutation = useMutation({
+    mutationFn: exportActiveChannelsM3u,
+    onSuccess: (result) => {
+      if (result.count === 0) {
+        alert("No active channels with stream URLs found to export.")
+        return
+      }
+      downloadFile(result.m3u, "channels.m3u", "text/plain")
+    },
+  })
+
+  const syncKodiMutation = useMutation({
+    mutationFn: syncKodiContentIds,
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["channels"] })
+      alert(
+        `Kodi sync complete!\n\n` +
+          `Total DB channels: ${result.total}\n` +
+          `Kodi channels: ${result.kodiChannels}\n` +
+          `Matched: ${result.matched}\n` +
+          `Updated: ${result.updated}\n` +
+          `Skipped (no match): ${result.skipped}`
+      )
+    },
+    onError: (error) => {
+      alert(`Kodi sync failed: ${error.message}`)
+    },
+  })
+
+  const uniqueCountries = [
+    ...new Set(data.map((c) => c.countryCode).filter(Boolean)),
+  ].sort() as string[]
 
   const filteredChannels = data.filter((channel) => {
     if (search.active && !channel.active) return false
     if (search.favourite && !channel.favourite) return false
-    if (search.countries?.length && !search.countries.includes(channel.countryCode ?? "")) return false
+    if (
+      search.countries?.length &&
+      !search.countries.includes(channel.countryCode ?? "")
+    )
+      return false
     return true
   })
 
@@ -138,14 +178,45 @@ function RouteComponent() {
           </Button>
         </div>
 
-        <div className="flex items-center space-x-2 border-l pl-4 ml-auto">
+        <div className="flex items-center space-x-2 pl-4 ml-auto gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportM3uMutation.mutate(undefined)}
+            disabled={exportM3uMutation.isPending}
+          >
+            {exportM3uMutation.isPending ? (
+              <>
+                <Spinner className="mr-2" />
+                Exporting...
+              </>
+            ) : (
+              "Export M3U"
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => syncKodiMutation.mutate(undefined)}
+            disabled={syncKodiMutation.isPending}
+          >
+            {syncKodiMutation.isPending ? (
+              <>
+                <Spinner className="mr-2" />
+                Syncing...
+              </>
+            ) : (
+              "Sync Kodi"
+            )}
+          </Button>
+
           <Button
             variant="default"
             size="sm"
-            onClick={handleExport}
-            disabled={isExporting}
+            onClick={() => exportYamlMutation.mutate(undefined)}
+            disabled={exportYamlMutation.isPending}
           >
-            {isExporting ? (
+            {exportYamlMutation.isPending ? (
               <>
                 <Spinner className="mr-2" />
                 Exporting...
@@ -161,7 +232,10 @@ function RouteComponent() {
         <div className="flex flex-wrap gap-3 mb-6 p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
           <span className="text-sm font-medium">Countries:</span>
           {uniqueCountries.map((country) => (
-            <div key={country} className="flex items-center space-x-1">
+            <div
+              key={country}
+              className="flex items-center space-x-1"
+            >
               <Checkbox
                 id={`country-${country}`}
                 checked={search.countries?.includes(country) ?? false}
@@ -180,7 +254,12 @@ function RouteComponent() {
                   })
                 }}
               />
-              <Label htmlFor={`country-${country}`} className="text-sm">{country}</Label>
+              <Label
+                htmlFor={`country-${country}`}
+                className="text-sm"
+              >
+                {country}
+              </Label>
             </div>
           ))}
         </div>
