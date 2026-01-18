@@ -26,7 +26,7 @@ describe("generateM3u", () => {
 
     expect(result).toMatch(/^#EXTM3U\n/)
     expect(result).toContain(
-      '#EXTINF:-1 tvg-id="AandE.us" tvg-name="US| A&E HD" tvg-logo="http://example.com/logo1.png" group-title="US| ENTERTAINMENT",A&E'
+      '#EXTINF:-1 tvg-id="AandE.us" tvg-name="US| A&E HD" tvg-logo="http://example.com/logo1.png" group-title="US| ENTERTAINMENT",US| A&E HD'
     )
     expect(result).toContain("http://example.com/stream1\n")
     expect(result).toContain(

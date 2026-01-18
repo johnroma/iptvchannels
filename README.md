@@ -17,7 +17,7 @@ iptvchannels/
 │   ├── db/                     # Drizzle schema & client
 │   │   ├── schema.ts           # Database schema definition
 │   │   ├── index.ts            # Database client export
-│   │   └── seed.ts             # Local dev seed script
+│   │   └── reset.ts            # Database reset script
 │   ├── lib/                    # Shared utilities
 │   ├── router.tsx              # Router configuration
 │   ├── routeTree.gen.ts        # Auto-generated route tree
@@ -32,6 +32,9 @@ iptvchannels/
 │   ├── prod.env                # Supabase production
 │   ├── supabase.env            # Supabase CLI token
 │   └── .env.example            # Template (safe to commit)
+├── scripts/
+│   ├── seed-channels.sh        # M3U channel seeder (bash/awk)
+│   └── seed-media.sh           # M3U media seeder (bash/awk)
 ├── supabase/
 │   ├── config.toml             # Supabase project config
 │   └── migrations/             # Drizzle-generated migrations
@@ -98,9 +101,14 @@ The `channels` table stores IPTV channel data:
 | `pnpm db:migrate` | Run migrations locally |
 | `pnpm db:studio` | Open Drizzle Studio (local) |
 | `pnpm db:studio:prod` | Open Drizzle Studio (Supabase) |
-| `pnpm db:seed` | Seed local with 1 mock row |
+| `pnpm db:seed:channels` | Seed channels from M3U (truncates first) |
+| `pnpm db:seed:channels:prod` | Seed channels to Supabase (truncates first) |
+| `pnpm db:seed:media` | Seed movies/series from M3U (truncates first) |
+| `pnpm db:seed:media:prod` | Seed movies/series to Supabase (truncates first) |
 | `pnpm db:psql` | Open psql shell (local) |
 | `pnpm db:psql:prod` | Open psql shell (Supabase) |
+| `pnpm db:reset` | Empty all tables without reseeding (rarely needed) |
+| `pnpm db:reset:prod` | Empty Supabase tables (rarely needed) |
 
 ### Supabase CLI
 
@@ -139,8 +147,46 @@ pnpm supabase db dump --schema-only
 
 ### Data Philosophy
 
-- **Local**: Disposable dev data. `pnpm db:seed` creates 1 mock row.
-- **Production**: Source of truth. Real channel data from M3U/contentid import.
+- **Local**: Disposable dev data. Can be reset and reseeded anytime.
+- **Production**: Source of truth. Real channel data from M3U import.
+
+### Database Scripts - Usage Order
+
+**Fresh start (new environment):**
+```bash
+pnpm db:push              # Create tables from schema
+pnpm db:seed:channels     # Import TV channels from M3U
+pnpm db:seed:media        # Import movies/series from M3U (optional)
+```
+
+**Schema changes:**
+```bash
+# Edit src/db/schema.ts
+pnpm db:push              # Apply to local
+# Test locally
+pnpm db:push:prod         # Apply to production
+```
+
+**Replace data (just re-run seed):**
+```bash
+pnpm db:seed:channels     # Truncates channels table, then imports
+pnpm db:seed:media        # Truncates media table, then imports
+```
+
+Each seed script truncates its own table before importing - no separate reset needed.
+
+**M3U seeding notes:**
+- Seed scripts expect M3U file at `../assets/seedchannels.m3u`
+- `db:seed:channels` processes live TV (stops at first .mp4/.mkv)
+- `db:seed:media` processes movies/series (.mp4/.mkv only)
+- Uses PostgreSQL COPY for fast bulk import
+
+**Empty tables without reseeding (rarely needed):**
+```bash
+pnpm db:reset             # Truncate all tables, leave them empty
+```
+
+Use `db:reset` only if you want empty tables without importing new data.
 
 ## Monorepo Structure
 
@@ -192,8 +238,8 @@ cp env-profiles/.env.example env-profiles/local.env
 # Push schema to local database
 pnpm db:push
 
-# Seed with mock data
-pnpm db:seed
+# Seed with channel data (requires ../assets/seedchannels.m3u)
+pnpm db:seed:channels
 
 # Open Drizzle Studio
 pnpm db:studio

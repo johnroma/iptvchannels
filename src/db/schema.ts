@@ -37,3 +37,32 @@ export const channels = pgTable("channels", {
 
 // Type export for use in the application
 export type Channel = typeof channels.$inferSelect
+
+// Media table for movies and series
+export const media = pgTable("media", {
+  id: uuid("id").primaryKey().defaultRandom(),
+
+  // From M3U file
+  tvgId: text("tvg_id"),
+  tvgName: text("tvg_name").notNull(), // e.g., "DE - Senran Kagura (2013) (Ger Sub) S02 E11"
+  tvgLogo: text("tvg_logo"), // TMDB poster URL
+  groupTitle: text("group_title"), // e.g., "|DE| ANIME SERIEN (SUB)"
+  streamUrl: text("stream_url"), // URL ending in .mp4 or .mkv
+
+  // Parsed/derived fields
+  mediaType: text("media_type"), // "movie" or "series" (derived from URL path)
+  year: integer("year"), // Parsed from title, e.g., 1994
+  season: integer("season"), // For series, e.g., 2
+  episode: integer("episode"), // For series, e.g., 11
+
+  // CMS fields
+  name: text("name"), // Custom display name
+  favourite: boolean("favourite").default(false),
+  active: boolean("active").default(false),
+
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+})
+
+export type Media = typeof media.$inferSelect

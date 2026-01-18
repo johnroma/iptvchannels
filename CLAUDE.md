@@ -15,7 +15,7 @@ IPTV Channel Management system with:
 ```
 iptvchannels/
 ├── src/
-│   ├── db/              # Drizzle ORM (schema, seed, reset, client)
+│   ├── db/              # Drizzle ORM (schema, reset, client)
 │   ├── server/          # Server functions (createServerFn)
 │   ├── components/      # App components
 │   ├── routes/          # TanStack Start file-based routes
@@ -37,6 +37,9 @@ iptvchannels/
 │   ├── prod.env         # Supabase connection
 │   ├── supabase.env     # Supabase CLI token
 │   └── .env.example     # Template (only file committed)
+├── scripts/             # Database seeding scripts (bash/awk)
+│   ├── seed-channels.sh # Import TV channels from M3U
+│   └── seed-media.sh    # Import movies/series from M3U
 ├── vite.config.ts
 ├── drizzle.config.ts
 └── pnpm-workspace.yaml
@@ -166,17 +169,25 @@ export const getChannelById = createServerFn({ method: "GET" })
 pnpm dev              # Run with local.env (kills existing port 3000 first)
 pnpm dev:prod         # Run with prod.env (Supabase data)
 
-# Database
+# Database schema
 pnpm db:push          # Push schema to local DB
 pnpm db:push:prod     # Push schema to Supabase
 pnpm db:migrate       # Run migrations (local)
 pnpm db:migrate:prod  # Run migrations (Supabase)
 pnpm db:studio        # Drizzle Studio (local)
 pnpm db:studio:prod   # Drizzle Studio (Supabase)
-pnpm db:seed          # Seed local DB
-pnpm db:seed:prod     # Seed production DB
-pnpm db:reset         # Reset local DB (drop all data)
-pnpm db:reset:prod    # Reset production DB (careful!)
+
+# Database seeding (truncates table first, then imports via PostgreSQL COPY)
+pnpm db:seed:channels      # Import TV channels from M3U (local)
+pnpm db:seed:channels:prod # Import TV channels from M3U (Supabase)
+pnpm db:seed:media         # Import movies/series from M3U (local)
+pnpm db:seed:media:prod    # Import movies/series from M3U (Supabase)
+
+# Empty tables without reseeding (rarely needed - seed already truncates)
+pnpm db:reset              # Truncate all tables, leave empty
+pnpm db:reset:prod         # Truncate Supabase tables (careful!)
+
+# Database utilities
 pnpm db:psql          # Connect to local DB via psql
 pnpm db:psql:prod     # Connect to Supabase via psql
 
@@ -190,7 +201,8 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 ## Database Schema
 
 Located at `src/db/schema.ts`:
-- `channels` table with: tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps
+- `channels` table: Live TV channels (tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
+- `media` table: Movies/series (tvgId, tvgName, tvgLogo, groupTitle, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
 
 Validation schemas use Zod (see `src/db/schema.ts` for `channelInputSchema`).
 
