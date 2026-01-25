@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { type Channel } from "~/db/schema"
+import { type CountryCode } from "~/db/validators"
 import { Button } from "@ui/components/button"
 import { Input } from "@ui/components/input"
 import { Label } from "@ui/components/label"
@@ -74,13 +75,20 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
     setIsLoading(true)
 
     try {
+      const submitData = {
+        ...formData,
+        countryCode: (formData.countryCode || undefined) as
+          | CountryCode
+          | undefined,
+      }
+
       let result: Channel | undefined
       if (mode === "edit" && channel) {
         result = await updateChannelFn({
-          data: { id: channel.id, ...formData },
+          data: { id: channel.id, ...submitData },
         })
       } else {
-        result = await createChannelFn({ data: formData })
+        result = await createChannelFn({ data: submitData })
       }
       setIsLoading(false)
       if (result) onChannelSave?.(result)

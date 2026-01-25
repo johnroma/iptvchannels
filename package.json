@@ -58,6 +58,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@tanstack/react-query-devtools": "^5.91.2",
     "@tanstack/react-router-devtools": "^1.144.0",
     "@types/node": "^25.0.3",
@@ -67,8 +68,11 @@
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.8",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.0",
     "vite": "^7.3.0",
     "vite-tsconfig-paths": "^6.0.3",
     "vitest": "^4.0.16"

@@ -1,29 +1,144 @@
+import { z } from "zod"
 import { queryOptions } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
-import { asc, eq } from "drizzle-orm"
+import { asc, desc, eq, count, isNotNull, and, inArray } from "drizzle-orm"
 import { db, channels, channelSchema, channelUpdateSchema } from "~/db"
 
-export const listChannels = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const result = await db.query.channels.findMany({
-      columns: {
-        id: true,
-        tvgName: true,
-        name: true,
-        active: true,
-        favourite: true,
-        countryCode: true,
+const listChannelsSchema = z.object({
+  cursor: z.number().optional().default(0),
+  limit: z.number().optional().default(100),
+  sortBy: z.enum(["name", "createdAt"]).optional().default("name"),
+  sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
+  groupTitle: z.string().optional(),
+  active: z.boolean().optional(),
+  favourite: z.boolean().optional(),
+  countries: z.array(z.string()).optional(),
+})
+
+export const listChannels = createServerFn({ method: "GET" })
+  .inputValidator(listChannelsSchema)
+  .handler(
+    async ({
+      data: {
+        cursor,
+        limit,
+        sortBy,
+        sortDirection,
+        groupTitle,
+        active,
+        favourite,
+        countries,
       },
-      orderBy: [asc(channels.createdAt)],
-    })
+    }) => {
+      // 1. Get total count (filtered if needed)
+      const filters = []
+      if (groupTitle) filters.push(eq(channels.groupTitle, groupTitle))
+      if (active !== undefined) filters.push(eq(channels.active, active))
+      if (favourite !== undefined)
+        filters.push(eq(channels.favourite, favourite))
+      if (countries && countries.length > 0) {
+        filters.push(inArray(channels.countryCode, countries))
+      }
+
+      const whereClause = filters.length > 0 ? and(...filters) : undefined
+
+      const [countResult] = await db
+        .select({ count: count() })
+        .from(channels)
+        .where(whereClause)
+      const totalCount = countResult?.count ?? 0
+
+      // 2. Determine sort order
+      const sortColumn = sortBy === "name" ? channels.name : channels.createdAt
+      const order =
+        sortDirection === "desc" ? desc(sortColumn) : asc(sortColumn)
+      // Secondary sort by ID to ensure stable pagination
+      const orderBy = [order, asc(channels.id)]
+
+      // 3. Fetch paginated data
+      const result = await db.query.channels.findMany({
+        where: whereClause,
+        columns: {
+          id: true,
+          tvgName: true,
+          name: true,
+          active: true,
+          favourite: true,
+          countryCode: true,
+          groupTitle: true,
+        },
+        orderBy: orderBy,
+        limit,
+        offset: cursor,
+      })
+
+      return {
+        data: result,
+        totalCount,
+      }
+    },
+  )
+
+export const getGroupTitles = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const result = await db
+      .selectDistinct({ groupTitle: channels.groupTitle })
+      .from(channels)
+      .where(isNotNull(channels.groupTitle))
+      .orderBy(asc(channels.groupTitle))
+
     return result
-  }
+      .map((r) => r.groupTitle)
+      .filter((g): g is string => typeof g === "string")
+  },
 )
 
-export const channelsQueryOptions = () =>
+export const getCountryCodes = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const result = await db
+      .selectDistinct({ countryCode: channels.countryCode })
+      .from(channels)
+      .where(isNotNull(channels.countryCode))
+      .orderBy(asc(channels.countryCode))
+
+    return result
+      .map((r) => r.countryCode)
+      .filter((c): c is string => typeof c === "string")
+  },
+)
+
+export const channelsQueryOptions = (
+  page: number = 1,
+  sortBy: "name" | "createdAt" = "createdAt",
+  sortDirection: "asc" | "desc" = "asc",
+  groupTitle?: string,
+  active?: boolean,
+  favourite?: boolean,
+  countries?: string[],
+) =>
   queryOptions({
-    queryKey: ["channels"],
-    queryFn: () => listChannels(),
+    queryKey: [
+      "channels",
+      page,
+      sortBy,
+      sortDirection,
+      groupTitle,
+      active,
+      favourite,
+      countries,
+    ],
+    queryFn: () =>
+      listChannels({
+        data: {
+          cursor: (page - 1) * 100,
+          sortBy,
+          sortDirection,
+          groupTitle,
+          active,
+          favourite,
+          countries,
+        },
+      }),
   })
 
 export const getChannelById = createServerFn({ method: "GET" })
@@ -129,12 +244,12 @@ export const exportActiveChannelsM3u = createServerFn({
   }
 })
 
-interface KodiChannel {
+type KodiChannel = {
   channelid: number
   label: string
 }
 
-interface KodiResponse {
+type KodiResponse = {
   result: {
     channels: KodiChannel[]
   }
@@ -147,7 +262,7 @@ export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
 
     if (!host || !port) {
       throw new Error(
-        "KODI_HOST and KODI_PORT environment variables are required"
+        "KODI_HOST and KODI_PORT environment variables are required",
       )
     }
 
@@ -186,7 +301,7 @@ export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
 
     // Build Kodi lookup map (lowercase label -> channelid)
     const kodiMap = new Map<string, number>(
-      kodiData.result.channels.map((c) => [c.label.toLowerCase(), c.channelid])
+      kodiData.result.channels.map((c) => [c.label.toLowerCase(), c.channelid]),
     )
 
     // Match and update
@@ -220,5 +335,5 @@ export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
       updated,
       skipped: dbChannels.length - matchedChannels.length,
     }
-  }
+  },
 )

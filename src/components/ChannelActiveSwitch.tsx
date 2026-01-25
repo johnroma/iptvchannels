@@ -7,6 +7,11 @@ import { type Channel } from "~/db/schema"
 
 type ChannelActiveSwitchProps = Pick<Channel, "id" | "active" | "tvgName">
 
+type PaginatedResult = {
+  data: Channel[]
+  totalCount: number
+}
+
 export function ChannelActiveSwitch({
   id,
   active,
@@ -21,29 +26,41 @@ export function ChannelActiveSwitch({
 
     onMutate: async (newActive) => {
       setIsUpdating(true)
-      // Cancel outgoing refetches
+
       await queryClient.cancelQueries({ queryKey: ["channels"] })
 
-      // Snapshot previous value
-      const previousChannels = queryClient.getQueryData<Channel[]>(["channels"])
+      const previousQueries = queryClient.getQueriesData({
+        queryKey: ["channels"],
+      })
 
-      // Optimistically update
-      queryClient.setQueryData<Channel[]>(["channels"], (old) =>
-        old?.map((c) => (c.id === id ? { ...c, active: newActive } : c))
+      queryClient.setQueriesData<PaginatedResult>(
+        { queryKey: ["channels"] },
+        (old) => {
+          if (!old || !old.data) return old
+
+          return {
+            ...old,
+            data: old.data.map((c) =>
+              c.id === id ? { ...c, active: newActive } : c,
+            ),
+          }
+        },
       )
 
-      return { previousChannels }
+      return { previousQueries }
     },
 
     onError: (_err, _newActive, context) => {
-      // Rollback on error
-      if (context?.previousChannels) {
-        queryClient.setQueryData(["channels"], context.previousChannels)
+      if (context?.previousQueries) {
+        for (const [key, data] of context.previousQueries) {
+          queryClient.setQueryData(key, data)
+        }
       }
     },
 
     onSettled: () => {
       setIsUpdating(false)
+      queryClient.invalidateQueries({ queryKey: ["channels"] })
     },
   })
 

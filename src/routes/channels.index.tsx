@@ -1,12 +1,16 @@
 import { z } from "zod"
 import {
   useMutation,
+  useQuery,
   useSuspenseQuery,
   useQueryClient,
+  keepPreviousData,
 } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import {
   channelsQueryOptions,
+  getGroupTitles,
+  getCountryCodes,
   exportActiveChannelsYaml,
   exportActiveChannelsM3u,
   syncKodiContentIds,
@@ -15,19 +19,78 @@ import { Checkbox } from "@ui/components/checkbox"
 import { Label } from "@ui/components/label"
 import { Button } from "@ui/components/button"
 import { Spinner } from "@ui/components/spinner"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui/components/select"
 import { ChannelRow } from "~/components/ChannelRow"
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react"
+
+const groupTitlesQueryOptions = {
+  queryKey: ["groupTitles"],
+  queryFn: () => getGroupTitles(),
+}
+
+const countryCodesQueryOptions = {
+  queryKey: ["countryCodes"],
+  queryFn: () => getCountryCodes(),
+}
 
 const channelsSearchSchema = z.object({
+  page: z.number().optional().default(1),
   active: z.boolean().optional(),
   favourite: z.boolean().optional(),
-  countries: z.array(z.string().length(2)).optional(),
+  // TanStack Router's built-in parser handles comma-separated arrays
+  // Incoming: "GR,IR" → transform to ["GR","IR"]
+  countries: z
+    .union([z.string(), z.array(z.string())])
+    .transform((val) => {
+      if (typeof val === "string") {
+        return val.split(",").filter(Boolean)
+      }
+      return val
+    })
+    .optional(),
   sortDirection: z.enum(["asc", "desc"]).optional(),
+  groupTitle: z.string().optional(),
 })
 
 export const Route = createFileRoute("/channels/")({
   validateSearch: (search) => channelsSearchSchema.parse(search),
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(channelsQueryOptions()),
+  loaderDeps: ({ search }) => ({
+    page: search.page,
+    sortDirection: search.sortDirection,
+    groupTitle: search.groupTitle,
+    active: search.active,
+    favourite: search.favourite,
+    countries: search.countries,
+  }),
+  loader: async ({ context, deps }) => {
+    const sortDirection = deps.sortDirection ?? "asc"
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        channelsQueryOptions(
+          deps.page,
+          "name",
+          sortDirection,
+          deps.groupTitle,
+          deps.active,
+          deps.favourite,
+          deps.countries,
+        ),
+      ),
+      context.queryClient.ensureQueryData(groupTitlesQueryOptions),
+      context.queryClient.ensureQueryData(countryCodesQueryOptions),
+    ])
+  },
   component: RouteComponent,
 })
 
@@ -47,7 +110,29 @@ function RouteComponent() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const queryClient = useQueryClient()
-  const { data } = useSuspenseQuery(channelsQueryOptions())
+  const page = search.page
+  const sortDirection = search.sortDirection ?? "asc"
+  const groupFilterEnabled = search.groupTitle !== undefined
+
+  const { data: groupTitles } = useSuspenseQuery(groupTitlesQueryOptions)
+  const { data: countryCodes } = useSuspenseQuery(countryCodesQueryOptions)
+
+  const { data: channelsData, isFetching } = useQuery({
+    ...channelsQueryOptions(
+      page,
+      "name",
+      sortDirection,
+      search.groupTitle,
+      search.active,
+      search.favourite,
+      search.countries,
+    ),
+    placeholderData: keepPreviousData,
+  })
+
+  const allChannels = channelsData?.data ?? []
+  const totalCount = channelsData?.totalCount ?? 0
+  const totalPages = Math.ceil(totalCount / 100)
 
   const exportYamlMutation = useMutation({
     mutationFn: exportActiveChannelsYaml,
@@ -57,7 +142,7 @@ function RouteComponent() {
           .map((s) => `• ${s.channel}: ${s.reason}`)
           .join("\n")
         alert(
-          `No channels exported.\n\nChannels need both 'scriptAlias' and 'contentId' to be exported.\n\nSkipped channels:\n${reasons || "No active channels found"}`
+          `No channels exported.\n\nChannels need both 'scriptAlias' and 'contentId' to be exported.\n\nSkipped channels:\n${reasons || "No active channels found"}`,
         )
         return
       }
@@ -69,7 +154,7 @@ function RouteComponent() {
           .map((s) => `• ${s.channel}: ${s.reason}`)
           .join("\n")
         alert(
-          `Exported ${result.count} channel(s).\n\nSkipped ${result.skipped.length} channel(s):\n${reasons}`
+          `Exported ${result.count} channel(s).\n\nSkipped ${result.skipped.length} channel(s):\n${reasons}`,
         )
       }
     },
@@ -96,35 +181,12 @@ function RouteComponent() {
           `Kodi channels: ${result.kodiChannels}\n` +
           `Matched: ${result.matched}\n` +
           `Updated: ${result.updated}\n` +
-          `Skipped (no match): ${result.skipped}`
+          `Skipped (no match): ${result.skipped}`,
       )
     },
     onError: (error) => {
       alert(`Kodi sync failed: ${error.message}`)
     },
-  })
-
-  const uniqueCountries = [
-    ...new Set(data.map((c) => c.countryCode).filter(Boolean)),
-  ].sort() as string[]
-
-  const filteredChannels = data.filter((channel) => {
-    if (search.active && !channel.active) return false
-    if (search.favourite && !channel.favourite) return false
-    if (
-      search.countries?.length &&
-      !search.countries.includes(channel.countryCode ?? "")
-    )
-      return false
-    return true
-  })
-
-  const sortDirection = search.sortDirection ?? "asc"
-  const sortedChannels = [...filteredChannels].sort((a, b) => {
-    const nameA = (a.name || a.tvgName).toLowerCase()
-    const nameB = (b.name || b.tvgName).toLowerCase()
-    const comparison = nameA.localeCompare(nameB)
-    return sortDirection === "desc" ? -comparison : comparison
   })
 
   return (
@@ -138,6 +200,7 @@ function RouteComponent() {
               navigate({
                 search: (prev) => ({
                   ...prev,
+                  page: 1,
                   active: checked === true ? true : undefined,
                 }),
               })
@@ -153,12 +216,60 @@ function RouteComponent() {
               navigate({
                 search: (prev) => ({
                   ...prev,
+                  page: 1,
                   favourite: checked === true ? true : undefined,
                 }),
               })
             }}
           />
           <Label htmlFor="favourite">Favourite only</Label>
+        </div>
+
+        <div className="flex items-center space-x-2 border-l pl-4">
+          <Checkbox
+            id="groupFilter"
+            checked={groupFilterEnabled}
+            onCheckedChange={(checked) => {
+              navigate({
+                search: (prev) => ({
+                  ...prev,
+                  page: 1,
+                  groupTitle: checked === true ? groupTitles[0] : undefined,
+                }),
+              })
+            }}
+          />
+          <Label htmlFor="groupFilter">Group:</Label>
+          <Select
+            value={search.groupTitle ?? ""}
+            onValueChange={(value) => {
+              navigate({
+                search: (prev) => ({
+                  ...prev,
+                  page: 1,
+                  groupTitle: value || undefined,
+                }),
+              })
+            }}
+            disabled={!groupFilterEnabled}
+          >
+            <SelectTrigger
+              size="sm"
+              className="w-48"
+            >
+              <SelectValue placeholder="Select group" />
+            </SelectTrigger>
+            <SelectContent>
+              {groupTitles.map((group) => (
+                <SelectItem
+                  key={group}
+                  value={group}
+                >
+                  {group}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex items-center space-x-2 border-l pl-4">
@@ -169,6 +280,7 @@ function RouteComponent() {
               navigate({
                 search: (prev) => ({
                   ...prev,
+                  page: 1,
                   sortDirection: sortDirection === "asc" ? "desc" : "asc",
                 }),
               })
@@ -228,10 +340,10 @@ function RouteComponent() {
         </div>
       </div>
 
-      {uniqueCountries.length > 0 && (
+      {countryCodes.length > 0 && (
         <div className="flex flex-wrap gap-3 mb-6 p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
           <span className="text-sm font-medium">Countries:</span>
-          {uniqueCountries.map((country) => (
+          {countryCodes.map((country) => (
             <div
               key={country}
               className="flex items-center space-x-1"
@@ -248,6 +360,7 @@ function RouteComponent() {
                         : current.filter((c) => c !== country)
                       return {
                         ...prev,
+                        page: 1,
                         countries: updated.length > 0 ? updated : undefined,
                       }
                     },
@@ -265,19 +378,77 @@ function RouteComponent() {
         </div>
       )}
 
-      <div className="mb-4 text-xl font-bold">Channel List</div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-xl font-bold">Channel List</div>
+        <div className="text-sm text-muted-foreground">
+          Showing {allChannels.length} of {totalCount} channels
+          {isFetching && <span className="ml-2">(Updating...)</span>}
+        </div>
+      </div>
 
-      {sortedChannels.length === 0 ? (
+      {allChannels.length === 0 ? (
         <div>No channels found.</div>
       ) : (
         <ul className="space-y-2">
-          {sortedChannels.map((channel) => (
+          {allChannels.map((channel) => (
             <ChannelRow
               key={channel.id}
               channel={channel}
             />
           ))}
         </ul>
+      )}
+
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: 1 }) })
+            }
+            disabled={page === 1 || isFetching}
+            title="First page"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: page - 1 }) })
+            }
+            disabled={page === 1 || isFetching}
+            title="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-medium w-24 text-center">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: page + 1 }) })
+            }
+            disabled={page === totalPages || isFetching}
+            title="Next page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: totalPages }) })
+            }
+            disabled={page === totalPages || isFetching}
+            title="Last page"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
       )}
     </div>
   )

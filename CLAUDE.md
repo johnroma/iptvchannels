@@ -6,6 +6,7 @@ IPTV Channel Management system with:
 - **Frontend**: TanStack Start (React meta-framework with SSR)
 - **Backend**: Drizzle ORM + PostgreSQL
 - **Styling**: Tailwind CSS v4 + shadcn/ui
+- **Linting**: ESLint flat config + typescript-eslint
 - **Local DB**: Homebrew PostgreSQL (not Docker)
 - **Production DB**: Supabase
 - **Deployment**: Vercel (planned)
@@ -15,21 +16,27 @@ IPTV Channel Management system with:
 ```
 iptvchannels/
 ├── src/
-│   ├── db/              # Drizzle ORM (schema, reset, client)
+│   ├── db/              # Drizzle ORM (schema, validators, reset, client)
+│   │   ├── schema.ts    # Table definitions (channels, media)
+│   │   ├── validators.ts # Zod validation schemas (channelSchema, channelUpdateSchema)
+│   │   ├── index.ts     # DB client + re-exports schema & validators
+│   │   └── reset.ts     # Database reset script
 │   ├── server/          # Server functions (createServerFn)
+│   │   └── channels.ts  # All channel CRUD + export + sync operations
 │   ├── components/      # App components
+│   ├── lib/             # Utilities (m3u-export, yaml-export, m3u-parser)
 │   ├── routes/          # TanStack Start file-based routes
 │   │   ├── __root.tsx   # Root layout (document shell)
 │   │   ├── index.tsx    # Home page
-│   │   ├── channels.index.tsx  # Channel list
-│   │   └── channels.$id.tsx    # Channel detail
-│   ├── styles/          # CSS files (Tailwind)
-│   ├── router.tsx       # TanStack Router + React Query setup
+│   │   ├── channels.index.tsx  # Channel list (paginated, server-filtered)
+│   │   ├── channels.$id.tsx    # Channel detail
+│   │   ├── channels.new.tsx    # Create channel
+│   │   └── edit/$id.tsx        # Edit channel
+│   ├── router.tsx       # TanStack Router + React Query SSR + custom search serialization
 │   └── routeTree.gen.ts # Auto-generated route tree
 ├── packages/ui/         # Shared UI components (shadcn/ui)
-│   ├── components/      # shadcn components (button, input, card, etc.)
+│   ├── components/      # shadcn components (button, input, card, select, switch, etc.)
 │   ├── lib/utils.ts     # cn() helper function
-│   ├── hooks/           # Shared hooks
 │   ├── styles/globals.css  # Tailwind + CSS variables
 │   └── components.json  # shadcn CLI config
 ├── env-profiles/        # Environment files (NOT .env.* at root)
@@ -40,6 +47,7 @@ iptvchannels/
 ├── scripts/             # Database seeding scripts (bash/awk)
 │   ├── seed-channels.sh # Import TV channels from M3U
 │   └── seed-media.sh    # Import movies/series from M3U
+├── eslint.config.mjs    # ESLint flat config (typescript-eslint)
 ├── vite.config.ts
 ├── drizzle.config.ts
 └── pnpm-workspace.yaml
@@ -62,14 +70,10 @@ Tailwind v4 uses the Vite plugin (no config file):
 plugins: [
   tsConfigPaths(),
   tanstackStart(),
+  nitro(),
   viteReact(),
   tailwindcss(),  // @tailwindcss/vite plugin
 ]
-```
-
-```css
-/* src/styles/app.css */
-@import 'tailwindcss';
 ```
 
 ## shadcn/ui Components
@@ -77,8 +81,7 @@ plugins: [
 Components are in `packages/ui/`. To add new components:
 
 ```bash
-cd packages/ui
-pnpm dlx shadcn@latest add button
+pnpm ui:add  # or: cd packages/ui && pnpm dlx shadcn@latest add <component>
 ```
 
 Import in app:
@@ -94,10 +97,10 @@ import { Button } from "@ui/components/button"
 
 **NO app.tsx or ssr.tsx needed!**
 
-### router.tsx with React Query SSR:
+### router.tsx with React Query SSR + Custom Search Serialization:
 ```tsx
 import { QueryClient } from '@tanstack/react-query'
-import { createRouter } from '@tanstack/react-router'
+import { createRouter, parseSearchWith } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import { routeTree } from './routeTree.gen'
 
@@ -108,9 +111,23 @@ export function getRouter() {
     context: { queryClient },
     defaultPreload: 'intent',
     scrollRestoration: true,
+    defaultErrorComponent: DefaultCatchBoundary,
+    defaultNotFoundComponent: () => <NotFound />,
+    // Custom serialization: arrays as repeated params (?countries=GR&countries=IR)
+    stringifySearch: (search) => { /* URLSearchParams-based */ },
+    parseSearch: parseSearchWith((value) => {
+      try { return JSON.parse(value) } catch { return value }
+    }),
   })
-  setupRouterSsrQueryIntegration({ router, queryClient })  // Provides QueryClientProvider!
+  setupRouterSsrQueryIntegration({ router, queryClient })
   return router
+}
+
+declare module '@tanstack/react-router' {
+  // MUST be interface (not type) for module augmentation/declaration merging
+  interface Register {
+    router: ReturnType<typeof getRouter>
+  }
 }
 ```
 
@@ -129,38 +146,105 @@ export const Route = createRootRouteWithContext<{
 
 ## Server Functions Pattern
 
-Server functions live in `src/server/` and use `createServerFn`:
+Server functions live in `src/server/` and use `createServerFn` with Zod input validation:
 
 ```tsx
+import { z } from "zod"
 import { createServerFn } from "@tanstack/react-start"
 import { eq } from "drizzle-orm"
-import { db } from "~/db"
-import { channels } from "~/db/schema"
+import { db, channels } from "~/db"
 
-// List with selected columns for performance
-export const listChannels = createServerFn({ method: "GET" }).handler(
-  async () => {
-    return db.query.channels.findMany({
-      columns: { id: true, tvgName: true },
-    })
-  }
-)
+// Paginated list with server-side filtering
+const listChannelsSchema = z.object({
+  cursor: z.number().optional().default(0),
+  limit: z.number().optional().default(100),
+  sortBy: z.enum(["name", "createdAt"]).optional().default("name"),
+  sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
+  groupTitle: z.string().optional(),
+  active: z.boolean().optional(),
+  favourite: z.boolean().optional(),
+  countries: z.array(z.string()).optional(),
+})
 
-// Get by ID with validation
-export const getChannelById = createServerFn({ method: "GET" })
-  .inputValidator(({ id }) => {
-    if (typeof id === "number" && !Number.isNaN(id)) return id
-    return null
+export const listChannels = createServerFn({ method: "GET" })
+  .inputValidator(listChannelsSchema)
+  .handler(async ({ data: { cursor, limit, ... } }) => {
+    // Build WHERE clause from filters, fetch with pagination
+    return { data: result, totalCount }
   })
+
+// Get by ID (UUID string)
+export const getChannelById = createServerFn({ method: "GET" })
+  .inputValidator((data: string) => typeof data === "string" ? data : null)
   .handler(async ({ data }) => {
     if (data === null) return null
     return db.query.channels.findFirst({
-      where: eq(channels.id, data),  // Use direct eq import!
+      where: eq(channels.id, data),
     })
   })
 ```
 
 **Important**: Always import `eq` directly from `drizzle-orm` and the table from schema. Don't use the callback destructuring pattern.
+
+## Data Fetching Patterns
+
+### Server-Side Filtering & Pagination
+
+All channel filtering (active, favourite, countries, groupTitle) is done server-side. The frontend passes filter params to `channelsQueryOptions` which constructs the query key and calls `listChannels`:
+
+```tsx
+export const channelsQueryOptions = (
+  page: number, sortBy, sortDirection, groupTitle?, active?, favourite?, countries?
+) => queryOptions({
+  queryKey: ["channels", page, sortBy, sortDirection, groupTitle, active, favourite, countries],
+  queryFn: () => listChannels({ data: { cursor: (page - 1) * 100, ... } }),
+})
+```
+
+### Route with loaderDeps + Server-Side Filters
+
+```tsx
+export const Route = createFileRoute("/channels/")({
+  validateSearch: (search) => channelsSearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({ page: search.page, groupTitle: search.groupTitle, ... }),
+  loader: async ({ context, deps }) => {
+    await Promise.all([
+      context.queryClient.ensureQueryData(channelsQueryOptions(deps.page, "name", ...)),
+      context.queryClient.ensureQueryData(groupTitlesQueryOptions),
+      context.queryClient.ensureQueryData(countryCodesQueryOptions),
+    ])
+  },
+})
+```
+
+### Query Strategy
+
+- **Static lookup data** (group titles, country codes): `useSuspenseQuery` + loader prefetch
+- **Paginated channel list**: `useQuery` + `keepPreviousData` (shows stale data while page transitions)
+- **Mutations** (toggle active): optimistic update via `setQueriesData` + `invalidateQueries` on settle
+
+## Validation Schemas
+
+Located at `src/db/validators.ts` (NOT `schema.ts`):
+- `channelSchema` — Zod schema for creating channels (derived from Drizzle schema via `drizzle-zod`)
+- `channelUpdateSchema` — Extends `channelSchema` with required `id: z.uuid()`
+- `COUNTRY_CODES` — ISO 3166-1 Alpha-2 country code const array
+- `CountryCode` — TypeScript type derived from `COUNTRY_CODES`
+
+## Database Schema
+
+Located at `src/db/schema.ts`:
+- `channels` table: Live TV channels (id:uuid, tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
+- `media` table: Movies/series (id:uuid, tvgId, tvgName, tvgLogo, groupTitle, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
+
+## ESLint Configuration
+
+ESLint flat config at `eslint.config.mjs` with `typescript-eslint`:
+- `@typescript-eslint/no-explicit-any`: error
+- `@typescript-eslint/no-unused-vars`: error (ignores `_` prefixed args)
+- `@typescript-eslint/consistent-type-definitions`: error, prefer `type` over `interface`
+
+**Exception**: TanStack Router's `Register` declaration MUST use `interface` for module augmentation. Use `// eslint-disable-next-line` there.
 
 ## NPM Scripts
 
@@ -168,6 +252,14 @@ export const getChannelById = createServerFn({ method: "GET" })
 # Development
 pnpm dev              # Run with local.env (kills existing port 3000 first)
 pnpm dev:prod         # Run with prod.env (Supabase data)
+pnpm build            # Production build
+pnpm preview          # Preview production build
+pnpm start            # Start production server
+pnpm test             # Run tests (vitest watch)
+pnpm test:run         # Run tests once
+
+# UI components
+pnpm ui:add           # Add shadcn component to packages/ui
 
 # Database schema
 pnpm db:push          # Push schema to local DB
@@ -198,20 +290,14 @@ pnpm sb:status        # Check Supabase table stats
 
 Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and uses `--strictPort` to fail if port is still busy.
 
-## Database Schema
-
-Located at `src/db/schema.ts`:
-- `channels` table: Live TV channels (tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
-- `media` table: Movies/series (tvgId, tvgName, tvgLogo, groupTitle, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
-
-Validation schemas use Zod (see `src/db/schema.ts` for `channelInputSchema`).
-
 ## Key Patterns
 
 1. **Environment switching**: Use `dotenv -e env-profiles/<profile>.env --` prefix
 2. **Local = disposable**: Local DB can be reset. Production is source of truth.
 3. **Supabase CLI**: Always use `pnpm supabase` to ensure token is loaded
 4. **No Docker**: Uses local Homebrew PostgreSQL (`john@localhost:5432/iptvchannels`)
+5. **Server-side filtering**: Active, favourite, countries, groupTitle are all server-side WHERE clauses — not client-side filters
+6. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
 
 ## Common Mistakes to Avoid
 
@@ -222,6 +308,8 @@ Validation schemas use Zod (see `src/db/schema.ts` for `channelInputSchema`).
 5. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
 6. Do NOT run multiple vite dev servers - `predev` script handles this automatically
 7. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
+8. Do NOT use `type` for TanStack Router's `Register` declaration - must be `interface` for module augmentation (add eslint-disable comment)
+9. Do NOT filter channels client-side for active/favourite/countries/group - these are server-side filters passed to `listChannels`
 
 ## GitHub Repository
 
