@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react"
+import { FormEvent, useState, useEffect } from "react"
 import { useServerFn } from "@tanstack/react-start"
 import { type Channel } from "~/db/schema"
 import { type CountryCode } from "~/db/validators"
@@ -25,6 +25,7 @@ const defaultFormData = {
   tvgName: "",
   tvgLogo: "",
   groupTitle: "",
+  groupTitleAlias: "",
   streamUrl: "",
   contentId: null as number | null,
   name: "",
@@ -43,27 +44,50 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
   const updateChannelFn = useServerFn(updateChannelForId)
   const createChannelFn = useServerFn(createChannel)
 
-  const [formData, setFormData] = useState(
-    channel
-      ? {
-          tvgId: channel.tvgId || "",
-          tvgName: channel.tvgName,
-          tvgLogo: channel.tvgLogo || "",
-          groupTitle: channel.groupTitle || "",
-          streamUrl: channel.streamUrl || "",
-          contentId: channel.contentId,
-          name: channel.name || "",
-          countryCode: channel.countryCode || "",
-          favourite: channel.favourite ?? false,
-          active: channel.active ?? false,
-          scriptAlias: channel.scriptAlias || "",
-        }
-      : defaultFormData
-  )
+  // Initialize form state
+  const [formData, setFormData] = useState(() => {
+    if (channel) {
+      return {
+        tvgId: channel.tvgId || "",
+        tvgName: channel.tvgName,
+        tvgLogo: channel.tvgLogo || "",
+        groupTitle: channel.groupTitle || "",
+        groupTitleAlias: channel.groupTitleAlias || "",
+        streamUrl: channel.streamUrl || "",
+        contentId: channel.contentId,
+        name: channel.name || "",
+        countryCode: channel.countryCode || "",
+        favourite: channel.favourite ?? false,
+        active: channel.active ?? false,
+        scriptAlias: channel.scriptAlias || "",
+      }
+    }
+    return defaultFormData
+  })
+
+  // Keep form state in sync with channel prop
+  useEffect(() => {
+    if (channel) {
+      setFormData({
+        tvgId: channel.tvgId || "",
+        tvgName: channel.tvgName,
+        tvgLogo: channel.tvgLogo || "",
+        groupTitle: channel.groupTitle || "",
+        groupTitleAlias: channel.groupTitleAlias || "",
+        streamUrl: channel.streamUrl || "",
+        contentId: channel.contentId,
+        name: channel.name || "",
+        countryCode: channel.countryCode || "",
+        favourite: channel.favourite ?? false,
+        active: channel.active ?? false,
+        scriptAlias: channel.scriptAlias || "",
+      })
+    }
+  }, [channel])
 
   function updateField<K extends keyof typeof formData>(
     field: K,
-    value: (typeof formData)[K]
+    value: (typeof formData)[K],
   ) {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (error) setError(null)
@@ -77,6 +101,7 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
     try {
       const submitData = {
         ...formData,
+        groupTitleAlias: formData.groupTitleAlias || null,
         countryCode: (formData.countryCode || undefined) as
           | CountryCode
           | undefined,
@@ -106,7 +131,10 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
   const loadingText = mode === "edit" ? "Saving..." : "Creating..."
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+    >
       {error && (
         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
           {error}
@@ -148,6 +176,16 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               value={formData.groupTitle}
               onChange={(e) => updateField("groupTitle", e.target.value)}
               placeholder="e.g., US| ENTERTAINMENT"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="groupTitleAlias">Group Alias</Label>
+            <Input
+              id="groupTitleAlias"
+              value={formData.groupTitleAlias}
+              onChange={(e) => updateField("groupTitleAlias", e.target.value)}
+              placeholder="e.g., USA Entertainment"
             />
           </div>
 
@@ -198,7 +236,10 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               id="countryCode"
               value={formData.countryCode}
               onChange={(e) =>
-                updateField("countryCode", e.target.value.toUpperCase().slice(0, 2))
+                updateField(
+                  "countryCode",
+                  e.target.value.toUpperCase().slice(0, 2),
+                )
               }
               placeholder="e.g., US, UK, SE"
               maxLength={2}
@@ -214,7 +255,7 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               onChange={(e) =>
                 updateField(
                   "contentId",
-                  e.target.value ? parseInt(e.target.value, 10) : null
+                  e.target.value ? parseInt(e.target.value, 10) : null,
                 )
               }
               placeholder="e.g., 123"
@@ -262,7 +303,10 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
 
       {/* Submit */}
       <div className="flex justify-end gap-2">
-        <Button type="submit" disabled={isLoading}>
+        <Button
+          type="submit"
+          disabled={isLoading}
+        >
           {isLoading ? loadingText : buttonText}
         </Button>
       </div>

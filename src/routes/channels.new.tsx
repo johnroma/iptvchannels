@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useQueryClient } from "@tanstack/react-query"
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
 import { ChannelForm } from "~/components/ChannelForm"
 
 export const Route = createFileRoute("/channels/new")({
@@ -7,11 +8,15 @@ export const Route = createFileRoute("/channels/new")({
 
 function PageAddChannel() {
   const navigate = useNavigate()
+  const router = useRouter()
+  const queryClient = useQueryClient()
 
   return (
     <ChannelForm
       mode="create"
-      onChannelSave={(created) => {
+      onChannelSave={async (created) => {
+        await queryClient.invalidateQueries({ queryKey: ["channels"] })
+        await router.invalidate()
         navigate({ to: "/channels/$id", params: { id: created.id } })
       }}
     />

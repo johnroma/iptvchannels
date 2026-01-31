@@ -1,5 +1,6 @@
 #!/bin/bash
 # Seed TV channels from M3U (stops at first .mp4/.mkv)
+# Uses staging table pattern for normalized group_titles FK
 # Usage: ./scripts/seed-channels.sh [local|prod] [m3u-file]
 
 set -e
@@ -121,11 +122,41 @@ fi
 echo "🗑️  Truncating channels table..."
 psql "$DATABASE_URL" -c "TRUNCATE TABLE channels RESTART IDENTITY CASCADE;"
 
-echo "📥 Importing channels via COPY..."
-psql "$DATABASE_URL" -c "\COPY channels(tvg_id, tvg_name, tvg_logo, group_title, stream_url) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')"
+echo "📥 Creating staging table and importing..."
+psql "$DATABASE_URL" <<EOF
+-- Create staging table with raw text group_title
+CREATE TEMP TABLE channels_staging (
+  tvg_id TEXT,
+  tvg_name TEXT NOT NULL,
+  tvg_logo TEXT,
+  group_title TEXT,
+  stream_url TEXT
+);
 
-# Set defaults for columns not in CSV
-psql "$DATABASE_URL" -c "UPDATE channels SET name = tvg_name, active = false, favourite = false WHERE name IS NULL;"
+-- Import raw data
+\COPY channels_staging(tvg_id, tvg_name, tvg_logo, group_title, stream_url) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')
+
+-- Insert distinct group titles (upsert)
+INSERT INTO group_titles (name)
+SELECT DISTINCT group_title FROM channels_staging WHERE group_title IS NOT NULL AND group_title != ''
+ON CONFLICT (name) DO NOTHING;
+
+-- Insert channels with FK lookup
+INSERT INTO channels (tvg_id, tvg_name, tvg_logo, group_title_id, stream_url, name, active, favourite)
+SELECT
+  s.tvg_id,
+  s.tvg_name,
+  s.tvg_logo,
+  g.id,
+  s.stream_url,
+  s.tvg_name,  -- default name to tvg_name
+  false,       -- default active
+  false        -- default favourite
+FROM channels_staging s
+LEFT JOIN group_titles g ON s.group_title = g.name;
+
+-- Staging table auto-drops at end of session
+EOF
 
 echo "✅ Imported $CHANNEL_COUNT channels!"
 rm -f "$CSV_FILE"

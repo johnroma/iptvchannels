@@ -17,9 +17,9 @@ IPTV Channel Management system with:
 iptvchannels/
 ├── src/
 │   ├── db/              # Drizzle ORM (schema, validators, reset, client)
-│   │   ├── schema.ts    # Table definitions (channels, media)
+│   │   ├── schema.ts    # Table definitions (group_titles, channels, media) + relations
 │   │   ├── validators.ts # Zod validation schemas (channelSchema, channelUpdateSchema)
-│   │   ├── index.ts     # DB client + re-exports schema & validators
+│   │   ├── index.ts     # Lazy-init DB client (Proxy pattern) + re-exports
 │   │   └── reset.ts     # Database reset script
 │   ├── server/          # Server functions (createServerFn)
 │   │   └── channels.ts  # All channel CRUD + export + sync operations
@@ -151,16 +151,16 @@ Server functions live in `src/server/` and use `createServerFn` with Zod input v
 ```tsx
 import { z } from "zod"
 import { createServerFn } from "@tanstack/react-start"
-import { eq } from "drizzle-orm"
-import { db, channels } from "~/db"
+import { eq, sql } from "drizzle-orm"
+import { db, channels, groupTitles } from "~/db"
 
-// Paginated list with server-side filtering
+// Paginated list with server-side filtering and JOINs
 const listChannelsSchema = z.object({
   cursor: z.number().optional().default(0),
   limit: z.number().optional().default(100),
   sortBy: z.enum(["name", "createdAt"]).optional().default("name"),
   sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
-  groupTitle: z.string().optional(),
+  groupTitleId: z.coerce.number().optional(),
   active: z.boolean().optional(),
   favourite: z.boolean().optional(),
   countries: z.array(z.string()).optional(),
@@ -169,36 +169,45 @@ const listChannelsSchema = z.object({
 export const listChannels = createServerFn({ method: "GET" })
   .inputValidator(listChannelsSchema)
   .handler(async ({ data: { cursor, limit, ... } }) => {
-    // Build WHERE clause from filters, fetch with pagination
+    // Uses explicit .select() with LEFT JOIN to group_titles
+    // COALESCE(alias, name) resolves group title display name
     return { data: result, totalCount }
   })
 
-// Get by ID (UUID string)
+// Get by ID (UUID string) — JOIN to resolve group title
 export const getChannelById = createServerFn({ method: "GET" })
   .inputValidator((data: string) => typeof data === "string" ? data : null)
   .handler(async ({ data }) => {
     if (data === null) return null
-    return db.query.channels.findFirst({
-      where: eq(channels.id, data),
-    })
+    // Uses .select() with LEFT JOIN to get groupTitle + groupTitleAlias
+    return result[0] ?? null
   })
 ```
 
-**Important**: Always import `eq` directly from `drizzle-orm` and the table from schema. Don't use the callback destructuring pattern.
+**Important**: Always import `eq` directly from `drizzle-orm` and the table from schema. Don't use the callback destructuring pattern. Use explicit `.select()` with JOINs instead of `db.query.*.findMany()` when resolving FK relationships.
 
 ## Data Fetching Patterns
 
 ### Server-Side Filtering & Pagination
 
-All channel filtering (active, favourite, countries, groupTitle) is done server-side. The frontend passes filter params to `channelsQueryOptions` which constructs the query key and calls `listChannels`:
+All channel filtering (active, favourite, countries, groupTitleId) is done server-side. The frontend passes filter params to `channelsQueryOptions` which constructs the query key and calls `listChannels`:
 
 ```tsx
-export const channelsQueryOptions = (
-  page: number, sortBy, sortDirection, groupTitle?, active?, favourite?, countries?
-) => queryOptions({
-  queryKey: ["channels", page, sortBy, sortDirection, groupTitle, active, favourite, countries],
-  queryFn: () => listChannels({ data: { cursor: (page - 1) * 100, ... } }),
-})
+type ChannelsQueryOptions = {
+  page?: number
+  sortBy?: "name" | "createdAt"
+  sortDirection?: "asc" | "desc"
+  groupTitleId?: number          // FK to group_titles (not the string name)
+  active?: boolean
+  favourite?: boolean
+  countries?: string[]
+}
+
+export const channelsQueryOptions = (options: ChannelsQueryOptions = {}) =>
+  queryOptions({
+    queryKey: ["channels", page, sortBy, sortDirection, groupTitleId, active, favourite, countries],
+    queryFn: () => listChannels({ data: { cursor: (page - 1) * 100, ... } }),
+  })
 ```
 
 ### Route with loaderDeps + Server-Side Filters
@@ -206,10 +215,10 @@ export const channelsQueryOptions = (
 ```tsx
 export const Route = createFileRoute("/channels/")({
   validateSearch: (search) => channelsSearchSchema.parse(search),
-  loaderDeps: ({ search }) => ({ page: search.page, groupTitle: search.groupTitle, ... }),
+  loaderDeps: ({ search }) => ({ page: search.page, groupTitleId: search.groupTitleId, ... }),
   loader: async ({ context, deps }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(channelsQueryOptions(deps.page, "name", ...)),
+      context.queryClient.ensureQueryData(channelsQueryOptions({ page: deps.page, sortBy: "name", ... })),
       context.queryClient.ensureQueryData(groupTitlesQueryOptions),
       context.queryClient.ensureQueryData(countryCodesQueryOptions),
     ])
@@ -220,22 +229,40 @@ export const Route = createFileRoute("/channels/")({
 ### Query Strategy
 
 - **Static lookup data** (group titles, country codes): `useSuspenseQuery` + loader prefetch
+- **Group titles**: `getGroupTitles` returns `{id, name, alias}[]` — frontend uses `id` for filtering, `name`/`alias` for display
 - **Paginated channel list**: `useQuery` + `keepPreviousData` (shows stale data while page transitions)
 - **Mutations** (toggle active): optimistic update via `setQueriesData` + `invalidateQueries` on settle
+- **After create/edit**: `invalidateQueries({ queryKey: ["channels"] })` + `router.invalidate()` to refresh both React Query cache and router loaders
 
 ## Validation Schemas
 
 Located at `src/db/validators.ts` (NOT `schema.ts`):
-- `channelSchema` — Zod schema for creating channels (derived from Drizzle schema via `drizzle-zod`)
-- `channelUpdateSchema` — Extends `channelSchema` with required `id: z.uuid()`
+- `channelSchema` — Zod schema for creating channels (derived from Drizzle schema via `drizzle-zod`). Accepts `groupTitle` as string and `groupTitleId` as number — server resolves string to FK via upsert.
+- `channelUpdateSchema` — Extends `channelSchema` with `id: z.uuid()` and `groupTitleAlias: z.string()` (for updating the alias on the group_titles lookup row)
 - `COUNTRY_CODES` — ISO 3166-1 Alpha-2 country code const array
 - `CountryCode` — TypeScript type derived from `COUNTRY_CODES`
 
 ## Database Schema
 
-Located at `src/db/schema.ts`:
-- `channels` table: Live TV channels (id:uuid, tvgId, tvgName, tvgLogo, groupTitle, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
-- `media` table: Movies/series (id:uuid, tvgId, tvgName, tvgLogo, groupTitle, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
+Located at `src/db/schema.ts`. Group titles are normalized into a lookup table shared by channels and media.
+
+- `group_titles` table: Normalized lookup (id:serial PK, name:text UNIQUE, alias:text). `name` is the original M3U value (e.g., "US| ENTERTAINMENT"), `alias` is an optional friendly override (e.g., "Entertainment"). Changing an alias updates it for all linked channels/media.
+- `channels` table: Live TV channels (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
+- `media` table: Movies/series (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, groupTitle:text, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
+
+### Channel Type
+
+The `Channel` type used by the frontend is NOT a raw DB row — it includes resolved group data via JOINs:
+
+```tsx
+type ChannelRow = typeof channels.$inferSelect
+export type Channel = ChannelRow & {
+  groupTitle: string | null      // Resolved from group_titles.name (or COALESCE with alias)
+  groupTitleAlias: string | null // From group_titles.alias
+}
+```
+
+Drizzle relations are defined for `db.query` with `with` support (`channelsRelations`, `mediaRelations`).
 
 ## ESLint Configuration
 
@@ -296,7 +323,9 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 2. **Local = disposable**: Local DB can be reset. Production is source of truth.
 3. **Supabase CLI**: Always use `pnpm supabase` to ensure token is loaded
 4. **No Docker**: Uses local Homebrew PostgreSQL (`john@localhost:5432/iptvchannels`)
-5. **Server-side filtering**: Active, favourite, countries, groupTitle are all server-side WHERE clauses — not client-side filters
+5. **Server-side filtering**: Active, favourite, countries, groupTitleId are all server-side WHERE clauses — not client-side filters
+6. **Normalized group titles**: `group_titles` table is shared by `channels` and `media` via FK. Alias changes propagate to all linked rows. Server functions resolve `groupTitle` string → FK via upsert.
+7. **Lazy DB initialization**: `src/db/index.ts` uses a Proxy that lazily initializes the Drizzle client on first access, preventing client-side import errors in SSR
 6. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
 
 ## Common Mistakes to Avoid
@@ -310,6 +339,9 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 7. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
 8. Do NOT use `type` for TanStack Router's `Register` declaration - must be `interface` for module augmentation (add eslint-disable comment)
 9. Do NOT filter channels client-side for active/favourite/countries/group - these are server-side filters passed to `listChannels`
+10. Do NOT use `groupTitle` string for filtering in the frontend — use `groupTitleId` (FK integer) which is faster and avoids a JOIN
+11. Do NOT use `db.query.channels.findMany()` when you need resolved group title data — use explicit `.select()` with LEFT JOIN to `group_titles`
+12. Do NOT import `db` at module top-level in files that may run on the client — the Proxy will throw. Only use `db` inside server functions.
 
 ## GitHub Repository
 

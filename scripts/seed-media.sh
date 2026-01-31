@@ -1,5 +1,6 @@
 #!/bin/bash
 # Seed movies/series from M3U (.mp4/.mkv entries only)
+# Uses staging table pattern for normalized group_titles FK
 # Usage: ./scripts/seed-media.sh [local|prod] [m3u-file]
 
 set -e
@@ -161,11 +162,49 @@ fi
 echo "🗑️  Truncating media table..."
 psql "$DATABASE_URL" -c "TRUNCATE TABLE media RESTART IDENTITY CASCADE;"
 
-echo "📥 Importing media via COPY (this may take a while for large datasets)..."
-psql "$DATABASE_URL" -c "\COPY media(tvg_id, tvg_name, tvg_logo, group_title, stream_url, media_type, year, season, episode) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')"
+echo "📥 Creating staging table and importing (this may take a while for large datasets)..."
+psql "$DATABASE_URL" <<EOF
+-- Create staging table with raw text group_title
+CREATE TEMP TABLE media_staging (
+  tvg_id TEXT,
+  tvg_name TEXT NOT NULL,
+  tvg_logo TEXT,
+  group_title TEXT,
+  stream_url TEXT,
+  media_type TEXT,
+  year INTEGER,
+  season INTEGER,
+  episode INTEGER
+);
 
-# Set defaults for columns not in CSV
-psql "$DATABASE_URL" -c "UPDATE media SET name = tvg_name, active = false, favourite = false WHERE name IS NULL;"
+-- Import raw data
+\COPY media_staging(tvg_id, tvg_name, tvg_logo, group_title, stream_url, media_type, year, season, episode) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')
+
+-- Insert distinct group titles (upsert) - may already exist from channels
+INSERT INTO group_titles (name)
+SELECT DISTINCT group_title FROM media_staging WHERE group_title IS NOT NULL AND group_title != ''
+ON CONFLICT (name) DO NOTHING;
+
+-- Insert media with FK lookup
+INSERT INTO media (tvg_id, tvg_name, tvg_logo, group_title_id, stream_url, media_type, year, season, episode, name, active, favourite)
+SELECT
+  s.tvg_id,
+  s.tvg_name,
+  s.tvg_logo,
+  g.id,
+  s.stream_url,
+  s.media_type,
+  s.year,
+  s.season,
+  s.episode,
+  s.tvg_name,  -- default name to tvg_name
+  false,       -- default active
+  false        -- default favourite
+FROM media_staging s
+LEFT JOIN group_titles g ON s.group_title = g.name;
+
+-- Staging table auto-drops at end of session
+EOF
 
 echo "✅ Imported $MEDIA_COUNT media entries!"
 rm -f "$CSV_FILE"

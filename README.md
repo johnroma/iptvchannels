@@ -19,9 +19,9 @@ iptvchannels/
 │   ├── components/             # App-specific components
 │   ├── server/                 # Server functions (createServerFn)
 │   ├── db/                     # Drizzle schema & client
-│   │   ├── schema.ts           # Database schema (channels, media)
+│   │   ├── schema.ts           # Database schema (group_titles, channels, media) + relations
 │   │   ├── validators.ts       # Zod validation schemas
-│   │   ├── index.ts            # Database client + re-exports
+│   │   ├── index.ts            # Lazy-init DB client (Proxy) + re-exports
 │   │   └── reset.ts            # Database reset script
 │   ├── lib/                    # Shared utilities (m3u-export, yaml-export, m3u-parser)
 │   ├── router.tsx              # Router + React Query SSR + custom search serialization
@@ -77,7 +77,17 @@ Set `DATABASE_URL` in Vercel environment variables to the Supabase connection st
 
 ## Database Schema
 
-The `channels` table stores IPTV channel data:
+### `group_titles` — Normalized lookup table
+
+Shared by `channels` and `media`. Changing an alias here updates it for all linked rows.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | serial | Primary key |
+| `name` | text | Original M3U value, UNIQUE (e.g., "US\| ENTERTAINMENT") |
+| `alias` | text | Optional friendly override (e.g., "Entertainment") |
+
+### `channels` — IPTV channel data
 
 | Column | Type | Source | Description |
 |--------|------|--------|-------------|
@@ -85,7 +95,7 @@ The `channels` table stores IPTV channel data:
 | `tvg_id` | text | M3U | EPG identifier |
 | `tvg_name` | text | M3U | Channel name (e.g., "US\| ABC HD") |
 | `tvg_logo` | text | M3U | Logo URL |
-| `group_title` | text | M3U | Category (e.g., "US\| ENTERTAINMENT") |
+| `group_title_id` | integer | M3U/FK | FK → `group_titles.id` |
 | `stream_url` | text | M3U | Stream URL |
 | `content_id` | integer | Kodi | Kodi channel ID for playback |
 | `name` | text | CMS | Custom display name |
@@ -189,7 +199,8 @@ Each seed script truncates its own table before importing - no separate reset ne
 - Seed scripts expect M3U file at `../assets/seedchannels.m3u`
 - `db:seed:channels` processes live TV (stops at first .mp4/.mkv)
 - `db:seed:media` processes movies/series (.mp4/.mkv only)
-- Uses PostgreSQL COPY for fast bulk import
+- Uses staging table pattern: COPY raw data → INSERT DISTINCT group titles → INSERT with FK JOIN
+- Group titles are shared: both seed scripts upsert into the same `group_titles` table
 
 **Empty tables without reseeding (rarely needed):**
 ```bash

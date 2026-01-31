@@ -60,7 +60,7 @@ const channelsSearchSchema = z.object({
     })
     .optional(),
   sortDirection: z.enum(["asc", "desc"]).optional(),
-  groupTitle: z.string().optional(),
+  groupTitleId: z.coerce.number().optional(),
 })
 
 export const Route = createFileRoute("/channels/")({
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/channels/")({
   loaderDeps: ({ search }) => ({
     page: search.page,
     sortDirection: search.sortDirection,
-    groupTitle: search.groupTitle,
+    groupTitleId: search.groupTitleId,
     active: search.active,
     favourite: search.favourite,
     countries: search.countries,
@@ -77,15 +77,15 @@ export const Route = createFileRoute("/channels/")({
     const sortDirection = deps.sortDirection ?? "asc"
     await Promise.all([
       context.queryClient.ensureQueryData(
-        channelsQueryOptions(
-          deps.page,
-          "name",
+        channelsQueryOptions({
+          page: deps.page,
+          sortBy: "name",
           sortDirection,
-          deps.groupTitle,
-          deps.active,
-          deps.favourite,
-          deps.countries,
-        ),
+          groupTitleId: deps.groupTitleId,
+          active: deps.active,
+          favourite: deps.favourite,
+          countries: deps.countries,
+        }),
       ),
       context.queryClient.ensureQueryData(groupTitlesQueryOptions),
       context.queryClient.ensureQueryData(countryCodesQueryOptions),
@@ -112,21 +112,21 @@ function RouteComponent() {
   const queryClient = useQueryClient()
   const page = search.page
   const sortDirection = search.sortDirection ?? "asc"
-  const groupFilterEnabled = search.groupTitle !== undefined
+  const groupFilterEnabled = search.groupTitleId !== undefined
 
   const { data: groupTitles } = useSuspenseQuery(groupTitlesQueryOptions)
   const { data: countryCodes } = useSuspenseQuery(countryCodesQueryOptions)
 
   const { data: channelsData, isFetching } = useQuery({
-    ...channelsQueryOptions(
+    ...channelsQueryOptions({
       page,
-      "name",
+      sortBy: "name",
       sortDirection,
-      search.groupTitle,
-      search.active,
-      search.favourite,
-      search.countries,
-    ),
+      groupTitleId: search.groupTitleId,
+      active: search.active,
+      favourite: search.favourite,
+      countries: search.countries,
+    }),
     placeholderData: keepPreviousData,
   })
 
@@ -230,24 +230,25 @@ function RouteComponent() {
             id="groupFilter"
             checked={groupFilterEnabled}
             onCheckedChange={(checked) => {
+              const firstGroup = groupTitles[0]
               navigate({
                 search: (prev) => ({
                   ...prev,
                   page: 1,
-                  groupTitle: checked === true ? groupTitles[0] : undefined,
+                  groupTitleId: checked ? firstGroup?.id : undefined,
                 }),
               })
             }}
           />
           <Label htmlFor="groupFilter">Group:</Label>
           <Select
-            value={search.groupTitle ?? ""}
+            value={search.groupTitleId?.toString() ?? ""}
             onValueChange={(value) => {
               navigate({
                 search: (prev) => ({
                   ...prev,
                   page: 1,
-                  groupTitle: value || undefined,
+                  groupTitleId: value ? parseInt(value, 10) : undefined,
                 }),
               })
             }}
@@ -262,10 +263,10 @@ function RouteComponent() {
             <SelectContent>
               {groupTitles.map((group) => (
                 <SelectItem
-                  key={group}
-                  value={group}
+                  key={group.id}
+                  value={group.id.toString()}
                 >
-                  {group}
+                  {group.name}
                 </SelectItem>
               ))}
             </SelectContent>
