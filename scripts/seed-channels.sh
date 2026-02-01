@@ -8,7 +8,13 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$PROJECT_ROOT/../assets"
-M3U_FILE="${2:-$ASSETS_DIR/seedchannels.m3u}"
+
+if [[ -z "$2" ]]; then
+  echo "Usage: $0 [local|prod] [m3u-file]"
+  exit 1
+fi
+
+M3U_FILE="$2"
 CSV_FILE="/tmp/channels_import.csv"
 
 ENV="${1:-local}"
