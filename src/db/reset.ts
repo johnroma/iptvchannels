@@ -15,8 +15,9 @@ async function main() {
     // Truncate in order: children first (CASCADE handles FK constraints)
     await sql`TRUNCATE TABLE "channels" RESTART IDENTITY CASCADE`
     await sql`TRUNCATE TABLE "media" RESTART IDENTITY CASCADE`
+    await sql`TRUNCATE TABLE "series" RESTART IDENTITY CASCADE`
     await sql`TRUNCATE TABLE "group_titles" RESTART IDENTITY CASCADE`
-    console.log("✅ Tables emptied (channels, media, group_titles).")
+    console.log("✅ Tables emptied (channels, media, series, group_titles).")
   } catch (err) {
     console.error("❌ Reset failed:", err)
   } finally {

@@ -1,6 +1,6 @@
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
-import { channels, media } from "./schema"
+import { channels, media, series } from "./schema"
 
 // ISO 3166-1 Alpha-2 country codes
 // Source: https://www.iban.com/country-codes
@@ -317,10 +317,45 @@ export const mediaSchema = mediaBaseSchema
     year: z.coerce.number().int().min(1888).max(2100).optional().nullable(),
     season: z.coerce.number().int().min(0).optional().nullable(),
     episode: z.coerce.number().int().min(0).optional().nullable(),
+    seriesId: z.string().uuid().optional().nullable(),
   })
 
 // Update schema includes the id
 export const mediaUpdateSchema = mediaSchema.extend({
   id: z.uuid(),
   groupTitleAlias: z.string().optional().nullable(),
+})
+
+// --- Series Validators ---
+
+const seriesBaseSchema = createInsertSchema(series)
+
+export const seriesSchema = seriesBaseSchema
+  .omit({ id: true, createdAt: true, updatedAt: true })
+  .extend({
+    tvgName: z.string().min(1, { error: "Display name is required" }),
+    tvgLogo: z
+      .union([z.url(), z.literal("")])
+      .optional()
+      .nullable(),
+    groupTitle: z.string().optional().nullable(),
+    groupTitleId: z.number().optional().nullable(),
+  })
+
+const episodeSchema = z.object({
+  id: z.string().uuid().optional(),
+  season: z.coerce.number().int().min(0).optional().nullable(),
+  episode: z.coerce.number().int().min(0).optional().nullable(),
+  year: z.coerce.number().int().min(1888).max(2100).optional().nullable(),
+  streamUrl: z
+    .union([z.url(), z.literal("")])
+    .optional()
+    .nullable(),
+  name: z.string().optional().nullable(),
+})
+
+export const seriesUpdateSchema = seriesSchema.extend({
+  id: z.uuid(),
+  groupTitleAlias: z.string().optional().nullable(),
+  episodes: z.array(episodeSchema).optional(),
 })

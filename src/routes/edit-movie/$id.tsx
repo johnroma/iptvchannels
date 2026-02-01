@@ -6,31 +6,31 @@ import {
   useRouter,
 } from "@tanstack/react-router"
 import { type Media } from "~/db/schema"
-import { MediaForm } from "~/components/MediaForm"
+import { MovieForm } from "~/components/MovieForm"
 import { getStreamById } from "~/server/shared"
 
-export const Route = createFileRoute("/edit-media/$id")({
-  component: PageEditMedia,
+export const Route = createFileRoute("/edit-movie/$id")({
+  component: PageEditMovie,
   loader: async ({ params }): Promise<Media> => {
     const id = params.id
-    const mediaData = await getStreamById({ data: { id, table: "media" } })
-    if (!mediaData) {
+    const movieData = await getStreamById({ data: { id, table: "media" } })
+    if (!movieData) {
       throw notFound()
     }
-    return mediaData as Media
+    return movieData as Media
   },
 })
 
-function PageEditMedia() {
-  const media = Route.useLoaderData()
+function PageEditMovie() {
+  const movie = Route.useLoaderData()
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
 
   return (
-    <MediaForm
+    <MovieForm
       mode="edit"
-      media={media}
+      media={movie}
       onMediaSave={async (updated) => {
         await queryClient.invalidateQueries({ queryKey: ["media"] })
         await router.invalidate()
@@ -41,7 +41,7 @@ function PageEditMedia() {
         ) {
           router.history.back()
         } else {
-          navigate({ to: "/media/$id", params: { id: updated.id } })
+          navigate({ to: "/movies/$id", params: { id: updated.id } })
         }
       }}
     />

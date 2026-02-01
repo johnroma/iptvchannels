@@ -78,17 +78,31 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
             </a>
             <span className="mx-2">|</span>
             <a
-              href="/media"
+              href="/movies"
               className="text-blue-600"
             >
-              Media
+              Movies
             </a>
             <span className="mx-2">|</span>
             <a
-              href="/media/new"
+              href="/movies/new"
               className="text-blue-600"
             >
-              Add Media
+              Add Movie
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/series"
+              className="text-blue-600"
+            >
+              Series
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/series/new"
+              className="text-blue-600"
+            >
+              Add Series
             </a>
           </nav>
           <h1 className="text-3xl font-bold">IPTV Channels Management</h1>

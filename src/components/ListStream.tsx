@@ -1,5 +1,4 @@
 import { type ReactNode } from "react"
-import { type TableKey } from "~/server/shared"
 import { ActiveSwitch } from "./ActiveSwitch"
 
 export type Stream = {
@@ -12,7 +11,8 @@ export type Stream = {
 type ListStreamProps = {
   item: Stream
   editHref: string
-  queryKey: TableKey
+  queryKey: string
+  onToggle?: (id: string, active: boolean) => Promise<unknown>
   children?: ReactNode
 }
 
@@ -20,6 +20,7 @@ export function ListStream({
   item,
   editHref,
   queryKey,
+  onToggle,
   children,
 }: Readonly<ListStreamProps>) {
   return (
@@ -30,6 +31,7 @@ export function ListStream({
           active={item.active}
           label={item.tvgName}
           queryKey={queryKey}
+          onToggle={onToggle}
         />
       </div>
       {item.name && (

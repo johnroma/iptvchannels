@@ -10,12 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as MediaIndexRouteImport } from './routes/media.index'
+import { Route as SeriesIndexRouteImport } from './routes/series.index'
+import { Route as MoviesIndexRouteImport } from './routes/movies.index'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
-import { Route as MediaNewRouteImport } from './routes/media.new'
-import { Route as MediaIdRouteImport } from './routes/media.$id'
+import { Route as SeriesNewRouteImport } from './routes/series.new'
+import { Route as SeriesIdRouteImport } from './routes/series.$id'
+import { Route as MoviesNewRouteImport } from './routes/movies.new'
+import { Route as MoviesIdRouteImport } from './routes/movies.$id'
 import { Route as EditIdRouteImport } from './routes/edit/$id'
-import { Route as EditMediaIdRouteImport } from './routes/edit-media/$id'
+import { Route as EditSeriesIdRouteImport } from './routes/edit-series/$id'
+import { Route as EditMovieIdRouteImport } from './routes/edit-movie/$id'
 import { Route as ChannelsNewRouteImport } from './routes/channels.new'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 
@@ -24,9 +28,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MediaIndexRoute = MediaIndexRouteImport.update({
-  id: '/media/',
-  path: '/media/',
+const SeriesIndexRoute = SeriesIndexRouteImport.update({
+  id: '/series/',
+  path: '/series/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesIndexRoute = MoviesIndexRouteImport.update({
+  id: '/movies/',
+  path: '/movies/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelsIndexRoute = ChannelsIndexRouteImport.update({
@@ -34,14 +43,24 @@ const ChannelsIndexRoute = ChannelsIndexRouteImport.update({
   path: '/channels/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MediaNewRoute = MediaNewRouteImport.update({
-  id: '/media/new',
-  path: '/media/new',
+const SeriesNewRoute = SeriesNewRouteImport.update({
+  id: '/series/new',
+  path: '/series/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MediaIdRoute = MediaIdRouteImport.update({
-  id: '/media/$id',
-  path: '/media/$id',
+const SeriesIdRoute = SeriesIdRouteImport.update({
+  id: '/series/$id',
+  path: '/series/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesNewRoute = MoviesNewRouteImport.update({
+  id: '/movies/new',
+  path: '/movies/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesIdRoute = MoviesIdRouteImport.update({
+  id: '/movies/$id',
+  path: '/movies/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditIdRoute = EditIdRouteImport.update({
@@ -49,9 +68,14 @@ const EditIdRoute = EditIdRouteImport.update({
   path: '/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EditMediaIdRoute = EditMediaIdRouteImport.update({
-  id: '/edit-media/$id',
-  path: '/edit-media/$id',
+const EditSeriesIdRoute = EditSeriesIdRouteImport.update({
+  id: '/edit-series/$id',
+  path: '/edit-series/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditMovieIdRoute = EditMovieIdRouteImport.update({
+  id: '/edit-movie/$id',
+  path: '/edit-movie/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelsNewRoute = ChannelsNewRouteImport.update({
@@ -69,35 +93,47 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
-  '/edit-media/$id': typeof EditMediaIdRoute
+  '/edit-movie/$id': typeof EditMovieIdRoute
+  '/edit-series/$id': typeof EditSeriesIdRoute
   '/edit/$id': typeof EditIdRoute
-  '/media/$id': typeof MediaIdRoute
-  '/media/new': typeof MediaNewRoute
+  '/movies/$id': typeof MoviesIdRoute
+  '/movies/new': typeof MoviesNewRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series/new': typeof SeriesNewRoute
   '/channels': typeof ChannelsIndexRoute
-  '/media': typeof MediaIndexRoute
+  '/movies': typeof MoviesIndexRoute
+  '/series': typeof SeriesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
-  '/edit-media/$id': typeof EditMediaIdRoute
+  '/edit-movie/$id': typeof EditMovieIdRoute
+  '/edit-series/$id': typeof EditSeriesIdRoute
   '/edit/$id': typeof EditIdRoute
-  '/media/$id': typeof MediaIdRoute
-  '/media/new': typeof MediaNewRoute
+  '/movies/$id': typeof MoviesIdRoute
+  '/movies/new': typeof MoviesNewRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series/new': typeof SeriesNewRoute
   '/channels': typeof ChannelsIndexRoute
-  '/media': typeof MediaIndexRoute
+  '/movies': typeof MoviesIndexRoute
+  '/series': typeof SeriesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
-  '/edit-media/$id': typeof EditMediaIdRoute
+  '/edit-movie/$id': typeof EditMovieIdRoute
+  '/edit-series/$id': typeof EditSeriesIdRoute
   '/edit/$id': typeof EditIdRoute
-  '/media/$id': typeof MediaIdRoute
-  '/media/new': typeof MediaNewRoute
+  '/movies/$id': typeof MoviesIdRoute
+  '/movies/new': typeof MoviesNewRoute
+  '/series/$id': typeof SeriesIdRoute
+  '/series/new': typeof SeriesNewRoute
   '/channels/': typeof ChannelsIndexRoute
-  '/media/': typeof MediaIndexRoute
+  '/movies/': typeof MoviesIndexRoute
+  '/series/': typeof SeriesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,46 +141,62 @@ export interface FileRouteTypes {
     | '/'
     | '/channels/$id'
     | '/channels/new'
-    | '/edit-media/$id'
+    | '/edit-movie/$id'
+    | '/edit-series/$id'
     | '/edit/$id'
-    | '/media/$id'
-    | '/media/new'
+    | '/movies/$id'
+    | '/movies/new'
+    | '/series/$id'
+    | '/series/new'
     | '/channels'
-    | '/media'
+    | '/movies'
+    | '/series'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/channels/$id'
     | '/channels/new'
-    | '/edit-media/$id'
+    | '/edit-movie/$id'
+    | '/edit-series/$id'
     | '/edit/$id'
-    | '/media/$id'
-    | '/media/new'
+    | '/movies/$id'
+    | '/movies/new'
+    | '/series/$id'
+    | '/series/new'
     | '/channels'
-    | '/media'
+    | '/movies'
+    | '/series'
   id:
     | '__root__'
     | '/'
     | '/channels/$id'
     | '/channels/new'
-    | '/edit-media/$id'
+    | '/edit-movie/$id'
+    | '/edit-series/$id'
     | '/edit/$id'
-    | '/media/$id'
-    | '/media/new'
+    | '/movies/$id'
+    | '/movies/new'
+    | '/series/$id'
+    | '/series/new'
     | '/channels/'
-    | '/media/'
+    | '/movies/'
+    | '/series/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
   ChannelsNewRoute: typeof ChannelsNewRoute
-  EditMediaIdRoute: typeof EditMediaIdRoute
+  EditMovieIdRoute: typeof EditMovieIdRoute
+  EditSeriesIdRoute: typeof EditSeriesIdRoute
   EditIdRoute: typeof EditIdRoute
-  MediaIdRoute: typeof MediaIdRoute
-  MediaNewRoute: typeof MediaNewRoute
+  MoviesIdRoute: typeof MoviesIdRoute
+  MoviesNewRoute: typeof MoviesNewRoute
+  SeriesIdRoute: typeof SeriesIdRoute
+  SeriesNewRoute: typeof SeriesNewRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
-  MediaIndexRoute: typeof MediaIndexRoute
+  MoviesIndexRoute: typeof MoviesIndexRoute
+  SeriesIndexRoute: typeof SeriesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,11 +208,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/media/': {
-      id: '/media/'
-      path: '/media'
-      fullPath: '/media'
-      preLoaderRoute: typeof MediaIndexRouteImport
+    '/series/': {
+      id: '/series/'
+      path: '/series'
+      fullPath: '/series'
+      preLoaderRoute: typeof SeriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/': {
+      id: '/movies/'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof MoviesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channels/': {
@@ -170,18 +229,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/media/new': {
-      id: '/media/new'
-      path: '/media/new'
-      fullPath: '/media/new'
-      preLoaderRoute: typeof MediaNewRouteImport
+    '/series/new': {
+      id: '/series/new'
+      path: '/series/new'
+      fullPath: '/series/new'
+      preLoaderRoute: typeof SeriesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/media/$id': {
-      id: '/media/$id'
-      path: '/media/$id'
-      fullPath: '/media/$id'
-      preLoaderRoute: typeof MediaIdRouteImport
+    '/series/$id': {
+      id: '/series/$id'
+      path: '/series/$id'
+      fullPath: '/series/$id'
+      preLoaderRoute: typeof SeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/new': {
+      id: '/movies/new'
+      path: '/movies/new'
+      fullPath: '/movies/new'
+      preLoaderRoute: typeof MoviesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies/$id': {
+      id: '/movies/$id'
+      path: '/movies/$id'
+      fullPath: '/movies/$id'
+      preLoaderRoute: typeof MoviesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/edit/$id': {
@@ -191,11 +264,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/edit-media/$id': {
-      id: '/edit-media/$id'
-      path: '/edit-media/$id'
-      fullPath: '/edit-media/$id'
-      preLoaderRoute: typeof EditMediaIdRouteImport
+    '/edit-series/$id': {
+      id: '/edit-series/$id'
+      path: '/edit-series/$id'
+      fullPath: '/edit-series/$id'
+      preLoaderRoute: typeof EditSeriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edit-movie/$id': {
+      id: '/edit-movie/$id'
+      path: '/edit-movie/$id'
+      fullPath: '/edit-movie/$id'
+      preLoaderRoute: typeof EditMovieIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channels/new': {
@@ -219,12 +299,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChannelsIdRoute: ChannelsIdRoute,
   ChannelsNewRoute: ChannelsNewRoute,
-  EditMediaIdRoute: EditMediaIdRoute,
+  EditMovieIdRoute: EditMovieIdRoute,
+  EditSeriesIdRoute: EditSeriesIdRoute,
   EditIdRoute: EditIdRoute,
-  MediaIdRoute: MediaIdRoute,
-  MediaNewRoute: MediaNewRoute,
+  MoviesIdRoute: MoviesIdRoute,
+  MoviesNewRoute: MoviesNewRoute,
+  SeriesIdRoute: SeriesIdRoute,
+  SeriesNewRoute: SeriesNewRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
-  MediaIndexRoute: MediaIndexRoute,
+  MoviesIndexRoute: MoviesIndexRoute,
+  SeriesIndexRoute: SeriesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

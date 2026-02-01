@@ -8,7 +8,8 @@ type ActiveSwitchProps = {
   id: string
   active: boolean | null
   label: string
-  queryKey: TableKey
+  queryKey: string
+  onToggle?: (id: string, active: boolean) => Promise<unknown>
 }
 
 type PaginatedResult = {
@@ -21,13 +22,20 @@ export function ActiveSwitch({
   active,
   label,
   queryKey,
+  onToggle,
 }: Readonly<ActiveSwitchProps>) {
   const queryClient = useQueryClient()
   const [isUpdating, setIsUpdating] = useState(false)
 
   const mutation = useMutation({
-    mutationFn: (newActive: boolean) =>
-      toggleActive({ data: { id, active: newActive, table: queryKey } }),
+    mutationFn: (newActive: boolean) => {
+      if (onToggle) {
+        return onToggle(id, newActive)
+      }
+      return toggleActive({
+        data: { id, active: newActive, table: queryKey as TableKey },
+      })
+    },
 
     onMutate: async (newActive) => {
       setIsUpdating(true)

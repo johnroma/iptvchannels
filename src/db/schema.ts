@@ -6,6 +6,7 @@ import {
   timestamp,
   uuid,
   serial,
+  index,
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 
@@ -64,22 +65,17 @@ export type Channel = ChannelRow & {
   groupTitleAlias: string | null
 }
 
-// Media table for movies and series
-export const media = pgTable("media", {
+// Series table - groups related episodes
+export const series = pgTable("series", {
   id: uuid("id").primaryKey().defaultRandom(),
 
-  // From M3U file
   tvgId: text("tvg_id"),
-  tvgName: text("tvg_name").notNull(), // e.g., "DE - Senran Kagura (2013) (Ger Sub) S02 E11"
-  tvgLogo: text("tvg_logo"), // TMDB poster URL
-  groupTitleId: integer("group_title_id").references(() => groupTitles.id), // FK to group_titles
-  streamUrl: text("stream_url"), // URL ending in .mp4 or .mkv
+  tvgName: text("tvg_name").notNull(), // Base name without SXX EXX
+  tvgLogo: text("tvg_logo"), // Shared poster
+  groupTitleId: integer("group_title_id").references(() => groupTitles.id),
 
-  // Parsed/derived fields
-  mediaType: text("media_type"), // "movie" or "series" (derived from URL path)
-  year: integer("year"), // Parsed from title, e.g., 1994
-  season: integer("season"), // For series, e.g., 2
-  episode: integer("episode"), // For series, e.g., 11
+  // Denormalized count — maintained by seed script and CRUD operations
+  episodeCount: integer("episode_count").default(0).notNull(),
 
   // CMS fields
   name: text("name"), // Custom display name
@@ -90,6 +86,42 @@ export const media = pgTable("media", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 })
+
+// Media table for movies and series episodes
+export const media = pgTable(
+  "media",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // From M3U file
+    tvgId: text("tvg_id"),
+    tvgName: text("tvg_name").notNull(), // e.g., "DE - Senran Kagura (2013) (Ger Sub) S02 E11"
+    tvgLogo: text("tvg_logo"), // TMDB poster URL
+    groupTitleId: integer("group_title_id").references(() => groupTitles.id), // FK to group_titles
+    streamUrl: text("stream_url"), // URL ending in .mp4 or .mkv
+
+    // Series FK - null for movies, set for series episodes
+    seriesId: uuid("series_id").references(() => series.id),
+
+    // Parsed/derived fields
+    mediaType: text("media_type"), // "movie" or "series" (derived from URL path)
+    year: integer("year"), // Parsed from title, e.g., 1994
+    season: integer("season"), // For series, e.g., 2
+    episode: integer("episode"), // For series, e.g., 11
+
+    // CMS fields
+    name: text("name"), // Custom display name
+    favourite: boolean("favourite").default(false),
+    active: boolean("active").default(false),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    index("media_series_id_idx").on(table.seriesId),
+  ],
+)
 
 // Raw database row type (internal use)
 type MediaRow = typeof media.$inferSelect
@@ -106,4 +138,26 @@ export const mediaRelations = relations(media, ({ one }) => ({
     fields: [media.groupTitleId],
     references: [groupTitles.id],
   }),
+  series: one(series, {
+    fields: [media.seriesId],
+    references: [series.id],
+  }),
+}))
+
+// Raw database row type (internal use)
+type SeriesRow = typeof series.$inferSelect
+
+// Series type for application use - has resolved groupTitle
+export type Series = SeriesRow & {
+  groupTitle: string | null
+  groupTitleAlias: string | null
+}
+
+// Relations for series
+export const seriesRelations = relations(series, ({ one, many }) => ({
+  groupTitle: one(groupTitles, {
+    fields: [series.groupTitleId],
+    references: [groupTitles.id],
+  }),
+  episodes: many(media),
 }))

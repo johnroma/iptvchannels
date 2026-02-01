@@ -16,6 +16,7 @@ export interface ParsedMedia extends ParsedChannel {
   year: number | null
   season: number | null
   episode: number | null
+  seriesBaseName: string | null
 }
 
 export interface M3uEntry {
@@ -65,13 +66,21 @@ export function parseYear(title: string): number | null {
 }
 
 /**
- * Parse season/episode from title like "S02 E11" or "S02E11"
+ * Strip SXX EXX suffix to get the series base name
+ * e.g., "DE - Senran Kagura (2013) (Ger Sub) S02 E11" → "DE - Senran Kagura (2013) (Ger Sub)"
+ */
+export function parseSeriesBaseName(title: string): string {
+  return title.replace(/\s*[Ss]\d{1,4}\s*[Ee]\d{1,4}\s*$/, "").trim()
+}
+
+/**
+ * Parse season/episode from title like "S02 E11", "S02E11", or "S2024 E6942"
  */
 export function parseSeasonEpisode(title: string): {
   season: number | null
   episode: number | null
 } {
-  const match = title.match(/[Ss](\d{1,2})\s*[Ee](\d{1,3})/)
+  const match = title.match(/[Ss](\d{1,4})\s*[Ee](\d{1,4})/)
   if (match) {
     return {
       season: parseInt(match[1], 10),
@@ -121,14 +130,19 @@ export function parseMedia(entry: M3uEntry): ParsedMedia | null {
 
   const info = parseExtInf(entry.extinf)
   const { season, episode } = parseSeasonEpisode(info.tvgName)
+  const mediaType = parseMediaType(entry.url)
 
   return {
     ...info,
     streamUrl: entry.url,
-    mediaType: parseMediaType(entry.url),
+    mediaType,
     year: parseYear(info.tvgName),
     season,
     episode,
+    seriesBaseName:
+      mediaType === "series" && season !== null
+        ? parseSeriesBaseName(info.tvgName)
+        : null,
   }
 }
 

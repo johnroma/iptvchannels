@@ -5,16 +5,9 @@ import { Button } from "@ui/components/button"
 import { Input } from "@ui/components/input"
 import { Label } from "@ui/components/label"
 import { Switch } from "@ui/components/switch"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@ui/components/select"
-import { createMedia, updateMediaForId } from "~/server/media"
+import { createMovie, updateMovieForId } from "~/server/movies"
 
-type MediaFormProps =
+type MovieFormProps =
   | {
       mode: "edit"
       media: Media
@@ -33,23 +26,20 @@ const defaultFormData = {
   groupTitle: "",
   groupTitleAlias: "",
   streamUrl: "",
-  mediaType: "" as string,
   year: null as number | null,
-  season: null as number | null,
-  episode: null as number | null,
   name: "",
   favourite: false,
   active: false,
 }
 
-export function MediaForm(props: Readonly<MediaFormProps>) {
+export function MovieForm(props: Readonly<MovieFormProps>) {
   const { mode, onMediaSave } = props
   const mediaItem = mode === "edit" ? props.media : undefined
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const updateMediaFn = useServerFn(updateMediaForId)
-  const createMediaFn = useServerFn(createMedia)
+  const updateMovieFn = useServerFn(updateMovieForId)
+  const createMovieFn = useServerFn(createMovie)
 
   const [formData, setFormData] = useState(() => {
     if (mediaItem) {
@@ -60,10 +50,7 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
         groupTitle: mediaItem.groupTitle || "",
         groupTitleAlias: mediaItem.groupTitleAlias || "",
         streamUrl: mediaItem.streamUrl || "",
-        mediaType: mediaItem.mediaType || "",
         year: mediaItem.year,
-        season: mediaItem.season,
-        episode: mediaItem.episode,
         name: mediaItem.name || "",
         favourite: mediaItem.favourite ?? false,
         active: mediaItem.active ?? false,
@@ -81,10 +68,7 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
         groupTitle: mediaItem.groupTitle || "",
         groupTitleAlias: mediaItem.groupTitleAlias || "",
         streamUrl: mediaItem.streamUrl || "",
-        mediaType: mediaItem.mediaType || "",
         year: mediaItem.year,
-        season: mediaItem.season,
-        episode: mediaItem.episode,
         name: mediaItem.name || "",
         favourite: mediaItem.favourite ?? false,
         active: mediaItem.active ?? false,
@@ -109,19 +93,19 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
       const submitData = {
         ...formData,
         groupTitleAlias: formData.groupTitleAlias || null,
-        mediaType: (formData.mediaType || null) as
-          | "movie"
-          | "series"
-          | null,
+        mediaType: "movie" as const,
+        season: null,
+        episode: null,
+        seriesId: null,
       }
 
       let result: Media | undefined
       if (mode === "edit" && mediaItem) {
-        result = (await updateMediaFn({
+        result = (await updateMovieFn({
           data: { id: mediaItem.id, ...submitData },
         })) as Media | undefined
       } else {
-        result = (await createMediaFn({ data: submitData })) as
+        result = (await createMovieFn({ data: submitData })) as
           | Media
           | undefined
       }
@@ -137,7 +121,7 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
     }
   }
 
-  const buttonText = mode === "edit" ? "Save Changes" : "Create Media"
+  const buttonText = mode === "edit" ? "Save Changes" : "Create Movie"
   const loadingText = mode === "edit" ? "Saving..." : "Creating..."
 
   return (
@@ -164,7 +148,7 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
               id="tvgName"
               value={formData.tvgName}
               onChange={(e) => updateField("tvgName", e.target.value)}
-              placeholder="e.g., DE - Senran Kagura (2013) S02 E11"
+              placeholder="e.g., The Shawshank Redemption (1994)"
               required
             />
           </div>
@@ -184,7 +168,7 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
               id="groupTitle"
               value={formData.groupTitle}
               onChange={(e) => updateField("groupTitle", e.target.value)}
-              placeholder="e.g., |DE| ANIME SERIEN"
+              placeholder="e.g., |US| MOVIES"
             />
           </div>
 
@@ -194,12 +178,12 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
               id="groupTitleAlias"
               value={formData.groupTitleAlias}
               onChange={(e) => updateField("groupTitleAlias", e.target.value)}
-              placeholder="e.g., Anime Series"
+              placeholder="e.g., Movies"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tvgLogo">Logo / Poster URL</Label>
+            <Label htmlFor="tvgLogo">Poster URL</Label>
             <Input
               id="tvgLogo"
               type="url"
@@ -207,45 +191,6 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
               onChange={(e) => updateField("tvgLogo", e.target.value)}
               placeholder="https://..."
             />
-          </div>
-
-          <div className="space-y-2 sm:col-span-2">
-            <Label htmlFor="streamUrl">Stream URL</Label>
-            <Input
-              id="streamUrl"
-              type="url"
-              value={formData.streamUrl}
-              onChange={(e) => updateField("streamUrl", e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
-        </div>
-      </fieldset>
-
-      {/* Media Info */}
-      <fieldset className="space-y-4">
-        <legend className="text-sm font-medium text-muted-foreground">
-          Media Info
-        </legend>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="mediaType">Type</Label>
-            <Select
-              value={formData.mediaType}
-              onValueChange={(value) =>
-                updateField("mediaType", value === "none" ? "" : value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">—</SelectItem>
-                <SelectItem value="movie">Movie</SelectItem>
-                <SelectItem value="series">Series</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-2">
@@ -260,43 +205,20 @@ export function MediaForm(props: Readonly<MediaFormProps>) {
                   e.target.value ? parseInt(e.target.value, 10) : null,
                 )
               }
-              placeholder="e.g., 2013"
+              placeholder="e.g., 1994"
               min={1888}
               max={2100}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="season">Season</Label>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="streamUrl">Stream URL</Label>
             <Input
-              id="season"
-              type="number"
-              value={formData.season ?? ""}
-              onChange={(e) =>
-                updateField(
-                  "season",
-                  e.target.value ? parseInt(e.target.value, 10) : null,
-                )
-              }
-              placeholder="e.g., 2"
-              min={0}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="episode">Episode</Label>
-            <Input
-              id="episode"
-              type="number"
-              value={formData.episode ?? ""}
-              onChange={(e) =>
-                updateField(
-                  "episode",
-                  e.target.value ? parseInt(e.target.value, 10) : null,
-                )
-              }
-              placeholder="e.g., 11"
-              min={0}
+              id="streamUrl"
+              type="url"
+              value={formData.streamUrl}
+              onChange={(e) => updateField("streamUrl", e.target.value)}
+              placeholder="https://..."
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Seed movies/series from M3U (.mp4/.mkv entries only)
 # Uses staging table pattern for normalized group_titles FK
+# Creates series records and links episodes via series_id FK
 # Usage: ./scripts/seed-media.sh [local|prod] [m3u-file]
 
 set -e
@@ -34,10 +35,11 @@ echo "   (processing .mp4/.mkv entries only - this may take a while)"
 # Parse M3U with awk - validates pairs before processing
 # Only accepts: #EXTINF line followed by http URL ending in .mp4/.mkv
 # Compatible with BSD awk (macOS)
+# Now also extracts series_base_name (tvg_name with SXX EXX stripped)
 awk '
 BEGIN {
   FS="\""
-  print "tvg_id\ttvg_name\ttvg_logo\tgroup_title\tstream_url\tmedia_type\tyear\tseason\tepisode"
+  print "tvg_id\ttvg_name\ttvg_logo\tgroup_title\tstream_url\tmedia_type\tyear\tseason\tepisode\tseries_base_name"
   has_extinf = 0
   skipped = 0
   count = 0
@@ -100,22 +102,29 @@ BEGIN {
   }
 
   # Parse season/episode from title - BSD awk compatible
-  # Match S02 E11 or S02E11 patterns
+  # Match S02 E11, S02E11, S2024 E6942 patterns (up to 4-digit season/episode)
   season = ""; episode = ""
   tmp_name = tvg_name
   # Convert to uppercase for matching
   gsub(/s/, "S", tmp_name)
   gsub(/e/, "E", tmp_name)
-  if (match(tmp_name, /S[0-9][0-9]? ?E[0-9][0-9]?[0-9]?/)) {
+  if (match(tmp_name, /S[0-9][0-9]?[0-9]?[0-9]? ?E[0-9][0-9]?[0-9]?[0-9]?/)) {
     se_str = substr(tmp_name, RSTART, RLENGTH)
     # Extract season number after S
-    if (match(se_str, /S[0-9][0-9]?/)) {
+    if (match(se_str, /S[0-9][0-9]?[0-9]?[0-9]?/)) {
       season = substr(se_str, RSTART + 1, RLENGTH - 1) + 0
     }
     # Extract episode number after E
-    if (match(se_str, /E[0-9][0-9]?[0-9]?/)) {
+    if (match(se_str, /E[0-9][0-9]?[0-9]?[0-9]?/)) {
       episode = substr(se_str, RSTART + 1, RLENGTH - 1) + 0
     }
+  }
+
+  # Compute series_base_name: strip SXX EXX suffix for series with season info
+  series_base_name = ""
+  if (media_type == "series" && season != "") {
+    series_base_name = tvg_name
+    sub(/ ?[Ss][0-9][0-9]?[0-9]?[0-9]? ?[Ee][0-9][0-9]?[0-9]?[0-9]? *$/, "", series_base_name)
   }
 
   # Escape tabs in fields
@@ -123,8 +132,9 @@ BEGIN {
   gsub(/\t/, " ", tvg_name)
   gsub(/\t/, " ", tvg_logo)
   gsub(/\t/, " ", group_title)
+  gsub(/\t/, " ", series_base_name)
 
-  print tvg_id "\t" tvg_name "\t" tvg_logo "\t" group_title "\t" url "\t" media_type "\t" year "\t" season "\t" episode
+  print tvg_id "\t" tvg_name "\t" tvg_logo "\t" group_title "\t" url "\t" media_type "\t" year "\t" season "\t" episode "\t" series_base_name
 
   count++
   has_extinf = 0
@@ -159,12 +169,12 @@ if [[ "$MEDIA_COUNT" -eq 0 ]]; then
   exit 0
 fi
 
-echo "🗑️  Truncating media table..."
-psql "$DATABASE_URL" -c "TRUNCATE TABLE media RESTART IDENTITY CASCADE;"
+echo "🗑️  Truncating media and series tables..."
+psql "$DATABASE_URL" -c "TRUNCATE TABLE media RESTART IDENTITY CASCADE; TRUNCATE TABLE series RESTART IDENTITY CASCADE;"
 
 echo "📥 Creating staging table and importing (this may take a while for large datasets)..."
 psql "$DATABASE_URL" <<EOF
--- Create staging table with raw text group_title
+-- Create staging table with raw text group_title and series_base_name
 CREATE TEMP TABLE media_staging (
   tvg_id TEXT,
   tvg_name TEXT NOT NULL,
@@ -174,19 +184,35 @@ CREATE TEMP TABLE media_staging (
   media_type TEXT,
   year INTEGER,
   season INTEGER,
-  episode INTEGER
+  episode INTEGER,
+  series_base_name TEXT
 );
 
 -- Import raw data
-\COPY media_staging(tvg_id, tvg_name, tvg_logo, group_title, stream_url, media_type, year, season, episode) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')
+\COPY media_staging(tvg_id, tvg_name, tvg_logo, group_title, stream_url, media_type, year, season, episode, series_base_name) FROM '$CSV_FILE' WITH (FORMAT csv, DELIMITER E'\t', HEADER true, NULL '')
 
 -- Insert distinct group titles (upsert) - may already exist from channels
 INSERT INTO group_titles (name)
 SELECT DISTINCT group_title FROM media_staging WHERE group_title IS NOT NULL AND group_title != ''
 ON CONFLICT (name) DO NOTHING;
 
--- Insert media with FK lookup
-INSERT INTO media (tvg_id, tvg_name, tvg_logo, group_title_id, stream_url, media_type, year, season, episode, name, active, favourite)
+-- Insert distinct series records from staging (where series_base_name is set)
+-- Use the first tvg_logo and group_title found for each series base name
+INSERT INTO series (tvg_name, tvg_logo, group_title_id, name, active, favourite)
+SELECT DISTINCT ON (s.series_base_name)
+  s.series_base_name,
+  s.tvg_logo,
+  g.id,
+  s.series_base_name,  -- default name to base name
+  false,
+  false
+FROM media_staging s
+LEFT JOIN group_titles g ON s.group_title = g.name
+WHERE s.series_base_name IS NOT NULL AND s.series_base_name != ''
+ORDER BY s.series_base_name, s.tvg_name;
+
+-- Insert movies (no series_base_name) with series_id = NULL
+INSERT INTO media (tvg_id, tvg_name, tvg_logo, group_title_id, stream_url, media_type, year, season, episode, series_id, name, active, favourite)
 SELECT
   s.tvg_id,
   s.tvg_name,
@@ -197,14 +223,51 @@ SELECT
   s.year,
   s.season,
   s.episode,
-  s.tvg_name,  -- default name to tvg_name
-  false,       -- default active
-  false        -- default favourite
+  NULL,
+  s.tvg_name,
+  false,
+  false
 FROM media_staging s
-LEFT JOIN group_titles g ON s.group_title = g.name;
+LEFT JOIN group_titles g ON s.group_title = g.name
+WHERE s.series_base_name IS NULL OR s.series_base_name = '';
+
+-- Insert series episodes with series_id FK lookup
+INSERT INTO media (tvg_id, tvg_name, tvg_logo, group_title_id, stream_url, media_type, year, season, episode, series_id, name, active, favourite)
+SELECT
+  s.tvg_id,
+  s.tvg_name,
+  s.tvg_logo,
+  g.id,
+  s.stream_url,
+  s.media_type,
+  s.year,
+  s.season,
+  s.episode,
+  sr.id,
+  s.tvg_name,
+  false,
+  false
+FROM media_staging s
+LEFT JOIN group_titles g ON s.group_title = g.name
+JOIN series sr ON s.series_base_name = sr.tvg_name
+WHERE s.series_base_name IS NOT NULL AND s.series_base_name != '';
+
+-- Update denormalized episode_count on series
+UPDATE series SET episode_count = sub.cnt
+FROM (
+  SELECT series_id, COUNT(*)::int AS cnt
+  FROM media
+  WHERE series_id IS NOT NULL
+  GROUP BY series_id
+) sub
+WHERE series.id = sub.series_id;
 
 -- Staging table auto-drops at end of session
 EOF
 
-echo "✅ Imported $MEDIA_COUNT media entries!"
+# Report counts
+SERIES_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM series;" | tr -d ' ')
+MOVIE_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM media WHERE series_id IS NULL;" | tr -d ' ')
+EPISODE_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM media WHERE series_id IS NOT NULL;" | tr -d ' ')
+echo "✅ Imported: $MOVIE_COUNT movies, $SERIES_COUNT series ($EPISODE_COUNT episodes)"
 rm -f "$CSV_FILE"

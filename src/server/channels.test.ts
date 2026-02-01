@@ -45,6 +45,12 @@ vi.mock("~/db", () => {
       id: "media.id",
       active: "media.active",
       groupTitleId: "media.groupTitleId",
+      seriesId: "media.seriesId",
+    },
+    series: {
+      id: "series.id",
+      active: "series.active",
+      groupTitleId: "series.groupTitleId",
     },
     channelSchema: { parse: (d: any) => d },
     channelUpdateSchema: { parse: (d: any) => d },

@@ -11,11 +11,12 @@ import {
 } from "drizzle-orm"
 import { queryOptions } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
-import { db, channels, media, groupTitles } from "~/db"
+import { db, channels, media, series, groupTitles } from "~/db"
+import { isNull } from "drizzle-orm"
 
 // ─── Table Registry ─────────────────────────────────────────
 
-const tables = { channels, media } as const
+const tables = { channels, media, series } as const
 export type TableKey = keyof typeof tables
 
 // ─── Toggle Active ──────────────────────────────────────────
@@ -35,7 +36,7 @@ export const toggleActive = createServerFn({ method: "POST" })
 // ─── List Streams ───────────────────────────────────────────
 
 const listStreamSchema = z.object({
-  table: z.enum(["channels", "media"]),
+  table: z.enum(["channels", "media", "series"]),
   cursor: z.number().optional().default(0),
   limit: z.number().optional().default(100),
   sortBy: z.enum(["name", "createdAt"]).optional().default("name"),
@@ -60,6 +61,10 @@ export const listStreams = createServerFn({ method: "GET" })
       filters.push(eq(table.groupTitleId, data.groupTitleId))
     if (data.table === "channels" && data.countries?.length) {
       filters.push(inArray(channels.countryCode, data.countries))
+    }
+    // For media table, only show movies (no series episodes)
+    if (data.table === "media") {
+      filters.push(isNull(media.seriesId))
     }
 
     const whereClause = filters.length > 0 ? and(...filters) : undefined
@@ -276,10 +281,16 @@ export async function createStreamLogic(tableKey: TableKey, data: any) {
 // ─── Export M3U ─────────────────────────────────────────────
 
 export const exportActiveStreamsM3u = createServerFn({ method: "GET" })
-  .inputValidator((data: { table: TableKey }) => data)
+  .inputValidator((data: { table: "channels" | "media" }) => data)
   .handler(async ({ data }) => {
     const { generateM3u } = await import("~/lib/m3u-export")
     const table = tables[data.table]
+
+    // For media, only export movies (no series episodes)
+    const exportFilter =
+      data.table === "media"
+        ? and(eq(table.active, true), isNull(media.seriesId))
+        : eq(table.active, true)
 
     const activeItems = await db
       .select({
@@ -294,7 +305,7 @@ export const exportActiveStreamsM3u = createServerFn({ method: "GET" })
       })
       .from(table)
       .leftJoin(groupTitles, eq(table.groupTitleId, groupTitles.id))
-      .where(eq(table.active, true))
+      .where(exportFilter)
       .orderBy(asc(table.name))
 
     const m3u = generateM3u(activeItems)
