@@ -1,26 +1,28 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { getStreamById } from "~/server/shared"
 
-export const Route = createFileRoute("/channels/$id")({
-  component: PageChannels,
+export const Route = createFileRoute("/movies/$id")({
+  component: PageMovie,
   loader: async ({ params }) => {
     const id = params.id
-    const channelData = await getStreamById({ data: { id, table: "channels" } })
-    if (!channelData) {
+    const movieData = await getStreamById({ data: { id, table: "media" } })
+    if (!movieData) {
       throw notFound()
     }
-    return channelData
+    return movieData
   },
 })
 
-function PageChannels() {
+function PageMovie() {
   const { tvgName, tvgId, name } = Route.useLoaderData()
   return (
     <div>
       <h2>
         {tvgName} - {tvgId}
       </h2>
-      $ Hello "/channels/{tvgName} - {tvgId} - {name}!"
+      <p>
+        {name || tvgName}
+      </p>
     </div>
   )
 }

@@ -1,8 +1,8 @@
 # IPTV Channels
 
-Channel management system for IPTV with Home Assistant integration.
+Channel management system for IPTV with Home Assistant and Kodi integration.
 
-**Stack:** TanStack Start + Drizzle ORM + PostgreSQL/Supabase
+**Stack:** TanStack Start + Drizzle ORM + PostgreSQL/Supabase + Tailwind CSS v4 + shadcn/ui
 
 ## Project Structure
 
@@ -12,31 +12,41 @@ iptvchannels/
 │   ├── routes/                 # TanStack Start file-based routing
 │   │   ├── __root.tsx          # Document shell (<html>, <body>)
 │   │   ├── index.tsx           # Home page
-│   │   └── channels/           # Channel management routes
+│   │   ├── channels.index.tsx  # Channel list (paginated, filtered)
+│   │   ├── channels.$id.tsx    # Channel detail
+│   │   ├── channels.new.tsx    # Create channel
+│   │   └── edit/$id.tsx        # Edit channel
 │   ├── components/             # App-specific components
+│   ├── server/                 # Server functions (createServerFn)
 │   ├── db/                     # Drizzle schema & client
-│   │   ├── schema.ts           # Database schema definition
-│   │   ├── index.ts            # Database client export
-│   │   └── seed.ts             # Local dev seed script
-│   ├── lib/                    # Shared utilities
-│   ├── router.tsx              # Router configuration
-│   ├── routeTree.gen.ts        # Auto-generated route tree
-│   └── styles.css              # Global styles
+│   │   ├── schema.ts           # Database schema (group_titles, channels, media) + relations
+│   │   ├── validators.ts       # Zod validation schemas
+│   │   ├── index.ts            # Lazy-init DB client (Proxy) + re-exports
+│   │   └── reset.ts            # Database reset script
+│   ├── lib/                    # Shared utilities (m3u-export, yaml-export, m3u-parser)
+│   ├── router.tsx              # Router + React Query SSR + custom search serialization
+│   └── routeTree.gen.ts        # Auto-generated route tree
 ├── packages/
-│   └── ui/                     # Shared UI components (dev only)
-│       ├── src/components/     # Reusable UI primitives
-│       ├── stories/            # Storybook stories
+│   └── ui/                     # Shared UI components (shadcn/ui)
+│       ├── components/         # shadcn components (button, input, card, select, etc.)
+│       ├── lib/utils.ts        # cn() helper
+│       ├── styles/globals.css  # Tailwind + CSS variables
+│       ├── components.json     # shadcn CLI config
 │       └── package.json
 ├── env-profiles/               # Environment configurations
 │   ├── local.env               # Local PostgreSQL
 │   ├── prod.env                # Supabase production
 │   ├── supabase.env            # Supabase CLI token
 │   └── .env.example            # Template (safe to commit)
+├── scripts/
+│   ├── seed-channels.sh        # M3U channel seeder (bash/awk)
+│   └── seed-media.sh           # M3U media seeder (bash/awk)
 ├── supabase/
 │   ├── config.toml             # Supabase project config
 │   └── migrations/             # Drizzle-generated migrations
+├── eslint.config.mjs           # ESLint flat config (typescript-eslint)
 ├── drizzle.config.ts           # Drizzle Kit configuration
-├── app.config.ts               # TanStack Start configuration
+├── vite.config.ts              # Vite + TanStack Start + Tailwind + Nitro
 ├── pnpm-workspace.yaml         # Workspace definition
 └── package.json                # Root scripts
 ```
@@ -67,15 +77,25 @@ Set `DATABASE_URL` in Vercel environment variables to the Supabase connection st
 
 ## Database Schema
 
-The `channels` table stores IPTV channel data:
+### `group_titles` — Normalized lookup table
+
+Shared by `channels` and `media`. Changing an alias here updates it for all linked rows.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | serial | Primary key |
+| `name` | text | Original M3U value, UNIQUE (e.g., "US\| ENTERTAINMENT") |
+| `alias` | text | Optional friendly override (e.g., "Entertainment") |
+
+### `channels` — IPTV channel data
 
 | Column | Type | Source | Description |
 |--------|------|--------|-------------|
-| `id` | serial | auto | Primary key |
+| `id` | uuid | auto | Primary key (random UUID) |
 | `tvg_id` | text | M3U | EPG identifier |
 | `tvg_name` | text | M3U | Channel name (e.g., "US\| ABC HD") |
 | `tvg_logo` | text | M3U | Logo URL |
-| `group_title` | text | M3U | Category (e.g., "US\| ENTERTAINMENT") |
+| `group_title_id` | integer | M3U/FK | FK → `group_titles.id` |
 | `stream_url` | text | M3U | Stream URL |
 | `content_id` | integer | Kodi | Kodi channel ID for playback |
 | `name` | text | CMS | Custom display name |
@@ -98,9 +118,14 @@ The `channels` table stores IPTV channel data:
 | `pnpm db:migrate` | Run migrations locally |
 | `pnpm db:studio` | Open Drizzle Studio (local) |
 | `pnpm db:studio:prod` | Open Drizzle Studio (Supabase) |
-| `pnpm db:seed` | Seed local with 1 mock row |
+| `pnpm db:seed:channels` | Seed channels from M3U (truncates first) |
+| `pnpm db:seed:channels:prod` | Seed channels to Supabase (truncates first) |
+| `pnpm db:seed:media` | Seed movies/series from M3U (truncates first) |
+| `pnpm db:seed:media:prod` | Seed movies/series to Supabase (truncates first) |
 | `pnpm db:psql` | Open psql shell (local) |
 | `pnpm db:psql:prod` | Open psql shell (Supabase) |
+| `pnpm db:reset` | Empty all tables without reseeding (rarely needed) |
+| `pnpm db:reset:prod` | Empty Supabase tables (rarely needed) |
 
 ### Supabase CLI
 
@@ -116,15 +141,18 @@ pnpm supabase inspect db table-stats --linked
 pnpm supabase db dump --schema-only
 ```
 
-### Development (coming soon)
+### Development
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | TanStack Start dev server |
-| `pnpm dev:local` | Dev with local database |
-| `pnpm dev:prod` | Dev with Supabase database |
-| `pnpm storybook` | Storybook dev server (port 6006) |
+| `pnpm dev` | Dev server with local database (port 3000) |
+| `pnpm dev:prod` | Dev server with Supabase database |
 | `pnpm build` | Production build |
+| `pnpm preview` | Preview production build |
+| `pnpm start` | Start production server |
+| `pnpm test` | Run tests (vitest watch) |
+| `pnpm test:run` | Run tests once |
+| `pnpm ui:add` | Add shadcn component to packages/ui |
 
 ## Local vs Production Flow
 
@@ -139,8 +167,47 @@ pnpm supabase db dump --schema-only
 
 ### Data Philosophy
 
-- **Local**: Disposable dev data. `pnpm db:seed` creates 1 mock row.
-- **Production**: Source of truth. Real channel data from M3U/contentid import.
+- **Local**: Disposable dev data. Can be reset and reseeded anytime.
+- **Production**: Source of truth. Real channel data from M3U import.
+
+### Database Scripts - Usage Order
+
+**Fresh start (new environment):**
+```bash
+pnpm db:push              # Create tables from schema
+pnpm db:seed:channels     # Import TV channels from M3U
+pnpm db:seed:media        # Import movies/series from M3U (optional)
+```
+
+**Schema changes:**
+```bash
+# Edit src/db/schema.ts
+pnpm db:push              # Apply to local
+# Test locally
+pnpm db:push:prod         # Apply to production
+```
+
+**Replace data (just re-run seed):**
+```bash
+pnpm db:seed:channels     # Truncates channels table, then imports
+pnpm db:seed:media        # Truncates media table, then imports
+```
+
+Each seed script truncates its own table before importing - no separate reset needed.
+
+**M3U seeding notes:**
+- Seed scripts expect M3U file at `../assets/seedchannels.m3u`
+- `db:seed:channels` processes live TV (stops at first .mp4/.mkv)
+- `db:seed:media` processes movies/series (.mp4/.mkv only)
+- Uses staging table pattern: COPY raw data → INSERT DISTINCT group titles → INSERT with FK JOIN
+- Group titles are shared: both seed scripts upsert into the same `group_titles` table
+
+**Empty tables without reseeding (rarely needed):**
+```bash
+pnpm db:reset             # Truncate all tables, leave them empty
+```
+
+Use `db:reset` only if you want empty tables without importing new data.
 
 ## Monorepo Structure
 
@@ -192,8 +259,8 @@ cp env-profiles/.env.example env-profiles/local.env
 # Push schema to local database
 pnpm db:push
 
-# Seed with mock data
-pnpm db:seed
+# Seed with channel data (requires ../assets/seedchannels.m3u)
+pnpm db:seed:channels
 
 # Open Drizzle Studio
 pnpm db:studio

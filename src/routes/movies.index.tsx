@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery,
   useSuspenseQuery,
-  useQueryClient,
   keepPreviousData,
 } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
@@ -12,11 +11,6 @@ import {
   getGroupTitles,
   exportActiveStreamsM3u,
 } from "~/server/shared"
-import {
-  getCountryCodes,
-  exportActiveChannelsYaml,
-  syncKodiContentIds,
-} from "~/server/channels"
 import { Checkbox } from "@ui/components/checkbox"
 import { Label } from "@ui/components/label"
 import { Button } from "@ui/components/button"
@@ -37,60 +31,41 @@ import {
 } from "lucide-react"
 
 const groupTitlesQueryOptions = {
-  queryKey: ["groupTitles", "channels"],
-  queryFn: () => getGroupTitles({ data: { table: "channels" } }),
+  queryKey: ["groupTitles", "media"],
+  queryFn: () => getGroupTitles({ data: { table: "media" } }),
 }
 
-const countryCodesQueryOptions = {
-  queryKey: ["countryCodes"],
-  queryFn: () => getCountryCodes(),
-}
-
-const channelsSearchSchema = z.object({
+const moviesSearchSchema = z.object({
   page: z.number().optional().default(1),
   active: z.boolean().optional(),
   favourite: z.boolean().optional(),
-  // TanStack Router's built-in parser handles comma-separated arrays
-  // Incoming: "GR,IR" → transform to ["GR","IR"]
-  countries: z
-    .union([z.string(), z.array(z.string())])
-    .transform((val) => {
-      if (typeof val === "string") {
-        return val.split(",").filter(Boolean)
-      }
-      return val
-    })
-    .optional(),
   sortDirection: z.enum(["asc", "desc"]).optional(),
   groupTitleId: z.coerce.number().optional(),
 })
 
-export const Route = createFileRoute("/channels/")({
-  validateSearch: (search) => channelsSearchSchema.parse(search),
+export const Route = createFileRoute("/movies/")({
+  validateSearch: (search) => moviesSearchSchema.parse(search),
   loaderDeps: ({ search }) => ({
     page: search.page,
     sortDirection: search.sortDirection,
     groupTitleId: search.groupTitleId,
     active: search.active,
     favourite: search.favourite,
-    countries: search.countries,
   }),
   loader: async ({ context, deps }) => {
     const sortDirection = deps.sortDirection ?? "asc"
     await Promise.all([
       context.queryClient.ensureQueryData(
-        streamQueryOptions("channels", {
+        streamQueryOptions("media", {
           page: deps.page,
           sortBy: "name",
           sortDirection,
           groupTitleId: deps.groupTitleId,
           active: deps.active,
           favourite: deps.favourite,
-          countries: deps.countries,
         }),
       ),
       context.queryClient.ensureQueryData(groupTitlesQueryOptions),
-      context.queryClient.ensureQueryData(countryCodesQueryOptions),
     ])
   },
   component: RouteComponent,
@@ -111,83 +86,36 @@ function downloadFile(content: string, filename: string, type: string) {
 function RouteComponent() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
-  const queryClient = useQueryClient()
   const page = search.page
   const sortDirection = search.sortDirection ?? "asc"
   const groupFilterEnabled = search.groupTitleId !== undefined
 
   const { data: groupTitles } = useSuspenseQuery(groupTitlesQueryOptions)
-  const { data: countryCodes } = useSuspenseQuery(countryCodesQueryOptions)
 
-  const { data: channelsData, isFetching } = useQuery({
-    ...streamQueryOptions("channels", {
+  const { data: moviesData, isFetching } = useQuery({
+    ...streamQueryOptions("media", {
       page,
       sortBy: "name",
       sortDirection,
       groupTitleId: search.groupTitleId,
       active: search.active,
       favourite: search.favourite,
-      countries: search.countries,
     }),
     placeholderData: keepPreviousData,
   })
 
-  const allChannels = channelsData?.data ?? []
-  const totalCount = channelsData?.totalCount ?? 0
+  const allMovies = moviesData?.data ?? []
+  const totalCount = moviesData?.totalCount ?? 0
   const totalPages = Math.ceil(totalCount / 100)
 
-  const exportYamlMutation = useMutation({
-    mutationFn: exportActiveChannelsYaml,
-    onSuccess: (result) => {
-      if (result.count === 0) {
-        const reasons = result.skipped
-          .map((s) => `• ${s.channel}: ${s.reason}`)
-          .join("\n")
-        alert(
-          `No channels exported.\n\nChannels need both 'scriptAlias' and 'contentId' to be exported.\n\nSkipped channels:\n${reasons || "No active channels found"}`,
-        )
-        return
-      }
-
-      downloadFile(result.yaml, "channels.yaml", "text/yaml")
-
-      if (result.skipped.length > 0) {
-        const reasons = result.skipped
-          .map((s) => `• ${s.channel}: ${s.reason}`)
-          .join("\n")
-        alert(
-          `Exported ${result.count} channel(s).\n\nSkipped ${result.skipped.length} channel(s):\n${reasons}`,
-        )
-      }
-    },
-  })
-
   const exportM3uMutation = useMutation({
-    mutationFn: () => exportActiveStreamsM3u({ data: { table: "channels" } }),
+    mutationFn: () => exportActiveStreamsM3u({ data: { table: "media" } }),
     onSuccess: (result) => {
       if (result.count === 0) {
-        alert("No active channels with stream URLs found to export.")
+        alert("No active movies with stream URLs found to export.")
         return
       }
-      downloadFile(result.m3u, "channels.m3u", "text/plain")
-    },
-  })
-
-  const syncKodiMutation = useMutation({
-    mutationFn: syncKodiContentIds,
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["channels"] })
-      alert(
-        `Kodi sync complete!\n\n` +
-          `Total DB channels: ${result.total}\n` +
-          `Kodi channels: ${result.kodiChannels}\n` +
-          `Matched: ${result.matched}\n` +
-          `Updated: ${result.updated}\n` +
-          `Skipped (no match): ${result.skipped}`,
-      )
-    },
-    onError: (error) => {
-      alert(`Kodi sync failed: ${error.message}`)
+      downloadFile(result.m3u, "movies.m3u", "text/plain")
     },
   })
 
@@ -309,96 +237,27 @@ function RouteComponent() {
               "Export M3U"
             )}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => syncKodiMutation.mutate(undefined)}
-            disabled={syncKodiMutation.isPending}
-          >
-            {syncKodiMutation.isPending ? (
-              <>
-                <Spinner className="mr-2" />
-                Syncing...
-              </>
-            ) : (
-              "Sync Kodi"
-            )}
-          </Button>
-
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => exportYamlMutation.mutate(undefined)}
-            disabled={exportYamlMutation.isPending}
-          >
-            {exportYamlMutation.isPending ? (
-              <>
-                <Spinner className="mr-2" />
-                Exporting...
-              </>
-            ) : (
-              "Export YAML"
-            )}
-          </Button>
         </div>
       </div>
 
-      {countryCodes.length > 0 && (
-        <div className="flex flex-wrap gap-3 mb-6 p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
-          <span className="text-sm font-medium">Countries:</span>
-          {countryCodes.map((country) => (
-            <div
-              key={country}
-              className="flex items-center space-x-1"
-            >
-              <Checkbox
-                id={`country-${country}`}
-                checked={search.countries?.includes(country) ?? false}
-                onCheckedChange={(checked) => {
-                  navigate({
-                    search: (prev) => {
-                      const current = prev.countries ?? []
-                      const updated = checked
-                        ? [...current, country]
-                        : current.filter((c) => c !== country)
-                      return {
-                        ...prev,
-                        page: 1,
-                        countries: updated.length > 0 ? updated : undefined,
-                      }
-                    },
-                  })
-                }}
-              />
-              <Label
-                htmlFor={`country-${country}`}
-                className="text-sm"
-              >
-                {country}
-              </Label>
-            </div>
-          ))}
-        </div>
-      )}
-
       <div className="flex items-center justify-between mb-4">
-        <div className="text-xl font-bold">Channel List</div>
+        <div className="text-xl font-bold">Movies</div>
         <div className="text-sm text-muted-foreground">
-          Showing {allChannels.length} of {totalCount} channels
+          Showing {allMovies.length} of {totalCount} movies
           {isFetching && <span className="ml-2">(Updating...)</span>}
         </div>
       </div>
 
-      {allChannels.length === 0 ? (
-        <div>No channels found.</div>
+      {allMovies.length === 0 ? (
+        <div>No movies found.</div>
       ) : (
         <ul className="space-y-2">
-          {allChannels.map((channel) => (
+          {allMovies.map((item) => (
             <ListStream
-              key={channel.id}
-              item={channel}
-              editHref={`/edit/${channel.id}`}
-              queryKey="channels"
+              key={item.id}
+              item={item}
+              editHref={`/edit-movie/${item.id}`}
+              queryKey="media"
             />
           ))}
         </ul>

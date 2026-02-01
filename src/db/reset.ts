@@ -11,11 +11,13 @@ const sql = postgres(connectionString)
 
 async function main() {
   try {
-    console.log("🗑️  Dropping tables and migration history...")
-    await sql`DROP TABLE IF EXISTS "channels" CASCADE`
-    await sql`DROP TABLE IF EXISTS "__drizzle_migrations" CASCADE`
-    await sql`DROP SCHEMA IF EXISTS "drizzle" CASCADE`
-    console.log("✅ Database reset complete.")
+    console.log("🗑️  Truncating all tables...")
+    // Truncate in order: children first (CASCADE handles FK constraints)
+    await sql`TRUNCATE TABLE "channels" RESTART IDENTITY CASCADE`
+    await sql`TRUNCATE TABLE "media" RESTART IDENTITY CASCADE`
+    await sql`TRUNCATE TABLE "series" RESTART IDENTITY CASCADE`
+    await sql`TRUNCATE TABLE "group_titles" RESTART IDENTITY CASCADE`
+    console.log("✅ Tables emptied (channels, media, series, group_titles).")
   } catch (err) {
     console.error("❌ Reset failed:", err)
   } finally {

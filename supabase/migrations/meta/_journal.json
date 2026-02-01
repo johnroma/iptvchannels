@@ -8,6 +8,13 @@
       "when": 1767709827729,
       "tag": "0000_dusty_supreme_intelligence",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769956886293,
+      "tag": "0001_elite_naoko",
+      "breakpoints": true
     }
   ]
 }
