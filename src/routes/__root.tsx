@@ -76,6 +76,20 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
             >
               Add Channel
             </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/media"
+              className="text-blue-600"
+            >
+              Media
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/media/new"
+              className="text-blue-600"
+            >
+              Add Media
+            </a>
           </nav>
           <h1 className="text-3xl font-bold">IPTV Channels Management</h1>
         </header>

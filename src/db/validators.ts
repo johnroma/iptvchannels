@@ -1,6 +1,6 @@
 import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
-import { channels } from "./schema"
+import { channels, media } from "./schema"
 
 // ISO 3166-1 Alpha-2 country codes
 // Source: https://www.iban.com/country-codes
@@ -288,6 +288,39 @@ export const channelSchema = baseSchema
 
 // Update schema includes the id
 export const channelUpdateSchema = channelSchema.extend({
+  id: z.uuid(),
+  groupTitleAlias: z.string().optional().nullable(),
+})
+
+// --- Media Validators ---
+
+const mediaBaseSchema = createInsertSchema(media)
+
+// Media form schema - omit auto-generated fields and FK, accept groupTitle as string
+export const mediaSchema = mediaBaseSchema
+  .omit({ id: true, createdAt: true, updatedAt: true })
+  .extend({
+    tvgName: z.string().min(1, { error: "Display name is required" }),
+    tvgLogo: z
+      .union([z.url(), z.literal("")])
+      .optional()
+      .nullable(),
+    streamUrl: z
+      .union([z.url(), z.literal("")])
+      .optional()
+      .nullable(),
+    // Accept groupTitle as string, server will resolve to FK
+    groupTitle: z.string().optional().nullable(),
+    groupTitleId: z.number().optional().nullable(),
+    // Media-specific fields
+    mediaType: z.enum(["movie", "series"]).optional().nullable(),
+    year: z.coerce.number().int().min(1888).max(2100).optional().nullable(),
+    season: z.coerce.number().int().min(0).optional().nullable(),
+    episode: z.coerce.number().int().min(0).optional().nullable(),
+  })
+
+// Update schema includes the id
+export const mediaUpdateSchema = mediaSchema.extend({
   id: z.uuid(),
   groupTitleAlias: z.string().optional().nullable(),
 })

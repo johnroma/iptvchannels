@@ -73,7 +73,6 @@ export const media = pgTable("media", {
   tvgName: text("tvg_name").notNull(), // e.g., "DE - Senran Kagura (2013) (Ger Sub) S02 E11"
   tvgLogo: text("tvg_logo"), // TMDB poster URL
   groupTitleId: integer("group_title_id").references(() => groupTitles.id), // FK to group_titles
-  groupTitle: text("group_title"), // e.g., "|DE| ANIME SERIEN (SUB)"
   streamUrl: text("stream_url"), // URL ending in .mp4 or .mkv
 
   // Parsed/derived fields
@@ -92,7 +91,14 @@ export const media = pgTable("media", {
   updatedAt: timestamp("updated_at").defaultNow(),
 })
 
-export type Media = typeof media.$inferSelect
+// Raw database row type (internal use)
+type MediaRow = typeof media.$inferSelect
+
+// Media type for application use - has resolved groupTitle instead of FK
+export type Media = MediaRow & {
+  groupTitle: string | null
+  groupTitleAlias: string | null
+}
 
 // Relations for media
 export const mediaRelations = relations(media, ({ one }) => ({

@@ -10,8 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MediaIndexRouteImport } from './routes/media.index'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
+import { Route as MediaNewRouteImport } from './routes/media.new'
+import { Route as MediaIdRouteImport } from './routes/media.$id'
 import { Route as EditIdRouteImport } from './routes/edit/$id'
+import { Route as EditMediaIdRouteImport } from './routes/edit-media/$id'
 import { Route as ChannelsNewRouteImport } from './routes/channels.new'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 
@@ -20,14 +24,34 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MediaIndexRoute = MediaIndexRouteImport.update({
+  id: '/media/',
+  path: '/media/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChannelsIndexRoute = ChannelsIndexRouteImport.update({
   id: '/channels/',
   path: '/channels/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MediaNewRoute = MediaNewRouteImport.update({
+  id: '/media/new',
+  path: '/media/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaIdRoute = MediaIdRouteImport.update({
+  id: '/media/$id',
+  path: '/media/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EditIdRoute = EditIdRouteImport.update({
   id: '/edit/$id',
   path: '/edit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditMediaIdRoute = EditMediaIdRouteImport.update({
+  id: '/edit-media/$id',
+  path: '/edit-media/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChannelsNewRoute = ChannelsNewRouteImport.update({
@@ -45,44 +69,82 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
+  '/edit-media/$id': typeof EditMediaIdRoute
   '/edit/$id': typeof EditIdRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media/new': typeof MediaNewRoute
   '/channels': typeof ChannelsIndexRoute
+  '/media': typeof MediaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
+  '/edit-media/$id': typeof EditMediaIdRoute
   '/edit/$id': typeof EditIdRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media/new': typeof MediaNewRoute
   '/channels': typeof ChannelsIndexRoute
+  '/media': typeof MediaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/channels/new': typeof ChannelsNewRoute
+  '/edit-media/$id': typeof EditMediaIdRoute
   '/edit/$id': typeof EditIdRoute
+  '/media/$id': typeof MediaIdRoute
+  '/media/new': typeof MediaNewRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/media/': typeof MediaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/channels/$id' | '/channels/new' | '/edit/$id' | '/channels'
+  fullPaths:
+    | '/'
+    | '/channels/$id'
+    | '/channels/new'
+    | '/edit-media/$id'
+    | '/edit/$id'
+    | '/media/$id'
+    | '/media/new'
+    | '/channels'
+    | '/media'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/channels/$id' | '/channels/new' | '/edit/$id' | '/channels'
+  to:
+    | '/'
+    | '/channels/$id'
+    | '/channels/new'
+    | '/edit-media/$id'
+    | '/edit/$id'
+    | '/media/$id'
+    | '/media/new'
+    | '/channels'
+    | '/media'
   id:
     | '__root__'
     | '/'
     | '/channels/$id'
     | '/channels/new'
+    | '/edit-media/$id'
     | '/edit/$id'
+    | '/media/$id'
+    | '/media/new'
     | '/channels/'
+    | '/media/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
   ChannelsNewRoute: typeof ChannelsNewRoute
+  EditMediaIdRoute: typeof EditMediaIdRoute
   EditIdRoute: typeof EditIdRoute
+  MediaIdRoute: typeof MediaIdRoute
+  MediaNewRoute: typeof MediaNewRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
+  MediaIndexRoute: typeof MediaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -94,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/media/': {
+      id: '/media/'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/channels/': {
       id: '/channels/'
       path: '/channels'
@@ -101,11 +170,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/media/new': {
+      id: '/media/new'
+      path: '/media/new'
+      fullPath: '/media/new'
+      preLoaderRoute: typeof MediaNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media/$id': {
+      id: '/media/$id'
+      path: '/media/$id'
+      fullPath: '/media/$id'
+      preLoaderRoute: typeof MediaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/edit/$id': {
       id: '/edit/$id'
       path: '/edit/$id'
       fullPath: '/edit/$id'
       preLoaderRoute: typeof EditIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edit-media/$id': {
+      id: '/edit-media/$id'
+      path: '/edit-media/$id'
+      fullPath: '/edit-media/$id'
+      preLoaderRoute: typeof EditMediaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/channels/new': {
@@ -129,8 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChannelsIdRoute: ChannelsIdRoute,
   ChannelsNewRoute: ChannelsNewRoute,
+  EditMediaIdRoute: EditMediaIdRoute,
   EditIdRoute: EditIdRoute,
+  MediaIdRoute: MediaIdRoute,
+  MediaNewRoute: MediaNewRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
+  MediaIndexRoute: MediaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

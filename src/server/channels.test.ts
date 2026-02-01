@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { updateChannelLogic } from "./channels"
+import { updateStreamLogic } from "./shared"
 import { db, groupTitles, channels } from "~/db"
 
 // Simple mock for query builders
@@ -41,12 +41,17 @@ vi.mock("~/db", () => {
     },
     // Mock schemas as object with parse/safeParse or just any object if the validtor wraps it
     // But since it's passed to .inputValidator(schema), it needs to be what z.object returns roughly
+    media: {
+      id: "media.id",
+      active: "media.active",
+      groupTitleId: "media.groupTitleId",
+    },
     channelSchema: { parse: (d: any) => d },
     channelUpdateSchema: { parse: (d: any) => d },
   }
 })
 
-describe("updateChannelLogic", () => {
+describe("updateStreamLogic", () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -70,12 +75,12 @@ describe("updateChannelLogic", () => {
     // Mock db.select for fetching group data at the end
     vi.mocked(db.select).mockReturnValue(createQueryBuilder(mockGroupData))
 
-    await updateChannelLogic({
+    await updateStreamLogic("channels", {
       id: "chan-1",
       groupTitleId: 10,
       groupTitleAlias: "My News",
       tvgName: "Test Channel",
-    } as any)
+    })
 
     // Assert group alias update called
     expect(db.update).toHaveBeenCalledWith(groupTitles)
@@ -103,12 +108,12 @@ describe("updateChannelLogic", () => {
 
     vi.mocked(db.select).mockReturnValue(createQueryBuilder(mockGroupData))
 
-    await updateChannelLogic({
+    await updateStreamLogic("channels", {
       id: "chan-1",
       groupTitleId: 10,
       groupTitleAlias: null, // Simulate empty string cleared to null
       tvgName: "Test Channel",
-    } as any)
+    })
 
     // Assert group alias update called with null
     expect(db.update).toHaveBeenCalledWith(groupTitles)
@@ -126,12 +131,12 @@ describe("updateChannelLogic", () => {
 
     vi.mocked(db.select).mockReturnValue(createQueryBuilder([]))
 
-    await updateChannelLogic({
+    await updateStreamLogic("channels", {
       id: "chan-1",
       groupTitleId: 10,
       groupTitleAlias: undefined, // Undefined means no change
       tvgName: "Test Channel",
-    } as any)
+    })
 
     // Assert group alias update NOT called
     expect(db.update).not.toHaveBeenCalledWith(groupTitles)
@@ -155,14 +160,14 @@ describe("updateChannelLogic", () => {
 
     vi.mocked(db.select).mockReturnValue(createQueryBuilder(mockGroupData))
 
-    await updateChannelLogic({
+    await updateStreamLogic("channels", {
       id: "chan-1",
       groupTitleId: 10,
       groupTitleAlias: "Global News",
       tvgName: "New Name",
       active: true,
       tvgLogo: "http://logo.png",
-    } as any)
+    })
 
     // Assert group alias update called
     expect(db.update).toHaveBeenCalledWith(groupTitles)

@@ -7,17 +7,17 @@ import {
 } from "@tanstack/react-router"
 import { type Channel } from "~/db/schema"
 import { ChannelForm } from "~/components/ChannelForm"
-import { getChannelById } from "~/server/channels"
+import { getStreamById } from "~/server/shared"
 
 export const Route = createFileRoute("/edit/$id")({
   component: PageEditChannel,
   loader: async ({ params }): Promise<Channel> => {
     const id = params.id
-    const channelData = await getChannelById({ data: id })
+    const channelData = await getStreamById({ data: { id, table: "channels" } })
     if (!channelData) {
       throw notFound()
     }
-    return channelData
+    return channelData as Channel
   },
 })
 

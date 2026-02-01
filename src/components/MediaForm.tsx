@@ -1,23 +1,29 @@
 import { FormEvent, useState, useEffect } from "react"
 import { useServerFn } from "@tanstack/react-start"
-import { type Channel } from "~/db/schema"
-import { type CountryCode } from "~/db/validators"
+import { type Media } from "~/db/schema"
 import { Button } from "@ui/components/button"
 import { Input } from "@ui/components/input"
 import { Label } from "@ui/components/label"
 import { Switch } from "@ui/components/switch"
-import { createChannel, updateChannelForId } from "~/server/channels"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui/components/select"
+import { createMedia, updateMediaForId } from "~/server/media"
 
-type ChannelFormProps =
+type MediaFormProps =
   | {
       mode: "edit"
-      channel: Channel
-      onChannelSave?: (channel: Channel) => void
+      media: Media
+      onMediaSave?: (media: Media) => void
     }
   | {
       mode: "create"
-      channel?: never
-      onChannelSave?: (channel: Channel) => void
+      media?: never
+      onMediaSave?: (media: Media) => void
     }
 
 const defaultFormData = {
@@ -27,63 +33,64 @@ const defaultFormData = {
   groupTitle: "",
   groupTitleAlias: "",
   streamUrl: "",
-  contentId: null as number | null,
+  mediaType: "" as string,
+  year: null as number | null,
+  season: null as number | null,
+  episode: null as number | null,
   name: "",
-  countryCode: "",
   favourite: false,
   active: false,
-  scriptAlias: "",
 }
 
-export function ChannelForm(props: Readonly<ChannelFormProps>) {
-  const { mode, onChannelSave } = props
-  const channel = mode === "edit" ? props.channel : undefined
+export function MediaForm(props: Readonly<MediaFormProps>) {
+  const { mode, onMediaSave } = props
+  const mediaItem = mode === "edit" ? props.media : undefined
 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const updateChannelFn = useServerFn(updateChannelForId)
-  const createChannelFn = useServerFn(createChannel)
+  const updateMediaFn = useServerFn(updateMediaForId)
+  const createMediaFn = useServerFn(createMedia)
 
-  // Initialize form state
   const [formData, setFormData] = useState(() => {
-    if (channel) {
+    if (mediaItem) {
       return {
-        tvgId: channel.tvgId || "",
-        tvgName: channel.tvgName,
-        tvgLogo: channel.tvgLogo || "",
-        groupTitle: channel.groupTitle || "",
-        groupTitleAlias: channel.groupTitleAlias || "",
-        streamUrl: channel.streamUrl || "",
-        contentId: channel.contentId,
-        name: channel.name || "",
-        countryCode: channel.countryCode || "",
-        favourite: channel.favourite ?? false,
-        active: channel.active ?? false,
-        scriptAlias: channel.scriptAlias || "",
+        tvgId: mediaItem.tvgId || "",
+        tvgName: mediaItem.tvgName,
+        tvgLogo: mediaItem.tvgLogo || "",
+        groupTitle: mediaItem.groupTitle || "",
+        groupTitleAlias: mediaItem.groupTitleAlias || "",
+        streamUrl: mediaItem.streamUrl || "",
+        mediaType: mediaItem.mediaType || "",
+        year: mediaItem.year,
+        season: mediaItem.season,
+        episode: mediaItem.episode,
+        name: mediaItem.name || "",
+        favourite: mediaItem.favourite ?? false,
+        active: mediaItem.active ?? false,
       }
     }
     return defaultFormData
   })
 
-  // Keep form state in sync with channel prop
   useEffect(() => {
-    if (channel) {
+    if (mediaItem) {
       setFormData({
-        tvgId: channel.tvgId || "",
-        tvgName: channel.tvgName,
-        tvgLogo: channel.tvgLogo || "",
-        groupTitle: channel.groupTitle || "",
-        groupTitleAlias: channel.groupTitleAlias || "",
-        streamUrl: channel.streamUrl || "",
-        contentId: channel.contentId,
-        name: channel.name || "",
-        countryCode: channel.countryCode || "",
-        favourite: channel.favourite ?? false,
-        active: channel.active ?? false,
-        scriptAlias: channel.scriptAlias || "",
+        tvgId: mediaItem.tvgId || "",
+        tvgName: mediaItem.tvgName,
+        tvgLogo: mediaItem.tvgLogo || "",
+        groupTitle: mediaItem.groupTitle || "",
+        groupTitleAlias: mediaItem.groupTitleAlias || "",
+        streamUrl: mediaItem.streamUrl || "",
+        mediaType: mediaItem.mediaType || "",
+        year: mediaItem.year,
+        season: mediaItem.season,
+        episode: mediaItem.episode,
+        name: mediaItem.name || "",
+        favourite: mediaItem.favourite ?? false,
+        active: mediaItem.active ?? false,
       })
     }
-  }, [channel])
+  }, [mediaItem])
 
   function updateField<K extends keyof typeof formData>(
     field: K,
@@ -102,23 +109,24 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
       const submitData = {
         ...formData,
         groupTitleAlias: formData.groupTitleAlias || null,
-        countryCode: (formData.countryCode || undefined) as
-          | CountryCode
-          | undefined,
+        mediaType: (formData.mediaType || null) as
+          | "movie"
+          | "series"
+          | null,
       }
 
-      let result: Channel | undefined
-      if (mode === "edit" && channel) {
-        result = (await updateChannelFn({
-          data: { id: channel.id, ...submitData },
-        })) as Channel | undefined
+      let result: Media | undefined
+      if (mode === "edit" && mediaItem) {
+        result = (await updateMediaFn({
+          data: { id: mediaItem.id, ...submitData },
+        })) as Media | undefined
       } else {
-        result = (await createChannelFn({ data: submitData })) as
-          | Channel
+        result = (await createMediaFn({ data: submitData })) as
+          | Media
           | undefined
       }
       setIsLoading(false)
-      if (result) onChannelSave?.(result)
+      if (result) onMediaSave?.(result)
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -129,7 +137,7 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
     }
   }
 
-  const buttonText = mode === "edit" ? "Save Changes" : "Create Channel"
+  const buttonText = mode === "edit" ? "Save Changes" : "Create Media"
   const loadingText = mode === "edit" ? "Saving..." : "Creating..."
 
   return (
@@ -156,18 +164,17 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               id="tvgName"
               value={formData.tvgName}
               onChange={(e) => updateField("tvgName", e.target.value)}
-              placeholder="e.g., US| A&E HD"
+              placeholder="e.g., DE - Senran Kagura (2013) S02 E11"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tvgId">EPG ID</Label>
+            <Label htmlFor="tvgId">TVG ID</Label>
             <Input
               id="tvgId"
               value={formData.tvgId}
               onChange={(e) => updateField("tvgId", e.target.value)}
-              placeholder="e.g., AandE.us"
             />
           </div>
 
@@ -177,7 +184,7 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               id="groupTitle"
               value={formData.groupTitle}
               onChange={(e) => updateField("groupTitle", e.target.value)}
-              placeholder="e.g., US| ENTERTAINMENT"
+              placeholder="e.g., |DE| ANIME SERIEN"
             />
           </div>
 
@@ -187,12 +194,12 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
               id="groupTitleAlias"
               value={formData.groupTitleAlias}
               onChange={(e) => updateField("groupTitleAlias", e.target.value)}
-              placeholder="e.g., USA Entertainment"
+              placeholder="e.g., Anime Series"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tvgLogo">Logo URL</Label>
+            <Label htmlFor="tvgLogo">Logo / Poster URL</Label>
             <Input
               id="tvgLogo"
               type="url"
@@ -215,64 +222,100 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
         </div>
       </fieldset>
 
-      {/* CMS Fields */}
+      {/* Media Info */}
+      <fieldset className="space-y-4">
+        <legend className="text-sm font-medium text-muted-foreground">
+          Media Info
+        </legend>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="mediaType">Type</Label>
+            <Select
+              value={formData.mediaType}
+              onValueChange={(value) =>
+                updateField("mediaType", value === "none" ? "" : value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">—</SelectItem>
+                <SelectItem value="movie">Movie</SelectItem>
+                <SelectItem value="series">Series</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="year">Year</Label>
+            <Input
+              id="year"
+              type="number"
+              value={formData.year ?? ""}
+              onChange={(e) =>
+                updateField(
+                  "year",
+                  e.target.value ? parseInt(e.target.value, 10) : null,
+                )
+              }
+              placeholder="e.g., 2013"
+              min={1888}
+              max={2100}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="season">Season</Label>
+            <Input
+              id="season"
+              type="number"
+              value={formData.season ?? ""}
+              onChange={(e) =>
+                updateField(
+                  "season",
+                  e.target.value ? parseInt(e.target.value, 10) : null,
+                )
+              }
+              placeholder="e.g., 2"
+              min={0}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="episode">Episode</Label>
+            <Input
+              id="episode"
+              type="number"
+              value={formData.episode ?? ""}
+              onChange={(e) =>
+                updateField(
+                  "episode",
+                  e.target.value ? parseInt(e.target.value, 10) : null,
+                )
+              }
+              placeholder="e.g., 11"
+              min={0}
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      {/* CMS */}
       <fieldset className="space-y-4">
         <legend className="text-sm font-medium text-muted-foreground">
           CMS Settings
         </legend>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="name">Custom Name</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              placeholder="Override display name"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="countryCode">Country Code</Label>
-            <Input
-              id="countryCode"
-              value={formData.countryCode}
-              onChange={(e) =>
-                updateField(
-                  "countryCode",
-                  e.target.value.toUpperCase().slice(0, 2),
-                )
-              }
-              placeholder="e.g., US, UK, SE"
-              maxLength={2}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contentId">Kodi Content ID</Label>
-            <Input
-              id="contentId"
-              type="number"
-              value={formData.contentId ?? ""}
-              onChange={(e) =>
-                updateField(
-                  "contentId",
-                  e.target.value ? parseInt(e.target.value, 10) : null,
-                )
-              }
-              placeholder="e.g., 123"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="scriptAlias">Script Alias</Label>
-            <Input
-              id="scriptAlias"
-              value={formData.scriptAlias}
-              onChange={(e) => updateField("scriptAlias", e.target.value)}
-              placeholder="e.g., channel_abc"
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="name">Custom Name</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={(e) => updateField("name", e.target.value)}
+            placeholder="Override display name"
+          />
         </div>
       </fieldset>
 

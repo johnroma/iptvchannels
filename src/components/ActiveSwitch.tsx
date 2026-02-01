@@ -1,47 +1,52 @@
 import { useState } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toggleChannelActive } from "~/server/channels"
 import { Switch } from "@ui/components/switch"
 import { Spinner } from "@ui/components/spinner"
-import { type Channel } from "~/db/schema"
+import { toggleActive, type TableKey } from "~/server/shared"
 
-type ChannelActiveSwitchProps = Pick<Channel, "id" | "active" | "tvgName">
+type ActiveSwitchProps = {
+  id: string
+  active: boolean | null
+  label: string
+  queryKey: TableKey
+}
 
 type PaginatedResult = {
-  data: Channel[]
+  data: { id: string; active: boolean }[]
   totalCount: number
 }
 
-export function ChannelActiveSwitch({
+export function ActiveSwitch({
   id,
   active,
-  tvgName,
-}: Readonly<ChannelActiveSwitchProps>) {
+  label,
+  queryKey,
+}: Readonly<ActiveSwitchProps>) {
   const queryClient = useQueryClient()
   const [isUpdating, setIsUpdating] = useState(false)
 
   const mutation = useMutation({
     mutationFn: (newActive: boolean) =>
-      toggleChannelActive({ data: { id, active: newActive } }),
+      toggleActive({ data: { id, active: newActive, table: queryKey } }),
 
     onMutate: async (newActive) => {
       setIsUpdating(true)
 
-      await queryClient.cancelQueries({ queryKey: ["channels"] })
+      await queryClient.cancelQueries({ queryKey: [queryKey] })
 
       const previousQueries = queryClient.getQueriesData({
-        queryKey: ["channels"],
+        queryKey: [queryKey],
       })
 
       queryClient.setQueriesData<PaginatedResult>(
-        { queryKey: ["channels"] },
+        { queryKey: [queryKey] },
         (old) => {
           if (!old || !old.data) return old
 
           return {
             ...old,
-            data: old.data.map((c) =>
-              c.id === id ? { ...c, active: newActive } : c,
+            data: old.data.map((item) =>
+              item.id === id ? { ...item, active: newActive } : item,
             ),
           }
         },
@@ -60,7 +65,7 @@ export function ChannelActiveSwitch({
 
     onSettled: () => {
       setIsUpdating(false)
-      queryClient.invalidateQueries({ queryKey: ["channels"] })
+      queryClient.invalidateQueries({ queryKey: [queryKey] })
     },
   })
 
@@ -72,7 +77,7 @@ export function ChannelActiveSwitch({
     <Switch
       checked={!!active}
       onCheckedChange={(checked) => mutation.mutate(checked)}
-      aria-label={`Toggle ${tvgName} active`}
+      aria-label={`Toggle ${label} active`}
     />
   )
 }
