@@ -6,6 +6,8 @@ Channel management system for IPTV with Home Assistant and Kodi integration.
 
 ## Project Structure
 
+Note: this repo expects environment files in a sibling directory: `../env-profiles/` (one level above `iptvchannels/`). That directory is intentionally not part of this git repo.
+
 ```
 iptvchannels/
 ├── src/
@@ -33,11 +35,7 @@ iptvchannels/
 │       ├── styles/globals.css  # Tailwind + CSS variables
 │       ├── components.json     # shadcn CLI config
 │       └── package.json
-├── env-profiles/               # Environment configurations
-│   ├── local.env               # Local PostgreSQL
-│   ├── prod.env                # Supabase production
-│   ├── supabase.env            # Supabase CLI token
-│   └── .env.example            # Template (safe to commit)
+├── (uses ../env-profiles/)     # Environment configs (not in this repo)
 ├── scripts/
 │   ├── seed-channels.sh        # M3U channel seeder (bash/awk)
 │   └── seed-media.sh           # M3U media seeder (bash/awk)
@@ -53,23 +51,23 @@ iptvchannels/
 
 ## Environment Setup
 
-Environment files are stored in `env-profiles/` and are **not committed to git** (except `.env.example`).
+Environment files are stored in `../env-profiles/` and are **not committed to git**.
 
 ### Create Environment Files
 
 ```bash
-cp env-profiles/.env.example env-profiles/local.env
-cp env-profiles/.env.example env-profiles/prod.env
-cp env-profiles/.env.example env-profiles/supabase.env
+cp ../env-profiles/.env.example ../env-profiles/local.env
+cp ../env-profiles/.env.example ../env-profiles/prod.env
+cp ../env-profiles/.env.example ../env-profiles/supabase.env
 ```
 
 ### Environment Profiles
 
 | File | Purpose | Variables |
 |------|---------|-----------|
-| `local.env` | Local development | `DATABASE_URL` (Homebrew Postgres) |
-| `prod.env` | Supabase production | `DATABASE_URL` (Supabase pooler) |
-| `supabase.env` | Supabase CLI | `SUPABASE_ACCESS_TOKEN` |
+| `../env-profiles/local.env` | Local development | `DATABASE_URL` (Homebrew Postgres), `KODI_URL` (preferred) or `KODI_HOST` + `KODI_PORT` |
+| `../env-profiles/prod.env` | Supabase production | `DATABASE_URL` (Supabase pooler) |
+| `../env-profiles/supabase.env` | Supabase CLI | `SUPABASE_ACCESS_TOKEN` |
 
 ### Vercel Deployment
 
@@ -105,6 +103,91 @@ Shared by `channels` and `media`. Changing an alias here updates it for all link
 | `script_alias` | text | CMS | Home Assistant script alias |
 | `created_at` | timestamp | auto | Created timestamp |
 | `updated_at` | timestamp | auto | Updated timestamp |
+
+## Export YAML (Home Assistant)
+
+This project does **not** call Home Assistant directly. Instead, it generates YAML you paste into Home Assistant (or include from a package) so Home Assistant can call *your* existing playback automation.
+
+- `Export YAML` generates Home Assistant `script:` entries.
+- Each exported channel becomes a script keyed by `channels.script_alias`.
+- The generated script calls `service: script.play_channel` and passes:
+  - `content_id` (Kodi PVR `channelid`, stored in `channels.content_id`)
+  - `channel_title` (from `channels.tvg_name`)
+  - `channel_thumbnail` (from `channels.tvg_logo`)
+
+Important: you must already have a `script.play_channel` in Home Assistant (or adapt the generator to call a different service). This repo only generates the per-channel wrappers.
+
+### What gets exported
+
+- Only channels with `active = true` are considered.
+- A channel is exported only if it has both:
+  - `script_alias` (used as the YAML key), and
+  - `content_id` (the value passed to `script.play_channel`).
+- Channels missing either field are skipped (the UI shows the skip reasons).
+
+## Sync Kodi (optional helper for content_id)
+
+The `Sync Kodi` button populates/refreshes `channels.content_id` by querying Kodi’s JSON-RPC API for the current PVR channel list and matching by name. It exists mainly to make `Export YAML` easier (so you don’t have to enter `content_id` manually).
+
+### What “Sync Kodi” does
+
+- Calls Kodi JSON-RPC `PVR.GetChannels` (`channelgroupid: "alltv"`) via `KODI_URL` (preferred) or `http://$KODI_HOST:$KODI_PORT/jsonrpc`
+- Builds a map of `kodiChannel.label → kodiChannel.channelid` (case-insensitive)
+- Matches each DB channel by `channels.tvg_name` (case-insensitive) against the Kodi label
+- Updates `channels.content_id` when it differs
+
+### What it changes (and what it does not)
+
+- Updates only `channels.content_id` (and `channels.updated_at`) for matched rows.
+- Does **not** create/delete channels in Kodi or in the database.
+- Does **not** change `stream_url`, `script_alias`, `active`, or any other CMS fields.
+
+### Requirements
+
+- Kodi must be reachable from the server running TanStack Start (usually your local dev machine on the same LAN).
+- Set `KODI_URL` (preferred) or `KODI_HOST` + `KODI_PORT` in the environment profile you run with (typically `../env-profiles/local.env`).
+- If nothing is set, it defaults to `http://localhost:8080/jsonrpc`.
+
+Examples:
+
+```bash
+# Option A (preferred): full base URL (the app will append /jsonrpc if missing)
+KODI_URL=http://192.168.86.44:8080
+
+# Option B: host + port
+KODI_HOST=192.168.86.44
+KODI_PORT=8080
+```
+
+### Kodi setup (so JSON-RPC is reachable)
+
+In Kodi, enable the web server / remote control so `http://<kodi-ip>:<port>/jsonrpc` is reachable:
+
+- Settings → Services → Control:
+  - enable remote control (same device / other systems as needed)
+- Settings → Services → Web server:
+  - enable “Allow remote control via HTTP”
+  - note the configured port (often `8080`)
+
+This implementation currently assumes **no HTTP auth** on the JSON-RPC endpoint. If you configured a username/password in Kodi’s web server settings, `Sync Kodi` will fail until the code is extended to send credentials.
+
+### Limitations / troubleshooting
+
+- Matching is by `tvg_name` only (not the editable `name` field). If you renamed channels inside Kodi, they may not match.
+- Matching is exact aside from case. If it can’t match, either adjust the M3U/Kodi channel name or set `content_id` manually in the channel edit form.
+- When deployed (e.g. Vercel), the server likely cannot reach a home Kodi instance; run Sync Kodi from an environment that can reach Kodi, then store results in your DB.
+- If `Sync Kodi` reports lots of “Skipped”, compare your DB `tvg_name` values with the channel labels shown in Kodi (PVR channel list). Those labels are what the sync matches against.
+
+### Typical workflow
+
+1. Import/seed channels from M3U (populates `tvg_name`).
+2. For channels you want in Home Assistant:
+   - set `active = true`
+   - set `script_alias` (unique)
+3. Populate `content_id`:
+   - run `Sync Kodi` (recommended), or
+   - enter `content_id` manually in the channel edit form.
+4. Run `Export YAML` and add the output to Home Assistant.
 
 ## npm Scripts
 
@@ -253,7 +336,7 @@ brew services start postgresql@15
 pnpm install
 
 # Create environment files
-cp env-profiles/.env.example env-profiles/local.env
+cp ../env-profiles/.env.example ../env-profiles/local.env
 # Edit local.env with your local Postgres URL
 
 # Push schema to local database
@@ -269,7 +352,7 @@ pnpm db:studio
 ## Security
 
 **Never commit:**
-- `env-profiles/*.env` (except `.env.example`)
+- `../env-profiles/*.env`
 - Any file containing database passwords or API tokens
 
 The `.gitignore` is configured to exclude all sensitive files.

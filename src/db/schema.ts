@@ -31,7 +31,7 @@ export const channels = pgTable("channels", {
   groupTitleId: integer("group_title_id").references(() => groupTitles.id), // FK to group_titles
   streamUrl: text("stream_url"), // M3U stream URL
 
-  // From contentid.json (Kodi)
+  // From Kodi PVR channel id (synced via Kodi JSON-RPC)
   contentId: integer("content_id"), // Kodi channel ID for playback
 
   // CMS fields (editable via frontend)
