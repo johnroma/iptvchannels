@@ -66,14 +66,15 @@ type KodiResponse = {
 
 export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
   async () => {
-    const host = process.env.KODI_HOST
-    const port = process.env.KODI_PORT
+    const rawUrl = process.env.KODI_URL
+    const host = process.env.KODI_HOST ?? "localhost"
+    const port = process.env.KODI_PORT ?? "8080"
 
-    if (!host || !port) {
-      throw new Error(
-        "KODI_HOST and KODI_PORT environment variables are required",
-      )
-    }
+    const kodiJsonRpcUrl = rawUrl
+      ? rawUrl.endsWith("/jsonrpc")
+        ? rawUrl
+        : `${rawUrl.replace(/\/+$/, "")}/jsonrpc`
+      : `http://${host}:${port}/jsonrpc`
 
     const kodiRequest = {
       jsonrpc: "2.0",
@@ -82,11 +83,21 @@ export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
       id: 1,
     }
 
-    const kodiResponse = await fetch(`http://${host}:${port}/jsonrpc`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(kodiRequest),
-    })
+    let kodiResponse: Response
+    try {
+      kodiResponse = await fetch(kodiJsonRpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(kodiRequest),
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      throw new Error(
+        `Failed to connect to Kodi JSON-RPC at ${kodiJsonRpcUrl}. ` +
+          `Set KODI_URL (preferred) or KODI_HOST/KODI_PORT, and ensure Kodi's web server is enabled. ` +
+          `Underlying error: ${message}`,
+      )
+    }
 
     if (!kodiResponse.ok) {
       throw new Error(`Kodi API error: ${kodiResponse.status}`)

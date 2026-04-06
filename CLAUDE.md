@@ -39,11 +39,7 @@ iptvchannels/
 │   ├── lib/utils.ts     # cn() helper function
 │   ├── styles/globals.css  # Tailwind + CSS variables
 │   └── components.json  # shadcn CLI config
-├── env-profiles/        # Environment files (NOT .env.* at root)
-│   ├── local.env        # Local PostgreSQL connection
-│   ├── prod.env         # Supabase connection
-│   ├── supabase.env     # Supabase CLI token
-│   └── .env.example     # Template (only file committed)
+├── (uses ../env-profiles/)  # Environment files live one level above this repo (not committed)
 ├── scripts/             # Database seeding scripts (bash/awk)
 │   ├── seed-channels.sh # Import TV channels from M3U
 │   └── seed-media.sh    # Import movies/series from M3U
@@ -319,20 +315,22 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 
 ## Key Patterns
 
-1. **Environment switching**: Use `dotenv -e env-profiles/<profile>.env --` prefix
+1. **Environment switching**: Use `dotenv -e ../env-profiles/<profile>.env --` prefix (see `package.json` scripts)
 2. **Local = disposable**: Local DB can be reset. Production is source of truth.
 3. **Supabase CLI**: Always use `pnpm supabase` to ensure token is loaded
 4. **No Docker**: Uses local Homebrew PostgreSQL (`john@localhost:5432/iptvchannels`)
 5. **Server-side filtering**: Active, favourite, countries, groupTitleId are all server-side WHERE clauses — not client-side filters
 6. **Normalized group titles**: `group_titles` table is shared by `channels` and `media` via FK. Alias changes propagate to all linked rows. Server functions resolve `groupTitle` string → FK via upsert.
 7. **Lazy DB initialization**: `src/db/index.ts` uses a Proxy that lazily initializes the Drizzle client on first access, preventing client-side import errors in SSR
-6. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
+8. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
+9. **Home Assistant YAML export**: `exportActiveChannelsYaml` (`src/server/channels.ts`) generates per-channel `script:` entries for active channels that have both `scriptAlias` and `contentId`; each script calls `service: script.play_channel` with `content_id`, `channel_title`, `channel_thumbnail`. This repo does not call Home Assistant directly; it emits YAML.
+10. **Kodi sync**: `syncKodiContentIds` (`src/server/channels.ts`) calls Kodi JSON-RPC `PVR.GetChannels` at `KODI_URL` (preferred) or `http://$KODI_HOST:$KODI_PORT/jsonrpc` (defaults to `http://localhost:8080/jsonrpc`), matches by `tvgName` ↔ `label` (case-insensitive), and updates only `channels.contentId` (+ `updatedAt`) used by YAML export.
 
 ## Common Mistakes to Avoid
 
 1. Do NOT create `app.tsx` - TanStack Start doesn't need it
 2. Do NOT import HeadContent/Scripts from `@tanstack/react-start` - they're in `@tanstack/react-router`
-3. Do NOT put .env files at root - use `env-profiles/` directory
+3. Do NOT put .env files at root - use `../env-profiles/` sibling directory (see `package.json` scripts)
 4. Do NOT use Docker for local DB - use Homebrew PostgreSQL
 5. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
 6. Do NOT run multiple vite dev servers - `predev` script handles this automatically
