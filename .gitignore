@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# Environment files with secrets
+env-profiles/*.env
+!env-profiles/.env.example
+
 # Environment files now live outside the repo, under ../env-profiles/
 # Legacy env files inside the repo should not exist
 .env
