@@ -19,10 +19,11 @@ M3U_FILE="$2"
 CSV_FILE="/tmp/media_import.csv"
 
 ENV="${1:-local}"
+ENV_ROOT="${PROJECT_ROOT}/../env-profiles"
 if [[ "$ENV" == "prod" ]]; then
-  source "$PROJECT_ROOT/env-profiles/prod.env"
+  source "$ENV_ROOT/prod.env"
 else
-  source "$PROJECT_ROOT/env-profiles/local.env"
+  source "$ENV_ROOT/local.env"
 fi
 
 # Add Homebrew PostgreSQL to PATH if needed
