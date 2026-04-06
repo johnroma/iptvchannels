@@ -189,6 +189,32 @@ This implementation currently assumes **no HTTP auth** on the JSON-RPC endpoint.
    - enter `content_id` manually in the channel edit form.
 4. Run `Export YAML` and add the output to Home Assistant.
 
+## M3U Export System
+
+M3U export is generated from the database (not from raw seed files) and always reflects current app state.
+
+### Rules used by M3U export
+
+- Exports only rows with `active = true`.
+- Skips rows without `stream_url`.
+- Resolves `group-title` from `COALESCE(group_titles.alias, group_titles.name)`.
+- Channels export uses table `channels`.
+- Movies export uses table `media` with movie-only filtering:
+  - `series_id IS NULL`
+  - `media_type = 'movie'`
+
+### UI export buttons
+
+- `Channels` page `Export M3U` downloads `channels.m3u`.
+- `Movies` page `Export M3U` downloads `movies.m3u`.
+
+### Direct playlist URLs (for VLC / IPTV clients)
+
+- `GET /channels/m3u` returns the live channel playlist as `audio/x-mpegurl`
+- `GET /movies/m3u` returns the live movie playlist as `audio/x-mpegurl`
+
+These URLs always return what a current export would produce, so VLC can open them directly as network playlists.
+
 ## npm Scripts
 
 ### Database Commands

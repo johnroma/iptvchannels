@@ -71,6 +71,13 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
             </a>
             <span className="mx-2">|</span>
             <a
+              href="/channels/m3u"
+              className="text-blue-600"
+            >
+              Channels M3U URL
+            </a>
+            <span className="mx-2">|</span>
+            <a
               href="/channels/new"
               className="text-blue-600"
             >
@@ -82,6 +89,13 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
               className="text-blue-600"
             >
               Movies
+            </a>
+            <span className="mx-2">|</span>
+            <a
+              href="/movies/m3u"
+              className="text-blue-600"
+            >
+              Movies M3U URL
             </a>
             <span className="mx-2">|</span>
             <a

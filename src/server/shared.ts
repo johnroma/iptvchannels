@@ -13,6 +13,7 @@ import { queryOptions } from "@tanstack/react-query"
 import { createServerFn } from "@tanstack/react-start"
 import { db, channels, media, series, groupTitles } from "~/db"
 import { isNull } from "drizzle-orm"
+import { getActiveStreamsM3u } from "./m3u"
 
 // ─── Table Registry ─────────────────────────────────────────
 
@@ -282,35 +283,7 @@ export async function createStreamLogic(tableKey: TableKey, data: any) {
 
 export const exportActiveStreamsM3u = createServerFn({ method: "GET" })
   .inputValidator((data: { table: "channels" | "media" }) => data)
-  .handler(async ({ data }) => {
-    const { generateM3u } = await import("~/lib/m3u-export")
-    const table = tables[data.table]
-
-    // For media, only export movies (no series episodes)
-    const exportFilter =
-      data.table === "media"
-        ? and(eq(table.active, true), isNull(media.seriesId))
-        : eq(table.active, true)
-
-    const activeItems = await db
-      .select({
-        tvgId: table.tvgId,
-        tvgName: table.tvgName,
-        tvgLogo: table.tvgLogo,
-        streamUrl: table.streamUrl,
-        name: table.name,
-        groupTitle: sql<
-          string | null
-        >`COALESCE(${groupTitles.alias}, ${groupTitles.name})`,
-      })
-      .from(table)
-      .leftJoin(groupTitles, eq(table.groupTitleId, groupTitles.id))
-      .where(exportFilter)
-      .orderBy(asc(table.name))
-
-    const m3u = generateM3u(activeItems)
-    return { m3u, count: activeItems.filter((m) => m.streamUrl).length }
-  })
+  .handler(async ({ data }) => getActiveStreamsM3u(data.table))
 
 // ─── Group Titles ───────────────────────────────────────────
 
