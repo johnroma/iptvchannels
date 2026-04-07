@@ -325,6 +325,20 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 8. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
 9. **Home Assistant YAML export**: `exportActiveChannelsYaml` (`src/server/channels.ts`) generates per-channel `script:` entries for active channels that have both `scriptAlias` and `contentId`; each script calls `service: script.play_channel` with `content_id`, `channel_title`, `channel_thumbnail`. This repo does not call Home Assistant directly; it emits YAML.
 10. **Kodi sync**: `syncKodiContentIds` (`src/server/channels.ts`) calls Kodi JSON-RPC `PVR.GetChannels` at `KODI_URL` (preferred) or `http://$KODI_HOST:$KODI_PORT/jsonrpc` (defaults to `http://localhost:8080/jsonrpc`), matches by `tvgName` ↔ `label` (case-insensitive), and updates only `channels.contentId` (+ `updatedAt`) used by YAML export.
+11. **M3U export + URLs**: M3U output is DB-driven and active-only. Direct URLs are available at `/channels/m3u` and `/movies/m3u` via TanStack Start server routes (VLC-friendly `audio/x-mpegurl`), which avoids collision with the app's `$id` pages. Movies export filters to movie rows (`seriesId IS NULL` and `mediaType = "movie"`).
+12. **M3U formatting rules**: M3U uses `name || tvgName` as the visible label after the comma, keeps `tvg-name` as the original `tvgName`, and prefers the full English country name derived from `countryCode` for `group-title` before falling back to `COALESCE(group_titles.alias, group_titles.name)`.
+
+## Navigation Overview
+
+- `Home` - system overview and explanation of the navigation
+- `Channels` - live TV management, filters, active/favourite state, `Export M3U`, `Export YAML`, and `Sync Kodi`
+- `Channels M3U URL` - direct active-channel playlist at `/channels/m3u`
+- `Add Channel` - create a new live TV channel
+- `Movies` - movie management from the `media` table, excluding series episodes
+- `Movies M3U URL` - direct active-movie playlist at `/movies/m3u`
+- `Add Movie` - create a new movie
+- `Series` - series management and episode collections
+- `Add Series` - create a new series with episodes
 
 ## Common Mistakes to Avoid
 

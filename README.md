@@ -189,6 +189,50 @@ This implementation currently assumes **no HTTP auth** on the JSON-RPC endpoint.
    - enter `content_id` manually in the channel edit form.
 4. Run `Export YAML` and add the output to Home Assistant.
 
+## M3U Export System
+
+M3U export is generated from the database (not from raw seed files) and always reflects current app state.
+
+### Rules used by M3U export
+
+- Exports only rows with `active = true`.
+- Skips rows without `stream_url`.
+- Uses `name || tvg_name` as the visible M3U label after the comma in `#EXTINF`.
+- Keeps `tvg-name` as the original `tvg_name`.
+- Resolves `group-title` from country first when `country_code` exists on channels:
+  - `country_code` -> full English country name (for example `US` -> `United States`)
+  - otherwise falls back to `COALESCE(group_titles.alias, group_titles.name)`
+- Channels export uses table `channels`.
+- Movies export uses table `media` with movie-only filtering:
+  - `series_id IS NULL`
+  - `media_type = 'movie'`
+
+### UI export buttons
+
+- `Channels` page `Export M3U` downloads `channels.m3u`.
+- `Movies` page `Export M3U` downloads `movies.m3u`.
+
+### Direct playlist URLs (for VLC / IPTV clients)
+
+- `GET /channels/m3u` returns the live channel playlist as `audio/x-mpegurl`
+- `GET /movies/m3u` returns the live movie playlist as `audio/x-mpegurl`
+
+These URLs always return what a current export would produce, so VLC can open them directly as network playlists.
+
+## Navigation Overview
+
+The landing page explains the same structure shown in the top navigation:
+
+- `Home` - overview of the system and how channels, movies, series, Kodi sync, YAML export, and M3U feeds fit together
+- `Channels` - manage live TV channels, filters, active/favourite state, exports, and Kodi sync
+- `Channels M3U URL` - live active-channel playlist at `/channels/m3u` for VLC or other IPTV clients
+- `Add Channel` - create a new live TV channel record
+- `Movies` - manage movie entries stored in `media` where `series_id IS NULL` and `media_type = 'movie'`
+- `Movies M3U URL` - live active-movie playlist at `/movies/m3u`
+- `Add Movie` - create a new movie record
+- `Series` - manage series rows and their episode collections
+- `Add Series` - create a new series record with episodes
+
 ## npm Scripts
 
 ### Database Commands
