@@ -11,6 +11,7 @@ describe("generateM3u", () => {
         groupTitle: "US| ENTERTAINMENT",
         streamUrl: "http://example.com/stream1",
         name: "A&E",
+        countryCode: "US",
       },
       {
         tvgId: "US-ABC HD Boston",
@@ -26,7 +27,7 @@ describe("generateM3u", () => {
 
     expect(result).toMatch(/^#EXTM3U\n/)
     expect(result).toContain(
-      '#EXTINF:-1 tvg-id="AandE.us" tvg-name="US| A&E HD" tvg-logo="http://example.com/logo1.png" group-title="US| ENTERTAINMENT",US| A&E HD'
+      '#EXTINF:-1 tvg-id="AandE.us" tvg-name="US| A&E HD" tvg-logo="http://example.com/logo1.png" group-title="United States",A&E'
     )
     expect(result).toContain("http://example.com/stream1\n")
     expect(result).toContain(
@@ -66,6 +67,37 @@ describe("generateM3u", () => {
 
     expect(result).toBe(
       '#EXTM3U\n#EXTINF:-1 tvg-name="Minimal Channel",Minimal Channel\nhttp://example.com/minimal\n'
+    )
+  })
+
+  it("uses custom name as the visible M3U label", () => {
+    const channels: M3uChannel[] = [
+      {
+        tvgName: "US| CNN HD",
+        name: "CNN",
+        streamUrl: "http://example.com/cnn",
+      },
+    ]
+
+    const result = generateM3u(channels)
+
+    expect(result).toContain('#EXTINF:-1 tvg-name="US| CNN HD",CNN')
+  })
+
+  it("prefers the full country name for group-title when countryCode exists", () => {
+    const channels: M3uChannel[] = [
+      {
+        tvgName: "SE| SVT1",
+        groupTitle: "SE| ENTERTAINMENT",
+        countryCode: "SE",
+        streamUrl: "http://example.com/svt1",
+      },
+    ]
+
+    const result = generateM3u(channels)
+
+    expect(result).toContain(
+      '#EXTINF:-1 tvg-name="SE| SVT1" group-title="Sweden",SE| SVT1'
     )
   })
 

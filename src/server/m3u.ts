@@ -28,6 +28,7 @@ export async function getActiveStreamsM3u(tableKey: ExportTable) {
       tvgLogo: table.tvgLogo,
       streamUrl: table.streamUrl,
       name: table.name,
+      countryCode: tableKey === "channels" ? channels.countryCode : sql<null>`NULL`,
       groupTitle: sql<
         string | null
       >`COALESCE(${groupTitles.alias}, ${groupTitles.name})`,
