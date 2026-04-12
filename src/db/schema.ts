@@ -1,4 +1,5 @@
 import {
+  pgSchema,
   pgTable,
   text,
   boolean,
@@ -10,9 +11,17 @@ import {
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 
+const configuredSchema = process.env.DB_SCHEMA?.trim()
+const useNamedSchema = Boolean(
+  configuredSchema && configuredSchema.toLowerCase() !== "public",
+)
+const makeTable = useNamedSchema
+  ? pgSchema(configuredSchema as string).table
+  : pgTable
+
 // Group titles lookup table - normalized from channels/media
 // Normalized group titles for faster lookups and cleaner data
-export const groupTitles = pgTable("group_titles", {
+export const groupTitles = makeTable("group_titles", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(), // Original M3U value (e.g., "US| ENTERTAINMENT")
   alias: text("alias"), // Friendly display name (e.g. "Movies" instead of "US| MOVIES")
@@ -21,7 +30,7 @@ export const groupTitles = pgTable("group_titles", {
 export type GroupTitle = typeof groupTitles.$inferSelect
 
 // Channels table combining M3U data with Kodi content IDs
-export const channels = pgTable("channels", {
+export const channels = makeTable("channels", {
   id: uuid("id").primaryKey().defaultRandom(),
 
   // From M3U file
@@ -66,7 +75,7 @@ export type Channel = ChannelRow & {
 }
 
 // Series table - groups related episodes
-export const series = pgTable("series", {
+export const series = makeTable("series", {
   id: uuid("id").primaryKey().defaultRandom(),
 
   tvgId: text("tvg_id"),
@@ -88,7 +97,7 @@ export const series = pgTable("series", {
 })
 
 // Media table for movies and series episodes
-export const media = pgTable(
+export const media = makeTable(
   "media",
   {
     id: uuid("id").primaryKey().defaultRandom(),
