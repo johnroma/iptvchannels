@@ -243,10 +243,11 @@ Located at `src/db/validators.ts` (NOT `schema.ts`):
 Located at `src/db/schema.ts`. Group titles are normalized into a lookup table shared by channels and media.
 
 Current local/shared-DB layout:
-- database: `sodium`
-- application schema: `iptvchannels`
-- `drizzle.config.ts` uses `schemaFilter: ["iptvchannels"]`
-- `src/db/schema.ts` uses `pgSchema("iptvchannels")`
+- local shared database: `sodium`
+- local application schema: `iptvchannels`
+- schema targeting is env-driven via `DB_SCHEMA`
+- when `DB_SCHEMA=iptvchannels`, `drizzle.config.ts` applies `schemaFilter: ["iptvchannels"]`
+- when `DB_SCHEMA` is unset or `public`, the app falls back to the old unqualified/public-table layout for compatibility
 - local role search path is expected to resolve `iptvchannels, public`
 
 Tables in that schema:
@@ -360,7 +361,7 @@ Known local runtime split:
 3. Do NOT import HeadContent/Scripts from `@tanstack/react-start` - they're in `@tanstack/react-router`
 4. Do NOT put .env files at root - use `../env-profiles/` sibling directory (see `package.json` scripts)
 5. Do NOT use Docker for local DB - use Homebrew PostgreSQL
-6. Do NOT forget this app now targets `sodium.iptvchannels` locally, not `public` tables in a standalone `iptvchannels` database
+6. Do NOT forget local schema targeting is now env-driven. For the shared local DB use `DATABASE_URL=.../sodium` plus `DB_SCHEMA=iptvchannels`; for backward-compatible environments leave `DB_SCHEMA` unset.
 7. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
 8. Do NOT run multiple vite dev servers - `predev` script handles this automatically
 9. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
