@@ -5,6 +5,7 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   // Output to supabase/migrations for compatibility with supabase db push
   out: "./supabase/migrations",
+  schemaFilter: ["iptvchannels"],
   dbCredentials: {
     // Loaded from .env (local) or .env.production (Supabase)
     url: process.env.DATABASE_URL!,

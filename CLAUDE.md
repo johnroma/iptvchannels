@@ -7,7 +7,7 @@ IPTV Channel Management system with:
 - **Backend**: Drizzle ORM + PostgreSQL
 - **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Linting**: ESLint flat config + typescript-eslint
-- **Local DB**: Homebrew PostgreSQL (not Docker)
+- **Local DB**: Homebrew PostgreSQL (not Docker), currently using shared database `sodium`
 - **Production DB**: Supabase
 - **Deployment**: Vercel (planned)
 
@@ -242,6 +242,14 @@ Located at `src/db/validators.ts` (NOT `schema.ts`):
 
 Located at `src/db/schema.ts`. Group titles are normalized into a lookup table shared by channels and media.
 
+Current local/shared-DB layout:
+- database: `sodium`
+- application schema: `iptvchannels`
+- `drizzle.config.ts` uses `schemaFilter: ["iptvchannels"]`
+- `src/db/schema.ts` uses `pgSchema("iptvchannels")`
+- local role search path is expected to resolve `iptvchannels, public`
+
+Tables in that schema:
 - `group_titles` table: Normalized lookup (id:serial PK, name:text UNIQUE, alias:text). `name` is the original M3U value (e.g., "US| ENTERTAINMENT"), `alias` is an optional friendly override (e.g., "Entertainment"). Changing an alias updates it for all linked channels/media.
 - `channels` table: Live TV channels (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
 - `media` table: Movies/series (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, groupTitle:text, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
@@ -313,6 +321,11 @@ pnpm sb:status        # Check Supabase table stats
 
 Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and uses `--strictPort` to fail if port is still busy.
 
+Known local runtime split:
+- `pnpm dev` serves the editable dev runtime on `127.0.0.1:3000`
+- `srv/` is the production-like local runtime on `127.0.0.1:3100`
+- when refreshing `srv`, build in `source/` first, then copy `source/.output/` into `srv/.output/` before restarting `srv`
+
 ## Key Patterns
 
 1. **Environment switching**: Use `dotenv -e ../env-profiles/<profile>.env --` prefix (see `package.json` scripts)
@@ -342,18 +355,21 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 
 ## Common Mistakes to Avoid
 
-1. Do NOT create `app.tsx` - TanStack Start doesn't need it
-2. Do NOT import HeadContent/Scripts from `@tanstack/react-start` - they're in `@tanstack/react-router`
-3. Do NOT put .env files at root - use `../env-profiles/` sibling directory (see `package.json` scripts)
-4. Do NOT use Docker for local DB - use Homebrew PostgreSQL
-5. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
-6. Do NOT run multiple vite dev servers - `predev` script handles this automatically
-7. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
-8. Do NOT use `type` for TanStack Router's `Register` declaration - must be `interface` for module augmentation (add eslint-disable comment)
-9. Do NOT filter channels client-side for active/favourite/countries/group - these are server-side filters passed to `listChannels`
-10. Do NOT use `groupTitle` string for filtering in the frontend — use `groupTitleId` (FK integer) which is faster and avoids a JOIN
-11. Do NOT use `db.query.channels.findMany()` when you need resolved group title data — use explicit `.select()` with LEFT JOIN to `group_titles`
-12. Do NOT import `db` at module top-level in files that may run on the client — the Proxy will throw. Only use `db` inside server functions.
+1. Do NOT skip this file when doing framework-level work. `CLAUDE.md` is authoritative for this repo's TanStack Start/router setup and should be checked before changing root/router wiring.
+2. Do NOT create `app.tsx` - TanStack Start doesn't need it
+3. Do NOT import HeadContent/Scripts from `@tanstack/react-start` - they're in `@tanstack/react-router`
+4. Do NOT put .env files at root - use `../env-profiles/` sibling directory (see `package.json` scripts)
+5. Do NOT use Docker for local DB - use Homebrew PostgreSQL
+6. Do NOT forget this app now targets `sodium.iptvchannels` locally, not `public` tables in a standalone `iptvchannels` database
+7. Do NOT use `eq` from callback destructuring in Drizzle - import directly from `drizzle-orm`
+8. Do NOT run multiple vite dev servers - `predev` script handles this automatically
+9. Do NOT add shadcn components from wrong directory - must be in `packages/ui/`
+10. Do NOT use `type` for TanStack Router's `Register` declaration - must be `interface` for module augmentation (add eslint-disable comment)
+11. Do NOT filter channels client-side for active/favourite/countries/group - these are server-side filters passed to `listChannels`
+12. Do NOT use `groupTitle` string for filtering in the frontend — use `groupTitleId` (FK integer) which is faster and avoids a JOIN
+13. Do NOT use `db.query.channels.findMany()` when you need resolved group title data — use explicit `.select()` with LEFT JOIN to `group_titles`
+14. Do NOT import `db` at module top-level in files that may run on the client — the Proxy will throw. Only use `db` inside server functions.
+15. Do NOT assume `srv/` is current just because it runs. If you need confidence, compare `source/.output` and `srv/.output` after copying and restarting.
 
 ## GitHub Repository
 
