@@ -284,7 +284,8 @@ ESLint flat config at `eslint.config.mjs` with `typescript-eslint`:
 # Development
 pnpm dev              # Run with local.env (kills existing port 3000 first)
 pnpm dev:prod         # Run with prod.env (Supabase data)
-pnpm build            # Production build
+pnpm build            # Local production build
+pnpm build:prod       # Production-shaped build directly into ../srv/.output
 pnpm preview          # Preview production build
 pnpm start            # Start production server
 pnpm test             # Run tests (vitest watch)
@@ -325,7 +326,7 @@ Note: `pnpm dev` runs `predev` first which kills any process on port 3000, and u
 Known local runtime split:
 - `pnpm dev` serves the editable dev runtime on `127.0.0.1:3000`
 - `srv/` is the production-like local runtime on `127.0.0.1:3100`
-- when refreshing `srv`, build in `source/` first, then copy `source/.output/` into `srv/.output/` before restarting `srv`
+- when refreshing `srv`, run `pnpm build:prod` from the inner repo; `prod.env` sets `NITRO_OUTPUT_DIR=../srv/.output`, so the build writes directly into the wrapper runtime with no copy step
 
 ## Key Patterns
 
@@ -370,7 +371,7 @@ Known local runtime split:
 12. Do NOT use `groupTitle` string for filtering in the frontend — use `groupTitleId` (FK integer) which is faster and avoids a JOIN
 13. Do NOT use `db.query.channels.findMany()` when you need resolved group title data — use explicit `.select()` with LEFT JOIN to `group_titles`
 14. Do NOT import `db` at module top-level in files that may run on the client — the Proxy will throw. Only use `db` inside server functions.
-15. Do NOT assume `srv/` is current just because it runs. If you need confidence, compare `source/.output` and `srv/.output` after copying and restarting.
+15. Do NOT refresh `srv/` by copying `.output` from the source checkout. Use `pnpm build:prod`, which emits directly into `../srv/.output` via `NITRO_OUTPUT_DIR`.
 
 ## GitHub Repository
 
