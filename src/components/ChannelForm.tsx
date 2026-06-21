@@ -206,10 +206,10 @@ export function ChannelForm(props: Readonly<ChannelFormProps>) {
             <Label htmlFor="streamUrl">Stream URL</Label>
             <Input
               id="streamUrl"
-              type="url"
+              type="text"
               value={formData.streamUrl}
               onChange={(e) => updateField("streamUrl", e.target.value)}
-              placeholder="https://..."
+              placeholder="e.g., path/to/stream or https://..."
             />
           </div>
         </div>
