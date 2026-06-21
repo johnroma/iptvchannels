@@ -14,7 +14,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { db, channels, media, series, groupTitles } from "~/db"
 import { isNull } from "drizzle-orm"
 import { getActiveStreamsM3u } from "./m3u"
-import { stripStreamBase } from "~/lib/stream-url"
+import { buildStreamUrl, stripStreamBase } from "~/lib/stream-url"
 
 // ─── Table Registry ─────────────────────────────────────────
 
@@ -98,7 +98,12 @@ export const listStreams = createServerFn({ method: "GET" })
       .limit(data.limit)
       .offset(data.cursor)
 
-    return { data: result, totalCount }
+    const rows = result.map((row) => ({
+      ...row,
+      playUrl: buildStreamUrl(row.streamUrl),
+    }))
+
+    return { data: rows, totalCount }
   })
 
 // ─── Query Options ──────────────────────────────────────────
