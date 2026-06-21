@@ -392,12 +392,12 @@ export function SeriesForm(props: Readonly<SeriesFormProps>) {
                       </td>
                       <td className="px-3 py-1">
                         <Input
-                          type="url"
+                          type="text"
                           value={ep.streamUrl}
                           onChange={(e) =>
                             updateEpisode(idx, "streamUrl", e.target.value)
                           }
-                          placeholder="https://..."
+                          placeholder="e.g., path/to/stream"
                         />
                       </td>
                       <td className="px-3 py-1">
