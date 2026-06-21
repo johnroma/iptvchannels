@@ -271,10 +271,7 @@ export const channelSchema = baseSchema
       .union([z.url(), z.literal("")])
       .optional()
       .nullable(),
-    streamUrl: z
-      .union([z.url(), z.literal("")])
-      .optional()
-      .nullable(),
+    streamUrl: z.string().optional().nullable(),
     countryCode: z
       .enum(COUNTRY_CODES, {
         message: "Invalid ISO 3166-1 Alpha-2 country code",
@@ -305,10 +302,7 @@ export const mediaSchema = mediaBaseSchema
       .union([z.url(), z.literal("")])
       .optional()
       .nullable(),
-    streamUrl: z
-      .union([z.url(), z.literal("")])
-      .optional()
-      .nullable(),
+    streamUrl: z.string().optional().nullable(),
     // Accept groupTitle as string, server will resolve to FK
     groupTitle: z.string().optional().nullable(),
     groupTitleId: z.number().optional().nullable(),
@@ -347,10 +341,7 @@ const episodeSchema = z.object({
   season: z.coerce.number().int().min(0).optional().nullable(),
   episode: z.coerce.number().int().min(0).optional().nullable(),
   year: z.coerce.number().int().min(1888).max(2100).optional().nullable(),
-  streamUrl: z
-    .union([z.url(), z.literal("")])
-    .optional()
-    .nullable(),
+  streamUrl: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
 })
 

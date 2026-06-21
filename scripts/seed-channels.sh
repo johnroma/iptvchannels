@@ -97,6 +97,9 @@ BEGIN {
   gsub(/\t/, " ", tvg_logo)
   gsub(/\t/, " ", group_title)
 
+  # Strip scheme://host:port/ prefix — only the path is stored
+  sub(/^https?:\/\/[^/]+\//, "", url)
+
   print tvg_id "\t" tvg_name "\t" tvg_logo "\t" group_title "\t" url
   count++
   has_extinf = 0

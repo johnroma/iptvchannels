@@ -1,6 +1,7 @@
 import { and, asc, eq, isNull, sql } from "drizzle-orm"
 import { db, channels, media, groupTitles } from "~/db"
 import { generateM3u } from "~/lib/m3u-export"
+import { buildStreamUrl } from "~/lib/stream-url"
 
 const exportTables = {
   channels,
@@ -38,6 +39,11 @@ export async function getActiveStreamsM3u(tableKey: ExportTable) {
     .where(exportFilter)
     .orderBy(asc(table.name))
 
-  const m3u = generateM3u(activeItems)
+  const m3u = generateM3u(
+    activeItems.map((item) => ({
+      ...item,
+      streamUrl: buildStreamUrl(item.streamUrl),
+    })),
+  )
   return { m3u, count: activeItems.filter((item) => item.streamUrl).length }
 }
