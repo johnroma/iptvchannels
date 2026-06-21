@@ -257,6 +257,7 @@ function RouteComponent() {
               key={item.id}
               item={item}
               editHref={`/edit-movie/${item.id}`}
+              playHref={`/play/media/${item.id}`}
               queryKey="media"
             />
           ))}

@@ -398,6 +398,7 @@ function RouteComponent() {
               key={channel.id}
               item={channel}
               editHref={`/edit/${channel.id}`}
+              playHref={`/play/channels/${channel.id}`}
               queryKey="channels"
             />
           ))}

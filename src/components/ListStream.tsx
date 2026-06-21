@@ -1,4 +1,6 @@
 import { type ReactNode } from "react"
+import { Pencil, Play } from "lucide-react"
+import { Button } from "@ui/components/button"
 import { ActiveSwitch } from "./ActiveSwitch"
 
 export type Stream = {
@@ -6,12 +8,15 @@ export type Stream = {
   tvgName: string
   name: string | null
   active: boolean | null
+  playUrl: string | null
 }
 
 type ListStreamProps = {
   item: Stream
   editHref: string
+  playHref?: string
   queryKey: string
+  hidePlay?: boolean
   onToggle?: (id: string, active: boolean) => Promise<unknown>
   children?: ReactNode
 }
@@ -19,7 +24,9 @@ type ListStreamProps = {
 export function ListStream({
   item,
   editHref,
+  playHref,
   queryKey,
+  hidePlay = false,
   onToggle,
   children,
 }: Readonly<ListStreamProps>) {
@@ -42,13 +49,30 @@ export function ListStream({
       )}
       <span>{item.tvgName}</span>
       {children}
-      <span className="text-gray-400">-</span>
-      <a
-        href={editHref}
-        className="text-blue-600 hover:underline"
-      >
-        Edit
-      </a>
+      <div className="flex items-center gap-1 ml-2">
+        <Button variant="outline" size="sm" asChild>
+          <a href={editHref}>
+            <Pencil />
+            Edit
+          </a>
+        </Button>
+        {!hidePlay && playHref && item.playUrl && (
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+          >
+            <a
+              href={playHref}
+              title={`Play ${item.name ?? item.tvgName}`}
+            >
+              <Play />
+              Play
+            </a>
+          </Button>
+        )}
+      </div>
     </li>
   )
 }

@@ -265,6 +265,7 @@ function RouteComponent() {
               item={item}
               editHref={`/edit-series/${item.id}`}
               queryKey="series"
+              hidePlay
               onToggle={handleToggleSeriesActive}
             >
               {item.episodeCount !== undefined && (
