@@ -13,6 +13,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { db, series, media, groupTitles } from "~/db"
 import { seriesSchema, seriesUpdateSchema } from "~/db/validators"
 import { resolveGroupTitleId } from "./shared"
+import { stripStreamBase } from "~/lib/stream-url"
 
 // ─── List Series ────────────────────────────────────────────
 
@@ -233,7 +234,7 @@ export const updateSeries = createServerFn({ method: "POST" })
               season: ep.season ?? null,
               episode: ep.episode ?? null,
               year: ep.year ?? null,
-              streamUrl: ep.streamUrl || null,
+              streamUrl: stripStreamBase(ep.streamUrl) || null,
               name: ep.name || null,
               updatedAt: new Date(),
             })
@@ -337,6 +338,7 @@ export const createSeries = createServerFn({ method: "POST" })
 export const exportActiveSeriesM3u = createServerFn({ method: "GET" })
   .handler(async () => {
     const { generateM3u } = await import("~/lib/m3u-export")
+    const { buildStreamUrl } = await import("~/lib/stream-url")
 
     // Get all episodes of active series
     const episodes = await db
@@ -356,7 +358,12 @@ export const exportActiveSeriesM3u = createServerFn({ method: "GET" })
       .where(eq(series.active, true))
       .orderBy(asc(series.name), asc(media.season), asc(media.episode))
 
-    const m3u = generateM3u(episodes)
+    const m3u = generateM3u(
+      episodes.map((ep) => ({
+        ...ep,
+        streamUrl: buildStreamUrl(ep.streamUrl),
+      })),
+    )
     return { m3u, count: episodes.filter((e) => e.streamUrl).length }
   })
 

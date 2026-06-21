@@ -97,10 +97,13 @@ BEGIN {
     next
   }
 
-  # Determine media type from URL
+  # Determine media type from URL (before stripping base)
   media_type = ""
   if (url ~ /\/movie\//) media_type = "movie"
   else if (url ~ /\/series\//) media_type = "series"
+
+  # Strip scheme://host:port/ prefix — only the path is stored
+  sub(/^https?:\/\/[^/]+\//, "", url)
 
   # Parse year from title like "(1994)" - BSD awk compatible
   year = ""

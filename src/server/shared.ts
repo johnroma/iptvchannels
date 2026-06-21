@@ -14,6 +14,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { db, channels, media, series, groupTitles } from "~/db"
 import { isNull } from "drizzle-orm"
 import { getActiveStreamsM3u } from "./m3u"
+import { stripStreamBase } from "~/lib/stream-url"
 
 // ─── Table Registry ─────────────────────────────────────────
 
@@ -208,7 +209,7 @@ export async function updateStreamLogic(tableKey: TableKey, data: any) {
       ...updateData,
       groupTitleId,
       tvgLogo: updateData.tvgLogo || null,
-      streamUrl: updateData.streamUrl || null,
+      streamUrl: stripStreamBase(updateData.streamUrl) || null,
       updatedAt: new Date(),
     })
     .where(eq(table.id, id))
@@ -254,7 +255,7 @@ export async function createStreamLogic(tableKey: TableKey, data: any) {
       ...insertData,
       groupTitleId,
       tvgLogo: insertData.tvgLogo || null,
-      streamUrl: insertData.streamUrl || null,
+      streamUrl: stripStreamBase(insertData.streamUrl) || null,
     })
     .returning()
 
