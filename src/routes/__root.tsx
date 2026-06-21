@@ -9,9 +9,39 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 import * as React from "react"
 import type { QueryClient } from "@tanstack/react-query"
+import {
+  Clapperboard,
+  Film,
+  Home as HomeIcon,
+  Plus,
+  Rss,
+  Tv,
+} from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary"
 import { NotFound } from "~/components/NotFound"
 import globalCss from "@ui/styles/globals.css?url"
+
+type NavItem = { href: string; label: string; icon: LucideIcon }
+
+// Grouped by content type: list → add → feed
+const navGroups: NavItem[][] = [
+  [{ href: "/", label: "Home", icon: HomeIcon }],
+  [
+    { href: "/channels", label: "Channels", icon: Tv },
+    { href: "/channels/new", label: "Add Channel", icon: Plus },
+    { href: "/channels/m3u", label: "Channels Feed", icon: Rss },
+  ],
+  [
+    { href: "/movies", label: "Movies", icon: Film },
+    { href: "/movies/new", label: "Add Movie", icon: Plus },
+    { href: "/movies/m3u", label: "Movies Feed", icon: Rss },
+  ],
+  [
+    { href: "/series", label: "Series", icon: Clapperboard },
+    { href: "/series/new", label: "Add Series", icon: Plus },
+  ],
+]
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -55,71 +85,32 @@ function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
       </head>
       <body>
         <header className="m-10">
-          <nav className="mb-4">
-            <a
-              href="/"
-              className="text-blue-600"
-            >
-              Home
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/channels"
-              className="text-blue-600"
-            >
-              Channels
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/channels/m3u"
-              className="text-blue-600"
-            >
-              Channels M3U URL
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/channels/new"
-              className="text-blue-600"
-            >
-              Add Channel
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/movies"
-              className="text-blue-600"
-            >
-              Movies
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/movies/m3u"
-              className="text-blue-600"
-            >
-              Movies M3U URL
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/movies/new"
-              className="text-blue-600"
-            >
-              Add Movie
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/series"
-              className="text-blue-600"
-            >
-              Series
-            </a>
-            <span className="mx-2">|</span>
-            <a
-              href="/series/new"
-              className="text-blue-600"
-            >
-              Add Series
-            </a>
+          <nav className="mb-6 flex flex-wrap items-center gap-1">
+            {navGroups.map((group, groupIndex) => (
+              <React.Fragment key={groupIndex}>
+                {groupIndex > 0 && (
+                  <span
+                    aria-hidden
+                    className="mx-1 h-5 w-px bg-border"
+                  />
+                )}
+                {group.map(({ href, label, icon: Icon }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <Icon className="size-4" />
+                    {label}
+                  </a>
+                ))}
+              </React.Fragment>
+            ))}
           </nav>
-          <h1 className="text-3xl font-bold">IPTV Channels Management</h1>
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
+            <Tv className="size-7 text-primary" />
+            IPTV Channels Management
+          </h1>
         </header>
         <main className="m-10">{children}</main>
         <TanStackRouterDevtools position="bottom-right" />
