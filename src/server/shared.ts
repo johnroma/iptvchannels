@@ -7,6 +7,8 @@ import {
   count,
   inArray,
   sql,
+  ilike,
+  or,
   getTableColumns,
 } from "drizzle-orm"
 import { queryOptions } from "@tanstack/react-query"
@@ -176,6 +178,42 @@ export const getStreamById = createServerFn({ method: "GET" })
       .limit(1)
 
     return result[0] ?? null
+  })
+
+// ─── Search Streams (autocomplete) ──────────────────────────
+
+const searchStreamSchema = z.object({
+  table: z.enum(["channels", "media", "series"]),
+  query: z.string().min(1).max(100),
+  limit: z.number().optional().default(30),
+})
+
+export const searchStreams = createServerFn({ method: "GET" })
+  .inputValidator(searchStreamSchema)
+  .handler(async ({ data }) => {
+    const table = tables[data.table]
+    const pattern = `%${data.query}%`
+
+    const filters = [
+      or(ilike(table.name, pattern), ilike(table.tvgName, pattern)),
+    ]
+    // For media table, exclude series episodes
+    if (data.table === "media") {
+      filters.push(isNull(media.seriesId))
+    }
+
+    const result = await db
+      .select({
+        id: table.id,
+        name: table.name,
+        tvgName: table.tvgName,
+      })
+      .from(table)
+      .where(and(...filters))
+      .orderBy(asc(table.name))
+      .limit(data.limit)
+
+    return result
   })
 
 // ─── Update Logic ───────────────────────────────────────────

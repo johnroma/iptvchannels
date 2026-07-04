@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@ui/components/select"
 import { ListStream } from "~/components/ListStream"
+import { MovieCombobox } from "~/components/MovieCombobox"
 import {
   ChevronLeft,
   ChevronRight,
@@ -202,6 +203,8 @@ function RouteComponent() {
             </SelectContent>
           </Select>
         </div>
+
+        <MovieCombobox />
 
         <div className="flex items-center space-x-2 border-l pl-4">
           <Button

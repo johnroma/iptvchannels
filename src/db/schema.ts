@@ -9,7 +9,7 @@ import {
   serial,
   index,
 } from "drizzle-orm/pg-core"
-import { relations } from "drizzle-orm"
+import { relations, sql } from "drizzle-orm"
 
 const configuredSchema = process.env.DB_SCHEMA?.trim()
 const useNamedSchema = Boolean(
@@ -55,7 +55,13 @@ export const channels = makeTable("channels", {
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-})
+}, (table) => [
+  // Indexes: trigram GIN for ILIKE search + B-tree for pagination
+  index("channels_name_trgm_idx").using("gin", sql`${table.name} gin_trgm_ops`),
+  index("channels_tvg_name_trgm_idx").using("gin", sql`${table.tvgName} gin_trgm_ops`),
+  index("channels_name_id_idx").on(table.name, table.id),
+  index("channels_created_at_id_idx").on(table.createdAt, table.id),
+])
 
 // Relations for db.query with 'with'
 export const channelsRelations = relations(channels, ({ one }) => ({
@@ -94,7 +100,13 @@ export const series = makeTable("series", {
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-})
+}, (table) => [
+  // Indexes: trigram GIN for ILIKE search + B-tree for pagination
+  index("series_name_trgm_idx").using("gin", sql`${table.name} gin_trgm_ops`),
+  index("series_tvg_name_trgm_idx").using("gin", sql`${table.tvgName} gin_trgm_ops`),
+  index("series_name_id_idx").on(table.name, table.id),
+  index("series_created_at_id_idx").on(table.createdAt, table.id),
+])
 
 // Media table for movies and series episodes
 export const media = makeTable(
@@ -129,6 +141,11 @@ export const media = makeTable(
   },
   (table) => [
     index("media_series_id_idx").on(table.seriesId),
+    // Partial indexes (movies only: series_id IS NULL) for ILIKE search + pagination
+    index("media_name_trgm_idx").using("gin", sql`${table.name} gin_trgm_ops`).where(sql`${table.seriesId} IS NULL`),
+    index("media_tvg_name_trgm_idx").using("gin", sql`${table.tvgName} gin_trgm_ops`).where(sql`${table.seriesId} IS NULL`),
+    index("media_name_id_idx").on(table.name, table.id).where(sql`${table.seriesId} IS NULL`),
+    index("media_created_at_id_idx").on(table.createdAt, table.id).where(sql`${table.seriesId} IS NULL`),
   ],
 )
 

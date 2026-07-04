@@ -39,6 +39,7 @@ export default defineConfig({
   server: {
     host,
     port,
+    allowedHosts: [host, "3000.anthood.net"],
   },
   plugins: [
     fixJsonDevServe,
