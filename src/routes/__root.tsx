@@ -11,6 +11,7 @@ import * as React from "react"
 import type { QueryClient } from "@tanstack/react-query"
 import {
   Clapperboard,
+  FileCode,
   Film,
   Home as HomeIcon,
   Plus,
@@ -31,6 +32,7 @@ const navGroups: NavItem[][] = [
     { href: "/channels", label: "Channels", icon: Tv },
     { href: "/channels/new", label: "Add Channel", icon: Plus },
     { href: "/channels/m3u", label: "Channels Feed", icon: Rss },
+    { href: "/channels/yaml", label: "Channels YAML", icon: FileCode },
   ],
   [
     { href: "/movies", label: "Movies", icon: Film },
