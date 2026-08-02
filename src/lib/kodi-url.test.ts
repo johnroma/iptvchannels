@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest"
-import { resolveKodiConnection } from "./kodi-url"
+import {
+  matchKodiChannels,
+  resolveKodiConnection,
+  type MatchableChannel,
+} from "./kodi-url"
 
 describe("resolveKodiConnection", () => {
   it("defaults to localhost:8080 when nothing is configured", () => {
@@ -70,5 +74,85 @@ describe("resolveKodiConnection", () => {
     expect(resolveKodiConnection({}).headers["Content-Type"]).toBe(
       "application/json",
     )
+  })
+})
+
+describe("matchKodiChannels", () => {
+  // Real shape from this deployment: Kodi labels are the CMS display name,
+  // not the raw M3U tvg-name.
+  const kodi = [
+    { channelid: 18, label: "CNN" },
+    { channelid: 12, label: "France 2" },
+    { channelid: 9, label: "SVT1" },
+  ]
+
+  const channel = (over: Partial<MatchableChannel>): MatchableChannel => ({
+    id: "id-1",
+    name: null,
+    tvgName: "US| SOMETHING",
+    contentId: null,
+    ...over,
+  })
+
+  it("matches on name when tvgName is the raw M3U value", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "a", name: "CNN", tvgName: "US| CNN FHD" })],
+      kodi,
+    )
+    expect(matches).toEqual([
+      { id: "a", label: "CNN", contentId: 18, changed: true },
+    ])
+  })
+
+  it("still matches on tvgName when name is unset", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "b", name: null, tvgName: "SVT1" })],
+      kodi,
+    )
+    expect(matches[0]).toMatchObject({ id: "b", contentId: 9 })
+  })
+
+  it("prefers name over tvgName when both match different Kodi channels", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "c", name: "CNN", tvgName: "SVT1" })],
+      kodi,
+    )
+    expect(matches[0].contentId).toBe(18)
+  })
+
+  it("is case- and whitespace-insensitive", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "d", name: "  france 2 " })],
+      kodi,
+    )
+    expect(matches[0].contentId).toBe(12)
+  })
+
+  it("flags changed=false when contentId already matches", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "e", name: "CNN", contentId: 18 })],
+      kodi,
+    )
+    expect(matches[0].changed).toBe(false)
+  })
+
+  it("returns no match for unknown channels and ignores blank names", () => {
+    expect(
+      matchKodiChannels(
+        [
+          channel({ id: "f", name: "Not In Kodi", tvgName: "US| NOPE" }),
+          channel({ id: "g", name: "   ", tvgName: "US| ALSO NOPE" }),
+        ],
+        kodi,
+      ),
+    ).toEqual([])
+  })
+
+  it("matches each DB channel at most once", () => {
+    const matches = matchKodiChannels(
+      [channel({ id: "h", name: "CNN", tvgName: "CNN" })],
+      kodi,
+    )
+    expect(matches).toHaveLength(1)
   })
 })

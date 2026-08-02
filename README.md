@@ -108,14 +108,40 @@ Shared by `channels` and `media`. Changing an alias here updates it for all link
 
 This project does **not** call Home Assistant directly. Instead, it generates YAML you paste into Home Assistant (or include from a package) so Home Assistant can call *your* existing playback automation.
 
-- `Export YAML` generates Home Assistant `script:` entries.
+- `Export YAML` generates a **plain mapping of Home Assistant scripts** — script IDs at
+  the top level, with no `script:` wrapper — so the file can be pulled in with
+  `script: !include channels.yaml` (or `!include_dir_merge_named`).
 - Each exported channel becomes a script keyed by `channels.script_alias`.
-- The generated script calls `service: script.play_channel` and passes:
+- The generated script uses `action:` (the current HA key; `service:` is deprecated)
+  to call `script.play_channel` and passes:
   - `content_id` (Kodi PVR `channelid`, stored in `channels.content_id`)
   - `channel_title` (from `channels.tvg_name`)
   - `channel_thumbnail` (from `channels.tvg_logo`)
 
-Important: you must already have a `script.play_channel` in Home Assistant (or adapt the generator to call a different service). This repo only generates the per-channel wrappers.
+Shape of the output:
+
+```yaml
+channel_bbc1:
+  alias: "BBC One"
+  icon: mdi:view-stream
+  sequence:
+    - action: script.play_channel
+      data:
+        content_id: 2246
+        channel_title: "UK| BBC 1"
+        channel_thumbnail: "http://example.com/bbc.png"
+```
+
+Wire it up in `configuration.yaml`:
+
+```yaml
+script: !include channels.yaml
+```
+
+If no channel qualifies, the file is a comment plus `{}` so the `!include` still
+yields an empty mapping rather than `null`.
+
+Important: you must already have a `script.play_channel` in Home Assistant (or adapt the generator to call a different action). This repo only generates the per-channel wrappers.
 
 ### What gets exported
 
@@ -133,7 +159,10 @@ The `Sync Kodi` button populates/refreshes `channels.content_id` by querying Kod
 
 - Calls Kodi JSON-RPC `PVR.GetChannels` (`channelgroupid: "alltv"`) via `KODI_URL` (preferred) or `http://$KODI_HOST:$KODI_PORT/jsonrpc`
 - Builds a map of `kodiChannel.label → kodiChannel.channelid` (case-insensitive)
-- Matches each DB channel by `channels.tvg_name` (case-insensitive) against the Kodi label
+- Matches each DB channel against that label by `channels.name` **first**, falling back to
+  `channels.tvg_name` (both case- and whitespace-insensitive). Kodi labels follow what the
+  channel is called in Kodi (`CNN`), not the raw M3U value (`US| CNN FHD`), so matching
+  `tvg_name` alone matches nothing on typical data.
 - Updates `channels.content_id` when it differs
 
 ### What it changes (and what it does not)
@@ -182,8 +211,8 @@ If Kodi’s web server has **Require authentication** enabled, set `KODI_USER` a
 
 ### Limitations / troubleshooting
 
-- Matching is by `tvg_name` only (not the editable `name` field). If you renamed channels inside Kodi, they may not match.
-- Matching is exact aside from case. If it can’t match, either adjust the M3U/Kodi channel name or set `content_id` manually in the channel edit form.
+- Matching tries `name` then `tvg_name`. Set a channel’s `name` to exactly its Kodi label to make it match.
+- Matching is exact aside from case and surrounding whitespace. If it can’t match, either adjust the channel `name` to match the Kodi label or set `content_id` manually in the channel edit form.
 - When deployed (e.g. Vercel), the server likely cannot reach a home Kodi instance; run Sync Kodi from an environment that can reach Kodi, then store results in your DB.
 - If `Sync Kodi` reports lots of “Skipped”, compare your DB `tvg_name` values with the channel labels shown in Kodi (PVR channel list). Those labels are what the sync matches against.
 

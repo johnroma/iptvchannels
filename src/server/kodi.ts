@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { db, channels } from "~/db"
-import { resolveKodiConnection } from "~/lib/kodi-url"
+import { matchKodiChannels, resolveKodiConnection } from "~/lib/kodi-url"
 
 // ─── Sync ───────────────────────────────────────────────────
 
@@ -83,43 +83,32 @@ export async function runKodiSync(): Promise<KodiSyncResult> {
   const dbChannels = await db.query.channels.findMany({
     columns: {
       id: true,
+      name: true,
       tvgName: true,
       contentId: true,
     },
   })
 
-  const kodiMap = new Map<string, number>(
-    kodiData.result.channels.map((c) => [c.label.toLowerCase(), c.channelid]),
-  )
+  const matches = matchKodiChannels(dbChannels, kodiData.result.channels)
+  const changed = matches.filter((m) => m.changed)
 
-  let updated = 0
-  const matchedChannels: string[] = []
-  const updatedChannels: string[] = []
-  for (const channel of dbChannels) {
-    const kodiId = kodiMap.get(channel.tvgName.toLowerCase())
-    if (kodiId !== undefined) {
-      matchedChannels.push(channel.tvgName)
-      if (kodiId !== channel.contentId) {
-        await db
-          .update(channels)
-          .set({ contentId: kodiId, updatedAt: new Date() })
-          .where(eq(channels.id, channel.id))
-        updated++
-        updatedChannels.push(channel.tvgName)
-      }
-    }
+  for (const match of changed) {
+    await db
+      .update(channels)
+      .set({ contentId: match.contentId, updatedAt: new Date() })
+      .where(eq(channels.id, match.id))
   }
 
-  console.log("Matched channels:", matchedChannels)
-  if (updatedChannels.length > 0) {
-    console.log("Updated channels:", updatedChannels)
+  console.log("Matched channels:", matches.map((m) => m.label))
+  if (changed.length > 0) {
+    console.log("Updated channels:", changed.map((m) => m.label))
   }
 
   return {
     total: dbChannels.length,
     kodiChannels: kodiData.result.channels.length,
-    matched: matchedChannels.length,
-    updated,
-    skipped: dbChannels.length - matchedChannels.length,
+    matched: matches.length,
+    updated: changed.length,
+    skipped: dbChannels.length - matches.length,
   }
 }

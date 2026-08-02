@@ -46,3 +46,55 @@ export function resolveKodiConnection(
 
   return { url, headers, authenticated: Boolean(user) }
 }
+
+// ─── Channel matching ───────────────────────────────────────
+
+export type KodiLabel = { channelid: number; label: string }
+export type MatchableChannel = {
+  id: string
+  name: string | null
+  tvgName: string
+  contentId: number | null
+}
+export type ChannelMatch = {
+  id: string
+  label: string
+  contentId: number
+  changed: boolean
+}
+
+/**
+ * Matches DB channels against Kodi's PVR labels, case-insensitively.
+ *
+ * `name` (the CMS display name) is tried before `tvgName`, because Kodi labels
+ * follow what the channel is called in Kodi ("CNN"), not the raw M3U value
+ * ("US| CNN FHD"). Matching `tvgName` alone matches nothing on this data.
+ */
+export function matchKodiChannels(
+  dbChannels: MatchableChannel[],
+  kodiChannels: KodiLabel[],
+): ChannelMatch[] {
+  const kodiMap = new Map<string, number>()
+  for (const c of kodiChannels) {
+    kodiMap.set(c.label.trim().toLowerCase(), c.channelid)
+  }
+
+  const matches: ChannelMatch[] = []
+  for (const channel of dbChannels) {
+    const candidates = [channel.name, channel.tvgName]
+    for (const candidate of candidates) {
+      const key = candidate?.trim().toLowerCase()
+      if (!key) continue
+      const contentId = kodiMap.get(key)
+      if (contentId === undefined) continue
+      matches.push({
+        id: channel.id,
+        label: candidate as string,
+        contentId,
+        changed: contentId !== channel.contentId,
+      })
+      break
+    }
+  }
+  return matches
+}
