@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { count, eq, inArray, or, sql } from "drizzle-orm"
 import { db, channels } from "~/db"
 import { matchKodiChannels, resolveKodiConnection } from "~/lib/kodi-url"
 
@@ -80,16 +80,48 @@ export async function runKodiSync(): Promise<KodiSyncResult> {
     throw new Error("No channels returned from Kodi")
   }
 
-  const dbChannels = await db.query.channels.findMany({
-    columns: {
-      id: true,
-      name: true,
-      tvgName: true,
-      contentId: true,
-    },
-  })
+  const kodiChannels = kodiData.result.channels
 
-  const matches = matchKodiChannels(dbChannels, kodiData.result.channels)
+  // `total` is reported to the UI as "Total DB channels", so it must stay the
+  // whole-table count even though we only fetch matchable rows below.
+  const [totalRow] = await db.select({ value: count() }).from(channels)
+  const total = totalRow?.value ?? 0
+
+  const labels = kodiChannels
+    .map((c) => c.label.trim().toLowerCase())
+    .filter(Boolean)
+
+  if (labels.length === 0) {
+    return {
+      total,
+      kodiChannels: kodiChannels.length,
+      matched: 0,
+      updated: 0,
+      skipped: total,
+    }
+  }
+
+  // matchKodiChannels compares trimmed/lowercased `name` then `tvgName` for
+  // exact equality, so a row can only match if one of those is in the Kodi
+  // label set. Filtering here is equivalent to scanning the table in Node, but
+  // without shipping every row over the wire.
+  // NOTE: keep this predicate in sync with matchKodiChannels.
+  const dbChannels = await db
+    .select({
+      id: channels.id,
+      name: channels.name,
+      tvgName: channels.tvgName,
+      contentId: channels.contentId,
+    })
+    .from(channels)
+    .where(
+      or(
+        inArray(sql`lower(trim(${channels.name}))`, labels),
+        inArray(sql`lower(trim(${channels.tvgName}))`, labels),
+      ),
+    )
+
+  const matches = matchKodiChannels(dbChannels, kodiChannels)
   const changed = matches.filter((m) => m.changed)
 
   for (const match of changed) {
@@ -105,10 +137,10 @@ export async function runKodiSync(): Promise<KodiSyncResult> {
   }
 
   return {
-    total: dbChannels.length,
-    kodiChannels: kodiData.result.channels.length,
+    total,
+    kodiChannels: kodiChannels.length,
     matched: matches.length,
     updated: changed.length,
-    skipped: dbChannels.length - matches.length,
+    skipped: total - matches.length,
   }
 }

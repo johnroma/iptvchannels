@@ -69,6 +69,10 @@ export type ChannelMatch = {
  * `name` (the CMS display name) is tried before `tvgName`, because Kodi labels
  * follow what the channel is called in Kodi ("CNN"), not the raw M3U value
  * ("US| CNN FHD"). Matching `tvgName` alone matches nothing on this data.
+ *
+ * `dbChannels` may be pre-filtered to rows whose name/tvgName is in the Kodi
+ * label set — runKodiSync does exactly that in SQL. If the comparison rule here
+ * changes (e.g. fuzzy matching), that SQL predicate must change with it.
  */
 export function matchKodiChannels(
   dbChannels: MatchableChannel[],
