@@ -24,7 +24,8 @@ describe("generateHomeAssistantYaml", () => {
 
     expect(result.count).toBe(2)
     expect(result.skipped).toHaveLength(0)
-    expect(result.yaml).toContain("script:")
+    expect(result.yaml).not.toContain("script:\n")
+    expect(result.yaml).toMatch(/^channel_abc:$/m) // top level, not indented
     expect(result.yaml).toContain("channel_abc:")
     expect(result.yaml).toContain('alias: "ABC"')
     expect(result.yaml).toContain("content_id: 754")
@@ -52,7 +53,9 @@ describe("generateHomeAssistantYaml", () => {
       reason: "missing scriptAlias",
       channel: "Missing Alias",
     })
-    expect(result.yaml).toBe("# No channels with scriptAlias and contentId found")
+    expect(result.yaml).toBe(
+      "# No channels with scriptAlias and contentId found\n{}",
+    )
   })
 
   it("skips channels without contentId and tracks them", () => {
@@ -98,7 +101,9 @@ describe("generateHomeAssistantYaml", () => {
 
     expect(result.count).toBe(0)
     expect(result.skipped).toHaveLength(0)
-    expect(result.yaml).toBe("# No channels with scriptAlias and contentId found")
+    expect(result.yaml).toBe(
+      "# No channels with scriptAlias and contentId found\n{}",
+    )
   })
 
   it("generates correct YAML structure matching Home Assistant format", () => {
@@ -114,18 +119,48 @@ describe("generateHomeAssistantYaml", () => {
 
     const result = generateHomeAssistantYaml(channels)
 
-    const expectedYaml = `script:
-  channel_bbc1:
-    alias: "BBC One"
-    icon: mdi:view-stream
-    sequence:
-      - service: script.play_channel
-        data:
-          content_id: 2246
-          channel_title: "UK| BBC 1"
-          channel_thumbnail: "http://example.com/bbc.png"`
+    const expectedYaml = `channel_bbc1:
+  alias: "BBC One"
+  icon: mdi:view-stream
+  sequence:
+    - action: script.play_channel
+      data:
+        content_id: 2246
+        channel_title: "UK| BBC 1"
+        channel_thumbnail: "http://example.com/bbc.png"`
 
     expect(result.yaml).toBe(expectedYaml)
+  })
+
+  it("emits an !include-safe mapping: no script: wrapper, action: not service:", () => {
+    const channels: ChannelExportData[] = [
+      {
+        scriptAlias: "channel_one",
+        name: "One",
+        tvgName: "US| One",
+        contentId: 1,
+        tvgLogo: null,
+      },
+      {
+        scriptAlias: "channel_two",
+        name: "Two",
+        tvgName: "US| Two",
+        contentId: 2,
+        tvgLogo: null,
+      },
+    ]
+
+    const { yaml } = generateHomeAssistantYaml(channels)
+
+    // Every script ID sits at column 0 so `script: !include channels.yaml` works
+    const topLevelKeys = yaml
+      .split("\n")
+      .filter((line) => /^\S/.test(line))
+      .map((line) => line.replace(/:.*$/, ""))
+    expect(topLevelKeys).toEqual(["channel_one", "channel_two"])
+
+    expect(yaml).toContain("- action: script.play_channel")
+    expect(yaml).not.toContain("service:")
   })
 
   it("processes mixed valid and invalid channels correctly", () => {

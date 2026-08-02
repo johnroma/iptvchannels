@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start"
-import { asc, eq, isNotNull } from "drizzle-orm"
+import { asc, isNotNull } from "drizzle-orm"
 import { db, channels, channelSchema, channelUpdateSchema } from "~/db"
 import { updateStreamLogic, createStreamLogic } from "./shared"
+import { runKodiSync } from "./kodi"
+import { getActiveChannelsYaml } from "./yaml"
 
 // ─── Channel CRUD (validation wrappers) ─────────────────────
 
@@ -33,123 +35,10 @@ export const getCountryCodes = createServerFn({ method: "GET" }).handler(
 
 export const exportActiveChannelsYaml = createServerFn({
   method: "GET",
-}).handler(async () => {
-  const { generateHomeAssistantYaml } = await import("~/lib/yaml-export")
-
-  const activeChannels = await db
-    .select({
-      scriptAlias: channels.scriptAlias,
-      name: channels.name,
-      tvgName: channels.tvgName,
-      contentId: channels.contentId,
-      tvgLogo: channels.tvgLogo,
-    })
-    .from(channels)
-    .where(eq(channels.active, true))
-    .orderBy(asc(channels.name))
-
-  return generateHomeAssistantYaml(activeChannels)
-})
+}).handler(async () => getActiveChannelsYaml())
 
 // ─── Kodi Sync (channel-specific) ───────────────────────────
 
-type KodiChannel = {
-  channelid: number
-  label: string
-}
-
-type KodiResponse = {
-  result: {
-    channels: KodiChannel[]
-  }
-}
-
 export const syncKodiContentIds = createServerFn({ method: "POST" }).handler(
-  async () => {
-    const rawUrl = process.env.KODI_URL
-    const host = process.env.KODI_HOST ?? "localhost"
-    const port = process.env.KODI_PORT ?? "8080"
-
-    const kodiJsonRpcUrl = rawUrl
-      ? rawUrl.endsWith("/jsonrpc")
-        ? rawUrl
-        : `${rawUrl.replace(/\/+$/, "")}/jsonrpc`
-      : `http://${host}:${port}/jsonrpc`
-
-    const kodiRequest = {
-      jsonrpc: "2.0",
-      method: "PVR.GetChannels",
-      params: { channelgroupid: "alltv" },
-      id: 1,
-    }
-
-    let kodiResponse: Response
-    try {
-      kodiResponse = await fetch(kodiJsonRpcUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(kodiRequest),
-      })
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      throw new Error(
-        `Failed to connect to Kodi JSON-RPC at ${kodiJsonRpcUrl}. ` +
-          `Set KODI_URL (preferred) or KODI_HOST/KODI_PORT, and ensure Kodi's web server is enabled. ` +
-          `Underlying error: ${message}`,
-      )
-    }
-
-    if (!kodiResponse.ok) {
-      throw new Error(`Kodi API error: ${kodiResponse.status}`)
-    }
-
-    const kodiData = (await kodiResponse.json()) as KodiResponse
-
-    if (!kodiData.result?.channels) {
-      throw new Error("No channels returned from Kodi")
-    }
-
-    const dbChannels = await db.query.channels.findMany({
-      columns: {
-        id: true,
-        tvgName: true,
-        contentId: true,
-      },
-    })
-
-    const kodiMap = new Map<string, number>(
-      kodiData.result.channels.map((c) => [c.label.toLowerCase(), c.channelid]),
-    )
-
-    let updated = 0
-    const matchedChannels: string[] = []
-    const updatedChannels: string[] = []
-    for (const channel of dbChannels) {
-      const kodiId = kodiMap.get(channel.tvgName.toLowerCase())
-      if (kodiId !== undefined) {
-        matchedChannels.push(channel.tvgName)
-        if (kodiId !== channel.contentId) {
-          await db
-            .update(channels)
-            .set({ contentId: kodiId, updatedAt: new Date() })
-            .where(eq(channels.id, channel.id))
-          updated++
-          updatedChannels.push(channel.tvgName)
-        }
-      }
-    }
-
-    console.log("Matched channels:", matchedChannels)
-    if (updatedChannels.length > 0) {
-      console.log("Updated channels:", updatedChannels)
-    }
-
-    return {
-      total: dbChannels.length,
-      kodiChannels: kodiData.result.channels.length,
-      matched: matchedChannels.length,
-      updated,
-      skipped: dbChannels.length - matchedChannels.length,
-    }
-  },
+  async () => runKodiSync(),
 )

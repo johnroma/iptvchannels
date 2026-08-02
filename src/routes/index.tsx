@@ -31,7 +31,7 @@ const highlights: Highlight[] = [
     icon: FileCode,
     title: "Home Assistant YAML",
     description:
-      "Generate per-channel play scripts for active channels in one click.",
+      "Generate per-channel play scripts in one click, or serve them live at /channels/yaml.",
   },
   {
     icon: RefreshCw,
@@ -75,6 +75,14 @@ const sections: { heading: string; cards: NavCard[] }[] = [
         title: "Channels Feed",
         description:
           "Direct live playlist at /channels/m3u for active channels. Built for VLC and IPTV clients.",
+        accent: "text-sky-500",
+      },
+      {
+        href: "/channels/yaml",
+        icon: FileCode,
+        title: "Channels YAML",
+        description:
+          "Home Assistant script YAML at /channels/yaml for active channels. Runs a Kodi sync first so content IDs are current.",
         accent: "text-sky-500",
       },
     ],

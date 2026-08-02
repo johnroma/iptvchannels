@@ -65,8 +65,8 @@ cp ../env-profiles/.env.example ../env-profiles/supabase.env
 
 | File | Purpose | Variables |
 |------|---------|-----------|
-| `../env-profiles/local.env` | Local development | `DATABASE_URL` (Homebrew Postgres), `KODI_URL` (preferred) or `KODI_HOST` + `KODI_PORT` |
-| `../env-profiles/prod.env` | Supabase production | `DATABASE_URL` (Supabase pooler) |
+| `../env-profiles/local.env` | Local development | `DATABASE_URL`, `DB_SCHEMA`, `KODI_URL` (preferred) or `KODI_HOST` + `KODI_PORT`, optional `KODI_USER`/`KODI_PASSWORD`, `STREAM_BASE_PATH`/`STREAM_BASE_PORT` |
+| `../env-profiles/prod.env` | Production build + `srv/` runtime | Same as local, plus `NITRO_OUTPUT_DIR=../srv/.output` |
 | `../env-profiles/supabase.env` | Supabase CLI | `SUPABASE_ACCESS_TOKEN` |
 
 ### Vercel Deployment
@@ -108,14 +108,40 @@ Shared by `channels` and `media`. Changing an alias here updates it for all link
 
 This project does **not** call Home Assistant directly. Instead, it generates YAML you paste into Home Assistant (or include from a package) so Home Assistant can call *your* existing playback automation.
 
-- `Export YAML` generates Home Assistant `script:` entries.
+- `Export YAML` generates a **plain mapping of Home Assistant scripts** — script IDs at
+  the top level, with no `script:` wrapper — so the file can be pulled in with
+  `script: !include channels.yaml` (or `!include_dir_merge_named`).
 - Each exported channel becomes a script keyed by `channels.script_alias`.
-- The generated script calls `service: script.play_channel` and passes:
+- The generated script uses `action:` (the current HA key; `service:` is deprecated)
+  to call `script.play_channel` and passes:
   - `content_id` (Kodi PVR `channelid`, stored in `channels.content_id`)
   - `channel_title` (from `channels.tvg_name`)
   - `channel_thumbnail` (from `channels.tvg_logo`)
 
-Important: you must already have a `script.play_channel` in Home Assistant (or adapt the generator to call a different service). This repo only generates the per-channel wrappers.
+Shape of the output:
+
+```yaml
+channel_bbc1:
+  alias: "BBC One"
+  icon: mdi:view-stream
+  sequence:
+    - action: script.play_channel
+      data:
+        content_id: 2246
+        channel_title: "UK| BBC 1"
+        channel_thumbnail: "http://example.com/bbc.png"
+```
+
+Wire it up in `configuration.yaml`:
+
+```yaml
+script: !include channels.yaml
+```
+
+If no channel qualifies, the file is a comment plus `{}` so the `!include` still
+yields an empty mapping rather than `null`.
+
+Important: you must already have a `script.play_channel` in Home Assistant (or adapt the generator to call a different action). This repo only generates the per-channel wrappers.
 
 ### What gets exported
 
@@ -133,7 +159,10 @@ The `Sync Kodi` button populates/refreshes `channels.content_id` by querying Kod
 
 - Calls Kodi JSON-RPC `PVR.GetChannels` (`channelgroupid: "alltv"`) via `KODI_URL` (preferred) or `http://$KODI_HOST:$KODI_PORT/jsonrpc`
 - Builds a map of `kodiChannel.label → kodiChannel.channelid` (case-insensitive)
-- Matches each DB channel by `channels.tvg_name` (case-insensitive) against the Kodi label
+- Matches each DB channel against that label by `channels.name` **first**, falling back to
+  `channels.tvg_name` (both case- and whitespace-insensitive). Kodi labels follow what the
+  channel is called in Kodi (`CNN`), not the raw M3U value (`US| CNN FHD`), so matching
+  `tvg_name` alone matches nothing on typical data.
 - Updates `channels.content_id` when it differs
 
 ### What it changes (and what it does not)
@@ -157,7 +186,16 @@ KODI_URL=http://192.168.86.44:8080
 # Option B: host + port
 KODI_HOST=192.168.86.44
 KODI_PORT=8080
+
+# Only if Kodi's web server requires authentication
+KODI_USER=kodi
+KODI_PASSWORD=changeme
 ```
+
+Both env profiles must carry these values: `local.env` is what `pnpm dev` loads, and
+`prod.env` is what `pnpm build:prod` and `srv/start.sh` load for the built runtime on
+`:3100`. A value present in only one profile means `Sync Kodi` works in dev and fails
+in the built app (or the reverse).
 
 ### Kodi setup (so JSON-RPC is reachable)
 
@@ -169,12 +207,12 @@ In Kodi, enable the web server / remote control so `http://<kodi-ip>:<port>/json
   - enable “Allow remote control via HTTP”
   - note the configured port (often `8080`)
 
-This implementation currently assumes **no HTTP auth** on the JSON-RPC endpoint. If you configured a username/password in Kodi’s web server settings, `Sync Kodi` will fail until the code is extended to send credentials.
+If Kodi’s web server has **Require authentication** enabled, set `KODI_USER` and `KODI_PASSWORD` in the same env profile and the sync sends an HTTP Basic `Authorization` header. Leave them blank when no auth is configured. A `401` from Kodi is reported with a message telling you which of the two cases applies.
 
 ### Limitations / troubleshooting
 
-- Matching is by `tvg_name` only (not the editable `name` field). If you renamed channels inside Kodi, they may not match.
-- Matching is exact aside from case. If it can’t match, either adjust the M3U/Kodi channel name or set `content_id` manually in the channel edit form.
+- Matching tries `name` then `tvg_name`. Set a channel’s `name` to exactly its Kodi label to make it match.
+- Matching is exact aside from case and surrounding whitespace. If it can’t match, either adjust the channel `name` to match the Kodi label or set `content_id` manually in the channel edit form.
 - When deployed (e.g. Vercel), the server likely cannot reach a home Kodi instance; run Sync Kodi from an environment that can reach Kodi, then store results in your DB.
 - If `Sync Kodi` reports lots of “Skipped”, compare your DB `tvg_name` values with the channel labels shown in Kodi (PVR channel list). Those labels are what the sync matches against.
 
@@ -188,6 +226,23 @@ This implementation currently assumes **no HTTP auth** on the JSON-RPC endpoint.
    - run `Sync Kodi` (recommended), or
    - enter `content_id` manually in the channel edit form.
 4. Run `Export YAML` and add the output to Home Assistant.
+
+### Direct YAML URL (`/channels/yaml`)
+
+`GET /channels/yaml` runs a **Kodi sync first**, then returns the same YAML the
+`Export YAML` button produces, as `text/yaml`. This is the YAML counterpart to
+`/channels/m3u`: a URL that always reflects current Kodi content IDs, so Home
+Assistant (or a `curl` in a cron job) can pull it without anyone clicking a button.
+
+- Response starts with comment lines recording sync stats, the export count, and
+  every skipped channel with its reason.
+- If the Kodi sync fails the endpoint returns **HTTP 502** with the underlying
+  error and serves no YAML — stale `content_id` values would silently produce a
+  wrong playback mapping.
+
+```bash
+curl -sS http://127.0.0.1:3100/channels/yaml
+```
 
 ## M3U Export System
 
@@ -216,6 +271,7 @@ M3U export is generated from the database (not from raw seed files) and always r
 
 - `GET /channels/m3u` returns the live channel playlist as `audio/x-mpegurl`
 - `GET /movies/m3u` returns the live movie playlist as `audio/x-mpegurl`
+- `GET /channels/yaml` returns Home Assistant script YAML as `text/yaml` (syncs Kodi first)
 
 These URLs always return what a current export would produce, so VLC can open them directly as network playlists.
 
@@ -226,6 +282,7 @@ The landing page explains the same structure shown in the top navigation:
 - `Home` - overview of the system and how channels, movies, series, Kodi sync, YAML export, and M3U feeds fit together
 - `Channels` - manage live TV channels, filters, active/favourite state, exports, and Kodi sync
 - `Channels M3U URL` - live active-channel playlist at `/channels/m3u` for VLC or other IPTV clients
+- `Channels YAML` - Home Assistant script YAML at `/channels/yaml`, refreshed by a Kodi sync on every request
 - `Add Channel` - create a new live TV channel record
 - `Movies` - manage movie entries stored in `media` where `series_id IS NULL` and `media_type = 'movie'`
 - `Movies M3U URL` - live active-movie playlist at `/movies/m3u`
