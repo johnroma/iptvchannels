@@ -49,3 +49,6 @@ coverage/
 .vercel
 .output
 dist
+
+# Understand-Anything: transient working dir (graph outputs ARE committed)
+.understand-anything/tmp/

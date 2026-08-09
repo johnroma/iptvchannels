@@ -17,15 +17,23 @@ iptvchannels/
 │   │   ├── channels.index.tsx  # Channel list (paginated, filtered)
 │   │   ├── channels.$id.tsx    # Channel detail
 │   │   ├── channels.new.tsx    # Create channel
-│   │   └── edit/$id.tsx        # Edit channel
-│   ├── components/             # App-specific components
-│   ├── server/                 # Server functions (createServerFn)
+│   │   ├── movies.index.tsx    # Movie list (paginated, filtered)
+│   │   ├── movies.$id.tsx      # Movie detail
+│   │   ├── movies.new.tsx      # Create movie
+│   │   ├── series.index.tsx    # Series list (paginated)
+│   │   ├── series.$id.tsx      # Series detail
+│   │   ├── series.new.tsx      # Create series
+│   │   ├── edit/$id.tsx        # Edit channel
+│   │   ├── edit-movie/$id.tsx  # Edit movie
+│   │   └── edit-series/$id.tsx # Edit series
+│   ├── components/             # App components (forms, lists, switches, boundaries)
+│   ├── server/                 # Server functions (createServerFn): shared.ts + channels/movies/series/kodi/m3u/yaml
+│   ├── lib/                    # Pure utilities: m3u-parser, m3u-export, yaml-export, kodi-url, stream-url (+ tests)
 │   ├── db/                     # Drizzle schema & client
-│   │   ├── schema.ts           # Database schema (group_titles, channels, media) + relations
-│   │   ├── validators.ts       # Zod validation schemas
+│   │   ├── schema.ts           # Database schema (group_titles, channels, series, media) + relations
+│   │   ├── validators.ts       # Zod validation schemas (channel/media/series + COUNTRY_CODES)
 │   │   ├── index.ts            # Lazy-init DB client (Proxy) + re-exports
 │   │   └── reset.ts            # Database reset script
-│   ├── lib/                    # Shared utilities (m3u-export, yaml-export, m3u-parser)
 │   ├── router.tsx              # Router + React Query SSR + custom search serialization
 │   └── routeTree.gen.ts        # Auto-generated route tree
 ├── packages/
@@ -37,14 +45,17 @@ iptvchannels/
 │       └── package.json
 ├── (uses ../env-profiles/)     # Environment configs (not in this repo)
 ├── scripts/
-│   ├── seed-channels.sh        # M3U channel seeder (bash/awk)
-│   └── seed-media.sh           # M3U media seeder (bash/awk)
+│   ├── seed-channels.sh        # M3U channel seeder (PostgreSQL COPY)
+│   ├── seed-media.sh           # M3U media seeder (movies/series, PostgreSQL COPY)
+│   └── migrate-stream-urls.sh  # Rewrite stream_url against STREAM_BASE_PATH/PORT
 ├── supabase/
 │   ├── config.toml             # Supabase project config
-│   └── migrations/             # Drizzle-generated migrations
+│   └── migrations/             # Drizzle-generated migrations + meta snapshots
+├── .understand-anything/       # Codebase knowledge graph (see /understand) — committed
 ├── eslint.config.mjs           # ESLint flat config (typescript-eslint)
 ├── drizzle.config.ts           # Drizzle Kit configuration
 ├── vite.config.ts              # Vite + TanStack Start + Tailwind + Nitro
+├── nitro.config.ts             # Nitro server preset config
 ├── pnpm-workspace.yaml         # Workspace definition
 └── package.json                # Root scripts
 ```
@@ -77,7 +88,7 @@ Set `DATABASE_URL` in Vercel environment variables to the Supabase connection st
 
 ### `group_titles` — Normalized lookup table
 
-Shared by `channels` and `media`. Changing an alias here updates it for all linked rows.
+Shared by `channels`, `media`, and `series`. Changing an alias here updates it for all linked rows.
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -101,6 +112,47 @@ Shared by `channels` and `media`. Changing an alias here updates it for all link
 | `favourite` | boolean | CMS | Mark as favourite |
 | `active` | boolean | CMS | Include in YAML export |
 | `script_alias` | text | CMS | Home Assistant script alias |
+| `created_at` | timestamp | auto | Created timestamp |
+| `updated_at` | timestamp | auto | Updated timestamp |
+
+### `series` — Series groupings
+
+Each row groups the `media` episodes that belong to one series (referenced via `media.series_id`).
+
+| Column | Type | Source | Description |
+|--------|------|--------|-------------|
+| `id` | uuid | auto | Primary key (random UUID) |
+| `tvg_id` | text | M3U | EPG identifier |
+| `tvg_name` | text | M3U | Base series name (without `Sxx Exx`) |
+| `tvg_logo` | text | M3U | Shared poster URL |
+| `group_title_id` | integer | M3U/FK | FK → `group_titles.id` |
+| `episode_count` | integer | derived | Denormalized episode count (maintained by seed/CRUD) |
+| `name` | text | CMS | Custom display name |
+| `favourite` | boolean | CMS | Mark as favourite |
+| `active` | boolean | CMS | Include in M3U export |
+| `created_at` | timestamp | auto | Created timestamp |
+| `updated_at` | timestamp | auto | Updated timestamp |
+
+### `media` — Movies and series episodes
+
+Movies are `media` rows with `series_id IS NULL` and `media_type = "movie"`; series episodes set `series_id` and `media_type = "series"`. The Movies page and `/movies/m3u` filter to movie rows only.
+
+| Column | Type | Source | Description |
+|--------|------|--------|-------------|
+| `id` | uuid | auto | Primary key (random UUID) |
+| `tvg_id` | text | M3U | EPG identifier |
+| `tvg_name` | text | M3U | Title (e.g., movie title or `... S02 E11`) |
+| `tvg_logo` | text | M3U | Poster / logo URL |
+| `group_title_id` | integer | M3U/FK | FK → `group_titles.id` |
+| `series_id` | uuid | parsed/FK | FK → `series.id` (null for movies) |
+| `stream_url` | text | M3U | Stream URL (`.mp4`/`.mkv`) |
+| `media_type` | text | derived | `"movie"` or `"series"` (from URL path) |
+| `year` | integer | parsed | Year parsed from title |
+| `season` | integer | parsed | Season number (series) |
+| `episode` | integer | parsed | Episode number (series) |
+| `name` | text | CMS | Custom display name |
+| `favourite` | boolean | CMS | Mark as favourite |
+| `active` | boolean | CMS | Include in M3U export |
 | `created_at` | timestamp | auto | Created timestamp |
 | `updated_at` | timestamp | auto | Updated timestamp |
 

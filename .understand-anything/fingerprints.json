@@ -1,0 +1,3461 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "987b1a22d431fcda697f807546a99c8535ff4a70",
+  "generatedAt": "2026-08-09T08:41:49.477Z",
+  "files": {
+    "CLAUDE.md": {
+      "filePath": "CLAUDE.md",
+      "contentHash": "8eccef7eb3e4eae3b1b11354e3cb2643ce9a65614372550dc3b1740080765e46",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 381,
+      "hasStructuralAnalysis": true
+    },
+    "drizzle.config.ts": {
+      "filePath": "drizzle.config.ts",
+      "contentHash": "d681c7d82772ef4dbce281c0951c45bcf7ba4cd7c0d97d6a71f98c33869ff2c9",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-kit",
+          "specifiers": [
+            "defineConfig"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "eslint.config.mjs": {
+      "filePath": "eslint.config.mjs",
+      "contentHash": "d1c48e09dfe1df3dbc94142a7d61b099ea504fd6aa657d40b25d300f167b7b08",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "pluginJs"
+          ]
+        },
+        {
+          "source": "typescript-eslint",
+          "specifiers": [
+            "tseslint"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "nitro.config.ts": {
+      "filePath": "nitro.config.ts",
+      "contentHash": "f9fd534e02267cc8059052ef1a5d8e1a147641fe5939cca55c59514d5ad867ac",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "nitro/config",
+          "specifiers": [
+            "defineNitroConfig"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "a7a4de48d8886eb9c9171c15a726b10e991a211126fce96534b10a0d822222d0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 90,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components.json": {
+      "filePath": "packages/ui/components.json",
+      "contentHash": "613e920e835a5d6a7af2cc3e18d7540f5c2914123a855bfb776790585bcb8890",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/avatar.tsx": {
+      "filePath": "packages/ui/components/avatar.tsx",
+      "contentHash": "e637ab3522c01631eac2e456588ef301314e2bb7940ebf7cd96e698a868d47bc",
+      "functions": [
+        {
+          "name": "Avatar",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "AvatarImage",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "AvatarFallback",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-avatar",
+          "specifiers": [
+            "* as AvatarPrimitive"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Avatar",
+        "AvatarImage",
+        "AvatarFallback"
+      ],
+      "totalLines": 52,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/button.tsx": {
+      "filePath": "packages/ui/components/button.tsx",
+      "contentHash": "5a5c4b8b60a8a80ba7b8b5d0319be2d3c61bfd2ce4fc2a645371dee9f6db0a77",
+      "functions": [
+        {
+          "name": "Button",
+          "params": [
+            "{\n  className,\n  variant = \"default\",\n  size = \"default\",\n  asChild = false,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 22
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-slot",
+          "specifiers": [
+            "Slot"
+          ]
+        },
+        {
+          "source": "class-variance-authority",
+          "specifiers": [
+            "cva",
+            "VariantProps"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Button",
+        "buttonVariants"
+      ],
+      "totalLines": 63,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/card.tsx": {
+      "filePath": "packages/ui/components/card.tsx",
+      "contentHash": "2040cdff27cd1ed771e0ebbd15abcd73d31f2f1e4be6664bd6816fffd2a87476",
+      "functions": [
+        {
+          "name": "Card",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "CardHeader",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "CardTitle",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "CardDescription",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "CardAction",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "CardContent",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "CardFooter",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Card",
+        "CardHeader",
+        "CardFooter",
+        "CardTitle",
+        "CardAction",
+        "CardDescription",
+        "CardContent"
+      ],
+      "totalLines": 93,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/checkbox.tsx": {
+      "filePath": "packages/ui/components/checkbox.tsx",
+      "contentHash": "2e577437a868f536e01e392dc32e825b3ac528a308ddf21848548b15e2e339ab",
+      "functions": [
+        {
+          "name": "Checkbox",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 22
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-checkbox",
+          "specifiers": [
+            "* as CheckboxPrimitive"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "CheckIcon"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Checkbox"
+      ],
+      "totalLines": 31,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/input.tsx": {
+      "filePath": "packages/ui/components/input.tsx",
+      "contentHash": "56b7fd30208addbcc2468cfda4f5bc0a55342211deaab61ee35b1c352b1622f1",
+      "functions": [
+        {
+          "name": "Input",
+          "params": [
+            "{ className, type, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Input"
+      ],
+      "totalLines": 22,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/label.tsx": {
+      "filePath": "packages/ui/components/label.tsx",
+      "contentHash": "9ec42c8a57e82311118b794318409ee02b2cebfa49ba6cce8457cff6448cd471",
+      "functions": [
+        {
+          "name": "Label",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-label",
+          "specifiers": [
+            "* as LabelPrimitive"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Label"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/popover.tsx": {
+      "filePath": "packages/ui/components/popover.tsx",
+      "contentHash": "9e203786575fe70e87f23d6fbac36af72511f7aa7bcb83de417b43a0db3f2d35",
+      "functions": [
+        {
+          "name": "Popover",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "PopoverTrigger",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "PopoverContent",
+          "params": [
+            "{\n  className,\n  align = \"center\",\n  sideOffset = 4,\n  alignOffset = 0,\n  side = \"bottom\",\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 33
+        },
+        {
+          "name": "PopoverAnchor",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "PopoverHeader",
+          "params": [
+            "{ className, ...props }"
+          ],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "PopoverTitle",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "PopoverDescription",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@base-ui/react/popover",
+          "specifiers": [
+            "PopoverPrimitive"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Popover",
+        "PopoverTrigger",
+        "PopoverContent",
+        "PopoverAnchor",
+        "PopoverHeader",
+        "PopoverTitle",
+        "PopoverDescription"
+      ],
+      "totalLines": 105,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/select.tsx": {
+      "filePath": "packages/ui/components/select.tsx",
+      "contentHash": "68fc754d3042f9fec3406895845e6fcc05d44f93a049478a9d3c706919100ebe",
+      "functions": [
+        {
+          "name": "Select",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "SelectGroup",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "SelectValue",
+          "params": [
+            "{\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "SelectTrigger",
+          "params": [
+            "{\n  className,\n  size = \"default\",\n  children,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "SelectContent",
+          "params": [
+            "{\n  className,\n  children,\n  position = \"item-aligned\",\n  align = \"center\",\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "SelectLabel",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "SelectItem",
+          "params": [
+            "{\n  className,\n  children,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "SelectSeparator",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "SelectScrollUpButton",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "SelectScrollDownButton",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-select",
+          "specifiers": [
+            "* as SelectPrimitive"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "CheckIcon",
+            "ChevronDownIcon",
+            "ChevronUpIcon"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectLabel",
+        "SelectScrollDownButton",
+        "SelectScrollUpButton",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "totalLines": 189,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/spinner.tsx": {
+      "filePath": "packages/ui/components/spinner.tsx",
+      "contentHash": "0a1cb89c4ff38f22c4572606a333f87f922595df96e8907a893ef04b7d831986",
+      "functions": [
+        {
+          "name": "Spinner",
+          "params": [
+            "{\n  className,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Loader2Icon"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Spinner"
+      ],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/components/switch.tsx": {
+      "filePath": "packages/ui/components/switch.tsx",
+      "contentHash": "425c03e5b3ab9ac4c7c1a41e3e46c80b1eaf1d1edaa3760b1e0fcba2f078d8dc",
+      "functions": [
+        {
+          "name": "Switch",
+          "params": [
+            "{\n  className,\n  checked,\n  ...props\n}"
+          ],
+          "exported": true,
+          "lineCount": 30
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@radix-ui/react-switch",
+          "specifiers": [
+            "* as SwitchPrimitive"
+          ]
+        },
+        {
+          "source": "@/lib/utils",
+          "specifiers": [
+            "cn"
+          ]
+        }
+      ],
+      "exports": [
+        "Switch"
+      ],
+      "totalLines": 38,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/index.ts": {
+      "filePath": "packages/ui/index.ts",
+      "contentHash": "6ca00bbc792fd80208de4ed7eb27696de69c3cea14d629e7c7a766d232ed8167",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "cn"
+      ],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/lib/utils.ts": {
+      "filePath": "packages/ui/lib/utils.ts",
+      "contentHash": "51bbf14cd1f84f49aab2e0dbee420137015d56b6677bb439e83a908cd292cce1",
+      "functions": [
+        {
+          "name": "cn",
+          "params": [
+            "...inputs"
+          ],
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "clsx",
+          "specifiers": [
+            "ClassValue",
+            "clsx"
+          ]
+        },
+        {
+          "source": "tailwind-merge",
+          "specifiers": [
+            "twMerge"
+          ]
+        }
+      ],
+      "exports": [
+        "cn"
+      ],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/package.json": {
+      "filePath": "packages/ui/package.json",
+      "contentHash": "316bfcbff767c997730f73552f4e958a2e8bf8dc1bc70e811db735dd53f80f6e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "packages/ui/styles/globals.css": {
+      "filePath": "packages/ui/styles/globals.css",
+      "contentHash": "5040f8930d87ced150301dc5672badf225ef94a62f2897613133e947212faf41",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 82,
+      "hasStructuralAnalysis": false
+    },
+    "packages/ui/tsconfig.json": {
+      "filePath": "packages/ui/tsconfig.json",
+      "contentHash": "2cc7db843b48e53c8cbf8c3f426661d7e49edbf9d498593923dec42256d98ecc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "pnpm-workspace.yaml": {
+      "filePath": "pnpm-workspace.yaml",
+      "contentHash": "0fb360452b0231d114d0b0ad6cc76bb48fe528382f55827cf93739bf64ec79e1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": true
+    },
+    "public/robots.txt": {
+      "filePath": "public/robots.txt",
+      "contentHash": "efdb5938a9736727f5cce2b60355588e4fa541d19d022d222d8a09b8efd5dcce",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "09f4d3e35df047a5b3e7573c695722f76975145dd1017913e51f7af28a2b9ff6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 460,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/migrate-stream-urls.sh": {
+      "filePath": "scripts/migrate-stream-urls.sh",
+      "contentHash": "8f16bc420d74aaaa3d59070bab98a1995ebcb4f0fa1b97aba3aadd4633960e77",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 66,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/seed-channels.sh": {
+      "filePath": "scripts/seed-channels.sh",
+      "contentHash": "450b2df912e16d2ee35e9b355fa8bf1fa30909a55f4f73a331824b6587897959",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 173,
+      "hasStructuralAnalysis": true
+    },
+    "scripts/seed-media.sh": {
+      "filePath": "scripts/seed-media.sh",
+      "contentHash": "db2153a8c04efc0b21994dfea15c47eedf0057535315b2f4d2d9e9a1abee1108",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 284,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ActiveSwitch.tsx": {
+      "filePath": "src/components/ActiveSwitch.tsx",
+      "contentHash": "48a69df4dc516116a26cf6bdad62f32a4687aa795de187673318b45ecf991e75",
+      "functions": [
+        {
+          "name": "ActiveSwitch",
+          "params": [
+            "{\n  id,\n  active,\n  label,\n  queryKey,\n  onToggle,\n}"
+          ],
+          "exported": true,
+          "lineCount": 72
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useMutation",
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@ui/components/switch",
+          "specifiers": [
+            "Switch"
+          ]
+        },
+        {
+          "source": "@ui/components/spinner",
+          "specifiers": [
+            "Spinner"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "toggleActive",
+            "TableKey"
+          ]
+        }
+      ],
+      "exports": [
+        "ActiveSwitch"
+      ],
+      "totalLines": 92,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ChannelForm.tsx": {
+      "filePath": "src/components/ChannelForm.tsx",
+      "contentHash": "d97a971ab510623570447c887e59e35b792779ad45b327dbb29a9126d461c637",
+      "functions": [
+        {
+          "name": "ChannelForm",
+          "params": [
+            "props"
+          ],
+          "exported": true,
+          "lineCount": 280
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "FormEvent",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "useServerFn"
+          ]
+        },
+        {
+          "source": "~/db/schema",
+          "specifiers": [
+            "Channel"
+          ]
+        },
+        {
+          "source": "~/db/validators",
+          "specifiers": [
+            "CountryCode"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/input",
+          "specifiers": [
+            "Input"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/switch",
+          "specifiers": [
+            "Switch"
+          ]
+        },
+        {
+          "source": "~/server/channels",
+          "specifiers": [
+            "createChannel",
+            "updateChannelForId"
+          ]
+        }
+      ],
+      "exports": [
+        "ChannelForm"
+      ],
+      "totalLines": 318,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/DefaultCatchBoundary.tsx": {
+      "filePath": "src/components/DefaultCatchBoundary.tsx",
+      "contentHash": "040521e9010b3be674dd27c6cd57eb1238e8b836ab5d028ffbe11fff72f0546c",
+      "functions": [
+        {
+          "name": "DefaultCatchBoundary",
+          "params": [
+            "{ error }"
+          ],
+          "exported": true,
+          "lineCount": 44
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "ErrorComponent",
+            "Link",
+            "rootRouteId",
+            "useMatch",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "ErrorComponentProps"
+          ]
+        }
+      ],
+      "exports": [
+        "DefaultCatchBoundary"
+      ],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/ListStream.tsx": {
+      "filePath": "src/components/ListStream.tsx",
+      "contentHash": "3897ec95c1001fd923168c3ff6958d6df5612ab19bcbdee5513ecd0874511510",
+      "functions": [
+        {
+          "name": "ListStream",
+          "params": [
+            "{\n  item,\n  editHref,\n  playHref,\n  queryKey,\n  hidePlay = false,\n  onToggle,\n  children,\n}"
+          ],
+          "exported": true,
+          "lineCount": 55
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "ReactNode"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Pencil",
+            "Play"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "./ActiveSwitch",
+          "specifiers": [
+            "ActiveSwitch"
+          ]
+        }
+      ],
+      "exports": [
+        "ListStream"
+      ],
+      "totalLines": 79,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/MovieCombobox.tsx": {
+      "filePath": "src/components/MovieCombobox.tsx",
+      "contentHash": "3c54ad0a87ff8c3c1ac66d472589e649e92cd4d3908cb0c18c60e34655f57b60",
+      "functions": [
+        {
+          "name": "displayLabel",
+          "params": [
+            "item"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "MovieCombobox",
+          "params": [],
+          "exported": true,
+          "lineCount": 83
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "useNavigate"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQuery"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ChevronsUpDown",
+            "Search"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/input",
+          "specifiers": [
+            "Input"
+          ]
+        },
+        {
+          "source": "@ui/components/popover",
+          "specifiers": [
+            "Popover",
+            "PopoverContent",
+            "PopoverTrigger"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "searchStreams"
+          ]
+        }
+      ],
+      "exports": [
+        "MovieCombobox"
+      ],
+      "totalLines": 107,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/MovieForm.tsx": {
+      "filePath": "src/components/MovieForm.tsx",
+      "contentHash": "6f9a64cde362553d2ec16f4197228caed31750ec9cc6131ee617a0288cc0c7d3",
+      "functions": [
+        {
+          "name": "MovieForm",
+          "params": [
+            "props"
+          ],
+          "exported": true,
+          "lineCount": 248
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "FormEvent",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "useServerFn"
+          ]
+        },
+        {
+          "source": "~/db/schema",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/input",
+          "specifiers": [
+            "Input"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/switch",
+          "specifiers": [
+            "Switch"
+          ]
+        },
+        {
+          "source": "~/server/movies",
+          "specifiers": [
+            "createMovie",
+            "updateMovieForId"
+          ]
+        }
+      ],
+      "exports": [
+        "MovieForm"
+      ],
+      "totalLines": 283,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/NotFound.tsx": {
+      "filePath": "src/components/NotFound.tsx",
+      "contentHash": "0c16a2d43ae963912c6be2f803481ede3037efecfa3ed81701176ff3626767a6",
+      "functions": [
+        {
+          "name": "NotFound",
+          "params": [
+            "{ children }"
+          ],
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "Link"
+          ]
+        }
+      ],
+      "exports": [
+        "NotFound"
+      ],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/SeriesForm.tsx": {
+      "filePath": "src/components/SeriesForm.tsx",
+      "contentHash": "656b0b4b390fd6d0e35bd5498039bc13c742f90c447a12c0e961d6b82024cfbd",
+      "functions": [
+        {
+          "name": "toEpisodeRows",
+          "params": [
+            "episodes"
+          ],
+          "returnType": "EpisodeRow[]",
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "SeriesForm",
+          "params": [
+            "props"
+          ],
+          "exported": true,
+          "lineCount": 374
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "FormEvent",
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "useServerFn"
+          ]
+        },
+        {
+          "source": "~/db/schema",
+          "specifiers": [
+            "Series"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/input",
+          "specifiers": [
+            "Input"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/switch",
+          "specifiers": [
+            "Switch"
+          ]
+        },
+        {
+          "source": "~/server/series",
+          "specifiers": [
+            "updateSeries",
+            "createSeries"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Trash2",
+            "Plus"
+          ]
+        }
+      ],
+      "exports": [
+        "SeriesForm"
+      ],
+      "totalLines": 453,
+      "hasStructuralAnalysis": true
+    },
+    "src/db/index.ts": {
+      "filePath": "src/db/index.ts",
+      "contentHash": "6760fee002243fd02baa70e6e90f45e1b5ebb8110e406a49beb9e411eb806fbd",
+      "functions": [
+        {
+          "name": "initDb",
+          "params": [],
+          "returnType": "Promise<Database>",
+          "exported": false,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-orm/postgres-js",
+          "specifiers": [
+            "PostgresJsDatabase"
+          ]
+        },
+        {
+          "source": "./schema",
+          "specifiers": [
+            "* as schema"
+          ]
+        }
+      ],
+      "exports": [
+        "db"
+      ],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    "src/db/reset.ts": {
+      "filePath": "src/db/reset.ts",
+      "contentHash": "95d89762fb530fa740118f8c920f824e1622febedcce6dc8108bc38fe3afb369",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": false,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "postgres",
+          "specifiers": [
+            "postgres"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "src/db/schema.ts": {
+      "filePath": "src/db/schema.ts",
+      "contentHash": "b44b5b5561f62e3fac241ea4e4467dd5588f39157de8ef253a1198222432c44e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-orm/pg-core",
+          "specifiers": [
+            "pgSchema",
+            "pgTable",
+            "text",
+            "boolean",
+            "integer",
+            "timestamp",
+            "uuid",
+            "serial",
+            "index"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "relations",
+            "sql"
+          ]
+        }
+      ],
+      "exports": [
+        "groupTitles",
+        "channels",
+        "channelsRelations",
+        "series",
+        "media",
+        "mediaRelations",
+        "seriesRelations"
+      ],
+      "totalLines": 190,
+      "hasStructuralAnalysis": true
+    },
+    "src/db/validators.ts": {
+      "filePath": "src/db/validators.ts",
+      "contentHash": "0ca5ccb30190a51a4cf40f3e3bce033a517eed5c440baf9823cfe7c383605172",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-zod",
+          "specifiers": [
+            "createInsertSchema"
+          ]
+        },
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "./schema",
+          "specifiers": [
+            "channels",
+            "media",
+            "series"
+          ]
+        }
+      ],
+      "exports": [
+        "COUNTRY_CODES",
+        "channelSchema",
+        "channelUpdateSchema",
+        "mediaSchema",
+        "mediaUpdateSchema",
+        "seriesSchema",
+        "seriesUpdateSchema"
+      ],
+      "totalLines": 353,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/kodi-url.test.ts": {
+      "filePath": "src/lib/kodi-url.test.ts",
+      "contentHash": "ce5633966118be502af8ee7b4fe2b32cbe1663f2e5acd5d8d51a8b33e8a01c02",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./kodi-url",
+          "specifiers": [
+            "matchKodiChannels",
+            "resolveKodiConnection",
+            "MatchableChannel"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 159,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/kodi-url.ts": {
+      "filePath": "src/lib/kodi-url.ts",
+      "contentHash": "4d4910a6d4c58963e6d2486962dd02e2dd04876d7162ba1b2c886019d9a37e5f",
+      "functions": [
+        {
+          "name": "resolveKodiConnection",
+          "params": [
+            "env"
+          ],
+          "returnType": "KodiConnection",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "matchKodiChannels",
+          "params": [
+            "dbChannels",
+            "kodiChannels"
+          ],
+          "returnType": "ChannelMatch[]",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "resolveKodiConnection",
+        "matchKodiChannels"
+      ],
+      "totalLines": 105,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/m3u-export.test.ts": {
+      "filePath": "src/lib/m3u-export.test.ts",
+      "contentHash": "9f47def4d2ef5e126090224bd3c527b07a6cad371a79584ad40103c08da20a95",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./m3u-export",
+          "specifiers": [
+            "generateM3u",
+            "M3uChannel"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 109,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/m3u-export.ts": {
+      "filePath": "src/lib/m3u-export.ts",
+      "contentHash": "0ebbb799e33b0f1e80f89ab93afdd2fd72e229d119d4e6463caa64b2a5e604c0",
+      "functions": [
+        {
+          "name": "generateM3u",
+          "params": [
+            "channels"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "~/db/validators",
+          "specifiers": [
+            "COUNTRY_CODES"
+          ]
+        }
+      ],
+      "exports": [
+        "generateM3u"
+      ],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/m3u-parser.test.ts": {
+      "filePath": "src/lib/m3u-parser.test.ts",
+      "contentHash": "14e1c668d21438eef6be683eceec93f39d7827f9641e78bca4b11202a46995be",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./m3u-parser",
+          "specifiers": [
+            "parseExtInf",
+            "isMediaUrl",
+            "parseMediaType",
+            "parseYear",
+            "parseSeasonEpisode",
+            "isValidEntry",
+            "parseChannel",
+            "parseMedia",
+            "parseM3uContent"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 321,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/m3u-parser.ts": {
+      "filePath": "src/lib/m3u-parser.ts",
+      "contentHash": "b7c63f1349f9e279f2f33e8ccb8ed9849b1591162a0ceb426398ea3cf1a4991d",
+      "functions": [
+        {
+          "name": "parseExtInf",
+          "params": [
+            "line"
+          ],
+          "returnType": "Omit<ParsedChannel, \"streamUrl\">",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "isMediaUrl",
+          "params": [
+            "url"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "parseMediaType",
+          "params": [
+            "url"
+          ],
+          "returnType": "\"movie\" | \"series\" | null",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "parseYear",
+          "params": [
+            "title"
+          ],
+          "returnType": "number | null",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "parseSeriesBaseName",
+          "params": [
+            "title"
+          ],
+          "returnType": "string",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "parseSeasonEpisode",
+          "params": [
+            "title"
+          ],
+          "returnType": "{\n  season: number | null\n  episode: number | null\n}",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "isValidEntry",
+          "params": [
+            "entry"
+          ],
+          "returnType": "boolean",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "parseChannel",
+          "params": [
+            "entry"
+          ],
+          "returnType": "ParsedChannel | null",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "parseMedia",
+          "params": [
+            "entry"
+          ],
+          "returnType": "ParsedMedia | null",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "parseM3uContent",
+          "params": [
+            "content",
+            "mode"
+          ],
+          "returnType": "ParseResult",
+          "exported": true,
+          "lineCount": 76
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "parseExtInf",
+        "isMediaUrl",
+        "parseMediaType",
+        "parseYear",
+        "parseSeriesBaseName",
+        "parseSeasonEpisode",
+        "isValidEntry",
+        "parseChannel",
+        "parseMedia",
+        "parseM3uContent"
+      ],
+      "totalLines": 237,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/stream-url.ts": {
+      "filePath": "src/lib/stream-url.ts",
+      "contentHash": "d253e9abb85d3ccf9289ffc3a2019b65a97fa6555d9fca4f39d505549f09a488",
+      "functions": [
+        {
+          "name": "buildStreamUrl",
+          "params": [
+            "path"
+          ],
+          "returnType": "string | null",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "stripStreamBase",
+          "params": [
+            "url"
+          ],
+          "returnType": "string | null",
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "buildStreamUrl",
+        "stripStreamBase"
+      ],
+      "totalLines": 15,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/yaml-export.test.ts": {
+      "filePath": "src/lib/yaml-export.test.ts",
+      "contentHash": "523963357a01c3fb4db822f53bfde353d767b3493232d53f0cc2b3a0b0e3878e",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect"
+          ]
+        },
+        {
+          "source": "./yaml-export",
+          "specifiers": [
+            "generateHomeAssistantYaml",
+            "ChannelExportData"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 200,
+      "hasStructuralAnalysis": true
+    },
+    "src/lib/yaml-export.ts": {
+      "filePath": "src/lib/yaml-export.ts",
+      "contentHash": "c7238a5a230fe02f09aca01dd8f9837ea56ec61d4e217c75c285149c65082511",
+      "functions": [
+        {
+          "name": "generateHomeAssistantYaml",
+          "params": [
+            "channels"
+          ],
+          "returnType": "ExportResult",
+          "exported": true,
+          "lineCount": 47
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [
+        "generateHomeAssistantYaml"
+      ],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    "src/router.tsx": {
+      "filePath": "src/router.tsx",
+      "contentHash": "8b67a615d0681c21b83c17a2e80ca5e2c503903dd276849a2c68ace6b8f2b78d",
+      "functions": [
+        {
+          "name": "getRouter",
+          "params": [],
+          "exported": true,
+          "lineCount": 49
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "QueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createRouter",
+            "parseSearchWith"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router-ssr-query",
+          "specifiers": [
+            "setupRouterSsrQueryIntegration"
+          ]
+        },
+        {
+          "source": "./routeTree.gen",
+          "specifiers": [
+            "routeTree"
+          ]
+        },
+        {
+          "source": "./components/DefaultCatchBoundary",
+          "specifiers": [
+            "DefaultCatchBoundary"
+          ]
+        },
+        {
+          "source": "./components/NotFound",
+          "specifiers": [
+            "NotFound"
+          ]
+        }
+      ],
+      "exports": [
+        "getRouter"
+      ],
+      "totalLines": 64,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/__root.tsx": {
+      "filePath": "src/routes/__root.tsx",
+      "contentHash": "0aca0f44060fc9d539204db84abeb37c1f28c428e0f4ebf5f2d20e20c5a83226",
+      "functions": [
+        {
+          "name": "RootComponent",
+          "params": [],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "RootDocument",
+          "params": [
+            "{ children }"
+          ],
+          "exported": false,
+          "lineCount": 43
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "HeadContent",
+            "Outlet",
+            "Scripts",
+            "createRootRouteWithContext"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query-devtools",
+          "specifiers": [
+            "ReactQueryDevtools"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router-devtools",
+          "specifiers": [
+            "TanStackRouterDevtools"
+          ]
+        },
+        {
+          "source": "react",
+          "specifiers": [
+            "* as React"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "QueryClient"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Clapperboard",
+            "FileCode",
+            "Film",
+            "HomeIcon",
+            "Plus",
+            "Rss",
+            "Tv"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "LucideIcon"
+          ]
+        },
+        {
+          "source": "~/components/DefaultCatchBoundary",
+          "specifiers": [
+            "DefaultCatchBoundary"
+          ]
+        },
+        {
+          "source": "~/components/NotFound",
+          "specifiers": [
+            "NotFound"
+          ]
+        },
+        {
+          "source": "@ui/styles/globals.css?url",
+          "specifiers": [
+            "globalCss"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 125,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/channels.$id.tsx": {
+      "filePath": "src/routes/channels.$id.tsx",
+      "contentHash": "21564dd27744b117c4056f555ce676d2222d036d880260d1a8832a72f4875f1d",
+      "functions": [
+        {
+          "name": "PageChannels",
+          "params": [],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "getStreamById"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/channels.index.tsx": {
+      "filePath": "src/routes/channels.index.tsx",
+      "contentHash": "3e34ad86d4adb83e8a2b2ee9a840bd0f7ed44dc354e3a2538acbfb5226587ce7",
+      "functions": [
+        {
+          "name": "downloadFile",
+          "params": [
+            "content",
+            "filename",
+            "type"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "RouteComponent",
+          "params": [],
+          "exported": false,
+          "lineCount": 351
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useMutation",
+            "useQuery",
+            "useSuspenseQuery",
+            "useQueryClient",
+            "keepPreviousData"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "streamQueryOptions",
+            "getGroupTitles",
+            "exportActiveStreamsM3u"
+          ]
+        },
+        {
+          "source": "~/server/channels",
+          "specifiers": [
+            "getCountryCodes",
+            "exportActiveChannelsYaml",
+            "syncKodiContentIds"
+          ]
+        },
+        {
+          "source": "@ui/components/checkbox",
+          "specifiers": [
+            "Checkbox"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/spinner",
+          "specifiers": [
+            "Spinner"
+          ]
+        },
+        {
+          "source": "@ui/components/select",
+          "specifiers": [
+            "Select",
+            "SelectContent",
+            "SelectItem",
+            "SelectTrigger",
+            "SelectValue"
+          ]
+        },
+        {
+          "source": "~/components/ListStream",
+          "specifiers": [
+            "ListStream"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ChevronLeft",
+            "ChevronRight",
+            "ChevronsLeft",
+            "ChevronsRight"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 462,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/channels.new.tsx": {
+      "filePath": "src/routes/channels.new.tsx",
+      "contentHash": "627ecaa715ca58e08ca215fc7d3ad1892c6d244a9212eb7eb7d8a976924100cc",
+      "functions": [
+        {
+          "name": "PageAddChannel",
+          "params": [],
+          "exported": false,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/components/ChannelForm",
+          "specifiers": [
+            "ChannelForm"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/edit-movie/$id.tsx": {
+      "filePath": "src/routes/edit-movie/$id.tsx",
+      "contentHash": "8401d6e4d5872933cbfb0271557d622e5cd8fda62dd4b9a801ec705714e1811d",
+      "functions": [
+        {
+          "name": "PageEditMovie",
+          "params": [],
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/db/schema",
+          "specifiers": [
+            "Media"
+          ]
+        },
+        {
+          "source": "~/components/MovieForm",
+          "specifiers": [
+            "MovieForm"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "getStreamById"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/edit-series/$id.tsx": {
+      "filePath": "src/routes/edit-series/$id.tsx",
+      "contentHash": "e7f406e768c0a423a0ab57e90335bbd32dad474764d6cfdcaf451f240229599f",
+      "functions": [
+        {
+          "name": "PageEditSeries",
+          "params": [],
+          "exported": false,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/components/SeriesForm",
+          "specifiers": [
+            "SeriesForm"
+          ]
+        },
+        {
+          "source": "~/server/series",
+          "specifiers": [
+            "getSeriesWithEpisodes"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 48,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/edit/$id.tsx": {
+      "filePath": "src/routes/edit/$id.tsx",
+      "contentHash": "a77df1a60dc0c0fb99bcee2a188b756464e5e1a629655a2fb32c15c8a2aada44",
+      "functions": [
+        {
+          "name": "PageEditChannel",
+          "params": [],
+          "exported": false,
+          "lineCount": 27
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/db/schema",
+          "specifiers": [
+            "Channel"
+          ]
+        },
+        {
+          "source": "~/components/ChannelForm",
+          "specifiers": [
+            "ChannelForm"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "getStreamById"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/index.tsx": {
+      "filePath": "src/routes/index.tsx",
+      "contentHash": "4236c15cbd504af40b75e6101a20ae7d23e6382534f134f616ace91ffa139bea",
+      "functions": [
+        {
+          "name": "Home",
+          "params": [],
+          "exported": false,
+          "lineCount": 63
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Clapperboard",
+            "FileCode",
+            "Film",
+            "Plus",
+            "RefreshCw",
+            "Rss",
+            "Tv"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "LucideIcon"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 205,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/movies.$id.tsx": {
+      "filePath": "src/routes/movies.$id.tsx",
+      "contentHash": "f5d5bcc4e4407f366a9118653c46135a42c482027077e2cf6a3a33b398cefff1",
+      "functions": [
+        {
+          "name": "PageMovie",
+          "params": [],
+          "exported": false,
+          "lineCount": 13
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "getStreamById"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/movies.index.tsx": {
+      "filePath": "src/routes/movies.index.tsx",
+      "contentHash": "e1e40dacbb6d7e0bcfee8dbba17ab0a200537cfac6aeb7dfd966cbf018db7dc1",
+      "functions": [
+        {
+          "name": "downloadFile",
+          "params": [
+            "content",
+            "filename",
+            "type"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "RouteComponent",
+          "params": [],
+          "exported": false,
+          "lineCount": 237
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useMutation",
+            "useQuery",
+            "useSuspenseQuery",
+            "keepPreviousData"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute"
+          ]
+        },
+        {
+          "source": "~/server/shared",
+          "specifiers": [
+            "streamQueryOptions",
+            "getGroupTitles",
+            "exportActiveStreamsM3u"
+          ]
+        },
+        {
+          "source": "@ui/components/checkbox",
+          "specifiers": [
+            "Checkbox"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/spinner",
+          "specifiers": [
+            "Spinner"
+          ]
+        },
+        {
+          "source": "@ui/components/select",
+          "specifiers": [
+            "Select",
+            "SelectContent",
+            "SelectItem",
+            "SelectTrigger",
+            "SelectValue"
+          ]
+        },
+        {
+          "source": "~/components/ListStream",
+          "specifiers": [
+            "ListStream"
+          ]
+        },
+        {
+          "source": "~/components/MovieCombobox",
+          "specifiers": [
+            "MovieCombobox"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ChevronLeft",
+            "ChevronRight",
+            "ChevronsLeft",
+            "ChevronsRight"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 324,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/movies.new.tsx": {
+      "filePath": "src/routes/movies.new.tsx",
+      "contentHash": "a941eb7a4d4ccdc50d4ad650348a052f947434103ef17655258b298071b4c64c",
+      "functions": [
+        {
+          "name": "PageAddMovie",
+          "params": [],
+          "exported": false,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/components/MovieForm",
+          "specifiers": [
+            "MovieForm"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/series.$id.tsx": {
+      "filePath": "src/routes/series.$id.tsx",
+      "contentHash": "7fa4c47191e1eb8535249a90ef82679fb9880fc27abd13b9b3857a939e8e29d7",
+      "functions": [
+        {
+          "name": "PageSeries",
+          "params": [],
+          "exported": false,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "notFound"
+          ]
+        },
+        {
+          "source": "~/server/series",
+          "specifiers": [
+            "getSeriesWithEpisodes"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/series.index.tsx": {
+      "filePath": "src/routes/series.index.tsx",
+      "contentHash": "358a648b25055a72c70fb2a29afcd8e24cc93ad1c0dc49175fd2e4156deb5363",
+      "functions": [
+        {
+          "name": "downloadFile",
+          "params": [
+            "content",
+            "filename",
+            "type"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "handleToggleSeriesActive",
+          "params": [
+            "id",
+            "active"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "RouteComponent",
+          "params": [],
+          "exported": false,
+          "lineCount": 244
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useMutation",
+            "useQuery",
+            "useSuspenseQuery",
+            "keepPreviousData"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute"
+          ]
+        },
+        {
+          "source": "~/server/series",
+          "specifiers": [
+            "seriesQueryOptions",
+            "getSeriesGroupTitles",
+            "exportActiveSeriesM3u",
+            "toggleSeriesActive"
+          ]
+        },
+        {
+          "source": "@ui/components/checkbox",
+          "specifiers": [
+            "Checkbox"
+          ]
+        },
+        {
+          "source": "@ui/components/label",
+          "specifiers": [
+            "Label"
+          ]
+        },
+        {
+          "source": "@ui/components/button",
+          "specifiers": [
+            "Button"
+          ]
+        },
+        {
+          "source": "@ui/components/spinner",
+          "specifiers": [
+            "Spinner"
+          ]
+        },
+        {
+          "source": "@ui/components/select",
+          "specifiers": [
+            "Select",
+            "SelectContent",
+            "SelectItem",
+            "SelectTrigger",
+            "SelectValue"
+          ]
+        },
+        {
+          "source": "~/components/ListStream",
+          "specifiers": [
+            "ListStream"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ChevronLeft",
+            "ChevronRight",
+            "ChevronsLeft",
+            "ChevronsRight"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 335,
+      "hasStructuralAnalysis": true
+    },
+    "src/routes/series.new.tsx": {
+      "filePath": "src/routes/series.new.tsx",
+      "contentHash": "0fa4aa33ef1bdc9cfc89df32003c02700c4c70e7db7e77ddf5e8239a65362e40",
+      "functions": [
+        {
+          "name": "PageAddSeries",
+          "params": [],
+          "exported": false,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "useQueryClient"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "createFileRoute",
+            "useNavigate",
+            "useRouter"
+          ]
+        },
+        {
+          "source": "~/components/SeriesForm",
+          "specifiers": [
+            "SeriesForm"
+          ]
+        }
+      ],
+      "exports": [
+        "Route"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "src/server.ts": {
+      "filePath": "src/server.ts",
+      "contentHash": "9904b36f91a2ab384bf388c3e32258f65c30b1eaf71d29692ba7a016a5b35336",
+      "functions": [
+        {
+          "name": "createM3uResponse",
+          "params": [
+            "m3u",
+            "filename",
+            "disposition"
+          ],
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "createYamlResponse",
+          "params": [
+            "yaml",
+            "filename"
+          ],
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "createServerEntry",
+          "params": [
+            "entry"
+          ],
+          "returnType": "ServerEntry",
+          "exported": true,
+          "lineCount": 68
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-start/server",
+          "specifiers": [
+            "createStartHandler",
+            "defaultStreamHandler",
+            "RequestHandler"
+          ]
+        },
+        {
+          "source": "@tanstack/react-router",
+          "specifiers": [
+            "Register"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "eq"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels",
+            "media"
+          ]
+        },
+        {
+          "source": "~/server/m3u",
+          "specifiers": [
+            "getActiveStreamsM3u"
+          ]
+        },
+        {
+          "source": "~/server/yaml",
+          "specifiers": [
+            "getActiveChannelsYaml"
+          ]
+        },
+        {
+          "source": "~/server/kodi",
+          "specifiers": [
+            "runKodiSync"
+          ]
+        },
+        {
+          "source": "~/lib/stream-url",
+          "specifiers": [
+            "buildStreamUrl"
+          ]
+        }
+      ],
+      "exports": [
+        "createServerEntry"
+      ],
+      "totalLines": 112,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/channels.test.ts": {
+      "filePath": "src/server/channels.test.ts",
+      "contentHash": "c5a5b0f8b0542f2422e5943c90d11767ffa801449dc29d5f1654a42d55a4f090",
+      "functions": [
+        {
+          "name": "createQueryBuilder",
+          "params": [
+            "returnVal"
+          ],
+          "exported": false,
+          "lineCount": 17
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vitest",
+          "specifiers": [
+            "describe",
+            "it",
+            "expect",
+            "vi",
+            "beforeEach"
+          ]
+        },
+        {
+          "source": "./shared",
+          "specifiers": [
+            "updateStreamLogic"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "groupTitles",
+            "channels"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 195,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/channels.ts": {
+      "filePath": "src/server/channels.ts",
+      "contentHash": "4c18aa6eba8c2d290ac05c9d3bb893afb43284904ca073612d8f3f2fcb1bd3a9",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "createServerFn"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "asc",
+            "isNotNull"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels",
+            "channelSchema",
+            "channelUpdateSchema"
+          ]
+        },
+        {
+          "source": "./shared",
+          "specifiers": [
+            "updateStreamLogic",
+            "createStreamLogic"
+          ]
+        },
+        {
+          "source": "./kodi",
+          "specifiers": [
+            "runKodiSync"
+          ]
+        },
+        {
+          "source": "./yaml",
+          "specifiers": [
+            "getActiveChannelsYaml"
+          ]
+        }
+      ],
+      "exports": [
+        "updateChannelForId",
+        "createChannel",
+        "getCountryCodes",
+        "exportActiveChannelsYaml",
+        "syncKodiContentIds"
+      ],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/kodi.ts": {
+      "filePath": "src/server/kodi.ts",
+      "contentHash": "deaa1c8487014b57edce276755c2060c407158be7f5c1217d7509cc4aec760d7",
+      "functions": [
+        {
+          "name": "runKodiSync",
+          "params": [],
+          "returnType": "Promise<KodiSyncResult>",
+          "exported": true,
+          "lineCount": 115
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "count",
+            "eq",
+            "inArray",
+            "or",
+            "sql"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels"
+          ]
+        },
+        {
+          "source": "~/lib/kodi-url",
+          "specifiers": [
+            "matchKodiChannels",
+            "resolveKodiConnection"
+          ]
+        }
+      ],
+      "exports": [
+        "runKodiSync"
+      ],
+      "totalLines": 147,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/m3u.ts": {
+      "filePath": "src/server/m3u.ts",
+      "contentHash": "a4aad7033010e171fd29145388d3c482be4699f49243616424f86190ac570b49",
+      "functions": [
+        {
+          "name": "getActiveStreamsM3u",
+          "params": [
+            "tableKey"
+          ],
+          "exported": true,
+          "lineCount": 37
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "and",
+            "asc",
+            "eq",
+            "isNull",
+            "sql"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels",
+            "media",
+            "groupTitles"
+          ]
+        },
+        {
+          "source": "~/lib/m3u-export",
+          "specifiers": [
+            "generateM3u"
+          ]
+        },
+        {
+          "source": "~/lib/stream-url",
+          "specifiers": [
+            "buildStreamUrl"
+          ]
+        }
+      ],
+      "exports": [
+        "getActiveStreamsM3u"
+      ],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/movies.ts": {
+      "filePath": "src/server/movies.ts",
+      "contentHash": "cd497a46db2db6999ac92b120215428f1eb04a7247c70afae9dab6ae11c11959",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "createServerFn"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "mediaSchema",
+            "mediaUpdateSchema"
+          ]
+        },
+        {
+          "source": "./shared",
+          "specifiers": [
+            "updateStreamLogic",
+            "createStreamLogic"
+          ]
+        }
+      ],
+      "exports": [
+        "updateMovieForId",
+        "createMovie"
+      ],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/series.ts": {
+      "filePath": "src/server/series.ts",
+      "contentHash": "f5da9fb08b13f0bfa81fd5d799643f0983b835aee4ca61697f8d4ea9ab4c73f6",
+      "functions": [
+        {
+          "name": "seriesQueryOptions",
+          "params": [
+            "options"
+          ],
+          "exported": true,
+          "lineCount": 32
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "eq",
+            "asc",
+            "desc",
+            "and",
+            "count",
+            "sql",
+            "getTableColumns"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "queryOptions"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "createServerFn"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "series",
+            "media",
+            "groupTitles"
+          ]
+        },
+        {
+          "source": "~/db/validators",
+          "specifiers": [
+            "seriesSchema",
+            "seriesUpdateSchema"
+          ]
+        },
+        {
+          "source": "./shared",
+          "specifiers": [
+            "resolveGroupTitleId"
+          ]
+        },
+        {
+          "source": "~/lib/stream-url",
+          "specifiers": [
+            "stripStreamBase"
+          ]
+        }
+      ],
+      "exports": [
+        "listSeries",
+        "seriesQueryOptions",
+        "getSeriesWithEpisodes",
+        "toggleSeriesActive",
+        "updateSeries",
+        "createSeries",
+        "exportActiveSeriesM3u",
+        "getSeriesGroupTitles"
+      ],
+      "totalLines": 385,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/shared.ts": {
+      "filePath": "src/server/shared.ts",
+      "contentHash": "eb22b7775bcc7f927b8e8eece3724f539130eab3871000526d0bca98bdc206e1",
+      "functions": [
+        {
+          "name": "streamQueryOptions",
+          "params": [
+            "table",
+            "options"
+          ],
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "updateStreamLogic",
+          "params": [
+            "tableKey",
+            "data"
+          ],
+          "exported": true,
+          "lineCount": 60
+        },
+        {
+          "name": "createStreamLogic",
+          "params": [
+            "tableKey",
+            "data"
+          ],
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "resolveGroupTitleId",
+          "params": [
+            "groupTitle"
+          ],
+          "returnType": "Promise<number | null>",
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zod",
+          "specifiers": [
+            "z"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "eq",
+            "asc",
+            "desc",
+            "and",
+            "count",
+            "inArray",
+            "sql",
+            "ilike",
+            "or",
+            "getTableColumns"
+          ]
+        },
+        {
+          "source": "@tanstack/react-query",
+          "specifiers": [
+            "queryOptions"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start",
+          "specifiers": [
+            "createServerFn"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels",
+            "media",
+            "series",
+            "groupTitles"
+          ]
+        },
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "isNull"
+          ]
+        },
+        {
+          "source": "./m3u",
+          "specifiers": [
+            "getActiveStreamsM3u"
+          ]
+        },
+        {
+          "source": "~/lib/stream-url",
+          "specifiers": [
+            "buildStreamUrl",
+            "stripStreamBase"
+          ]
+        }
+      ],
+      "exports": [
+        "toggleActive",
+        "listStreams",
+        "streamQueryOptions",
+        "getStreamById",
+        "searchStreams",
+        "updateStreamLogic",
+        "createStreamLogic",
+        "exportActiveStreamsM3u",
+        "getGroupTitles",
+        "resolveGroupTitleId"
+      ],
+      "totalLines": 375,
+      "hasStructuralAnalysis": true
+    },
+    "src/server/yaml.ts": {
+      "filePath": "src/server/yaml.ts",
+      "contentHash": "d857d5714df63c7d147e2af1738884899795ada2abd0a84e545f2bbaeb4dd11e",
+      "functions": [
+        {
+          "name": "getActiveChannelsYaml",
+          "params": [],
+          "returnType": "Promise<ExportResult>",
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "drizzle-orm",
+          "specifiers": [
+            "asc",
+            "eq"
+          ]
+        },
+        {
+          "source": "~/db",
+          "specifiers": [
+            "db",
+            "channels"
+          ]
+        },
+        {
+          "source": "~/lib/yaml-export",
+          "specifiers": [
+            "generateHomeAssistantYaml",
+            "ExportResult"
+          ]
+        }
+      ],
+      "exports": [
+        "getActiveChannelsYaml"
+      ],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/config.toml": {
+      "filePath": "supabase/config.toml",
+      "contentHash": "b9d5f7aadee2e3a7e8f4fd07821a9b6877f2bd82f71626456ad0db3c047394ce",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 383,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/0000_dusty_supreme_intelligence.sql": {
+      "filePath": "supabase/migrations/0000_dusty_supreme_intelligence.sql",
+      "contentHash": "8e9cf494a057009c65e410a0d3af21d21b5c1ce47fb986fe6bca93809ee81772",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/0001_elite_naoko.sql": {
+      "filePath": "supabase/migrations/0001_elite_naoko.sql",
+      "contentHash": "8c5233fbf349f4791bc47024568524ad0433ab88eba61078a1cedd4f5bc59d38",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/0001_performance_indexes.sql": {
+      "filePath": "supabase/migrations/0001_performance_indexes.sql",
+      "contentHash": "bc4095ba451d8fe81e65063219dec5413ff120758dec630f9b20e9e9fa9f2ead",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 57,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/meta/_journal.json": {
+      "filePath": "supabase/migrations/meta/_journal.json",
+      "contentHash": "ed47615ac1be5ef3ba11cfb3e02c72eba693ced91bfaf694463dfe4a16df334c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/meta/0000_snapshot.json": {
+      "filePath": "supabase/migrations/meta/0000_snapshot.json",
+      "contentHash": "d01c1196305bab1954a245e6b9ee2e8680ff3ad01f975040ff4e1f5ac562fc50",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 121,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/meta/0001_snapshot.json": {
+      "filePath": "supabase/migrations/meta/0001_snapshot.json",
+      "contentHash": "f2d9f68fe37947fb2e77f0b869f8603a5da2e0c925ad7cc0726f4f6daede7e28",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 430,
+      "hasStructuralAnalysis": true
+    },
+    "tsconfig.json": {
+      "filePath": "tsconfig.json",
+      "contentHash": "fa2a35372e204d649774c9a1711b77f7d6c43cced02fe6ec146342e53155f3ab",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "vercel.json": {
+      "filePath": "vercel.json",
+      "contentHash": "78df6b727e5fbb63ad186b739c68b34e36ea2fc2835df2f35b30b045ad710ab8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    "vite.config.ts": {
+      "filePath": "vite.config.ts",
+      "contentHash": "a6b6dd94940f4df85037dbd3660e53cc64607a51da48f10f5b6c599407fda727",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "node:path",
+          "specifiers": [
+            "dirname",
+            "resolve"
+          ]
+        },
+        {
+          "source": "node:url",
+          "specifiers": [
+            "fileURLToPath"
+          ]
+        },
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig",
+            "Plugin"
+          ]
+        },
+        {
+          "source": "vite-tsconfig-paths",
+          "specifiers": [
+            "tsConfigPaths"
+          ]
+        },
+        {
+          "source": "@tanstack/react-start/plugin/vite",
+          "specifiers": [
+            "tanstackStart"
+          ]
+        },
+        {
+          "source": "@tailwindcss/vite",
+          "specifiers": [
+            "tailwindcss"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "viteReact"
+          ]
+        },
+        {
+          "source": "nitro/vite",
+          "specifiers": [
+            "nitro"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

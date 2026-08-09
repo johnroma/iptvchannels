@@ -17,36 +17,63 @@ IPTV Channel Management system with:
 iptvchannels/
 ├── src/
 │   ├── db/              # Drizzle ORM (schema, validators, reset, client)
-│   │   ├── schema.ts    # Table definitions (group_titles, channels, media) + relations
-│   │   ├── validators.ts # Zod validation schemas (channelSchema, channelUpdateSchema)
+│   │   ├── schema.ts    # Tables (group_titles, channels, series, media) + relations
+│   │   ├── validators.ts # Zod schemas (channel/media/series create+update) + COUNTRY_CODES
 │   │   ├── index.ts     # Lazy-init DB client (Proxy pattern) + re-exports
 │   │   └── reset.ts     # Database reset script
 │   ├── server/          # Server functions (createServerFn)
-│   │   └── channels.ts  # All channel CRUD + export + sync operations
+│   │   ├── shared.ts    # Generic stream engine (paginated queries, CRUD, group-title upsert) for channels/movies/series
+│   │   ├── channels.ts  # Channel server fns (barrel re-exporting shared/kodi/yaml wrappers)
+│   │   ├── movies.ts    # Movie server fns (barrel re-exporting shared)
+│   │   ├── series.ts    # Series server fns (list/get/toggle/update/create/export)
+│   │   ├── kodi.ts      # runKodiSync — Kodi JSON-RPC PVR.GetChannels → content_id
+│   │   ├── m3u.ts       # getActiveStreamsM3u — M3U playlist server fn
+│   │   ├── yaml.ts      # getActiveChannelsYaml — Home Assistant script YAML
+│   │   └── channels.test.ts
 │   ├── components/      # App components
-│   ├── lib/             # Utilities (m3u-export, yaml-export, m3u-parser)
+│   │   ├── ChannelForm.tsx / MovieForm.tsx / SeriesForm.tsx  # Zod-validated create/edit forms
+│   │   ├── ListStream.tsx        # Reusable paginated table for all resource types
+│   │   ├── ActiveSwitch.tsx      # Optimistic active-state toggle
+│   │   ├── MovieCombobox.tsx     # Searchable movie picker (episode selection)
+│   │   └── DefaultCatchBoundary.tsx / NotFound.tsx
+│   ├── lib/             # Pure utilities (+ unit tests)
+│   │   ├── m3u-parser.ts(.test.ts)   # Parse M3U → channels vs media (series/season/episode/year)
+│   │   ├── m3u-export.ts(.test.ts)   # Format active rows → M3U playlist text
+│   │   ├── yaml-export.ts(.test.ts)  # generateHomeAssistantYaml (plain script mapping)
+│   │   ├── kodi-url.ts(.test.ts)     # resolveKodiConnection + matchKodiChannels
+│   │   └── stream-url.ts             # Normalize stream URLs (STREAM_BASE_PATH/PORT)
 │   ├── routes/          # TanStack Start file-based routes
-│   │   ├── __root.tsx   # Root layout (document shell)
-│   │   ├── index.tsx    # Home page
-│   │   ├── channels.index.tsx  # Channel list (paginated, server-filtered)
-│   │   ├── channels.$id.tsx    # Channel detail
-│   │   ├── channels.new.tsx    # Create channel
-│   │   └── edit/$id.tsx        # Edit channel
+│   │   ├── __root.tsx            # Root layout (document shell)
+│   │   ├── index.tsx             # Home page (system overview)
+│   │   ├── channels.index.tsx    # Channel list (paginated, server-filtered)
+│   │   ├── channels.$id.tsx      # Channel detail
+│   │   ├── channels.new.tsx      # Create channel
+│   │   ├── movies.index.tsx / movies.$id.tsx / movies.new.tsx
+│   │   ├── series.index.tsx / series.$id.tsx / series.new.tsx
+│   │   ├── edit/$id.tsx          # Edit channel
+│   │   ├── edit-movie/$id.tsx    # Edit movie
+│   │   └── edit-series/$id.tsx   # Edit series
 │   ├── router.tsx       # TanStack Router + React Query SSR + custom search serialization
-│   └── routeTree.gen.ts # Auto-generated route tree
-├── packages/ui/         # Shared UI components (shadcn/ui)
+│   └── routeTree.gen.ts # Auto-generated route tree (committed)
+├── packages/ui/         # Shared UI components (@iptvchannels/ui, shadcn/ui)
 │   ├── components/      # shadcn components (button, input, card, select, switch, etc.)
 │   ├── lib/utils.ts     # cn() helper function
 │   ├── styles/globals.css  # Tailwind + CSS variables
 │   └── components.json  # shadcn CLI config
 ├── (uses ../env-profiles/)  # Environment files live one level above this repo (not committed)
-├── scripts/             # Database seeding scripts (bash/awk)
-│   ├── seed-channels.sh # Import TV channels from M3U
-│   └── seed-media.sh    # Import movies/series from M3U
+├── scripts/             # Database seeding/migration scripts (bash)
+│   ├── seed-channels.sh       # Import TV channels from M3U (PostgreSQL COPY)
+│   ├── seed-media.sh          # Import movies/series from M3U (PostgreSQL COPY)
+│   └── migrate-stream-urls.sh # Rewrite stream_url against STREAM_BASE_PATH/PORT
+├── supabase/
+│   ├── config.toml             # Supabase project config
+│   └── migrations/             # Drizzle-generated SQL migrations + meta snapshots
+├── .understand-anything/ # Codebase knowledge graph (see /understand) — committed
 ├── eslint.config.mjs    # ESLint flat config (typescript-eslint)
-├── vite.config.ts
-├── drizzle.config.ts
-└── pnpm-workspace.yaml
+├── vite.config.ts       # Vite + TanStack Start + Tailwind v4 + Nitro pipeline
+├── nitro.config.ts      # Nitro server preset config
+├── drizzle.config.ts    # Drizzle Kit config (env-driven schemaFilter)
+└── pnpm-workspace.yaml  # Workspace definition (packages/*)
 ```
 
 ## Path Aliases
@@ -240,7 +267,7 @@ Located at `src/db/validators.ts` (NOT `schema.ts`):
 
 ## Database Schema
 
-Located at `src/db/schema.ts`. Group titles are normalized into a lookup table shared by channels and media.
+Located at `src/db/schema.ts`. Group titles are normalized into a lookup table shared by channels, media, and series.
 
 Current local/shared-DB layout:
 - local shared database: `sodium`
@@ -251,9 +278,10 @@ Current local/shared-DB layout:
 - local role search path is expected to resolve `iptvchannels, public`
 
 Tables in that schema:
-- `group_titles` table: Normalized lookup (id:serial PK, name:text UNIQUE, alias:text). `name` is the original M3U value (e.g., "US| ENTERTAINMENT"), `alias` is an optional friendly override (e.g., "Entertainment"). Changing an alias updates it for all linked channels/media.
+- `group_titles` table: Normalized lookup (id:serial PK, name:text UNIQUE, alias:text). `name` is the original M3U value (e.g., "US| ENTERTAINMENT"), `alias` is an optional friendly override (e.g., "Entertainment"). Changing an alias updates it for all linked channels/media/series.
 - `channels` table: Live TV channels (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, streamUrl, contentId, name, countryCode, favourite, active, scriptAlias, timestamps)
-- `media` table: Movies/series (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, groupTitle:text, streamUrl, mediaType, year, season, episode, name, favourite, active, timestamps)
+- `series` table: Series groupings (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, episodeCount:integer [denormalized, maintained by seed/CRUD], name, favourite, active, timestamps). `media` rows reference a series via `seriesId`.
+- `media` table: Movies and series episodes (id:uuid, tvgId, tvgName, tvgLogo, **groupTitleId:FK→group_titles**, **seriesId:FK→series** [null for movies], streamUrl, mediaType ["movie"|"series"], year, season, episode, name, favourite, active, timestamps)
 
 ### Channel Type
 
@@ -267,7 +295,7 @@ export type Channel = ChannelRow & {
 }
 ```
 
-Drizzle relations are defined for `db.query` with `with` support (`channelsRelations`, `mediaRelations`).
+Drizzle relations are defined for `db.query` with `with` support (`channelsRelations`, `mediaRelations`, `seriesRelations`).
 
 ## ESLint Configuration
 
@@ -335,7 +363,7 @@ Known local runtime split:
 3. **Supabase CLI**: Always use `pnpm supabase` to ensure token is loaded
 4. **No Docker**: Uses local Homebrew PostgreSQL (`john@localhost:5432/iptvchannels`)
 5. **Server-side filtering**: Active, favourite, countries, groupTitleId are all server-side WHERE clauses — not client-side filters
-6. **Normalized group titles**: `group_titles` table is shared by `channels` and `media` via FK. Alias changes propagate to all linked rows. Server functions resolve `groupTitle` string → FK via upsert.
+6. **Normalized group titles**: `group_titles` table is shared by `channels`, `media`, and `series` via FK. Alias changes propagate to all linked rows. Server functions resolve `groupTitle` string → FK via upsert.
 7. **Lazy DB initialization**: `src/db/index.ts` uses a Proxy that lazily initializes the Drizzle client on first access, preventing client-side import errors in SSR
 8. **Page-based pagination**: Uses `cursor` offset with page numbers, not infinite scroll
 9. **Home Assistant YAML export**: `getActiveChannelsYaml` (`src/server/yaml.ts`) generates a plain top-level mapping of scripts (**no `script:` wrapper** — the file is consumed via `script: !include channels.yaml`) for active channels that have both `scriptAlias` and `contentId`; each script uses `action: script.play_channel` (not the deprecated `service:`) with `content_id`, `channel_title`, `channel_thumbnail`. Empty result is `{}` so an `!include` yields a mapping, not null. This repo does not call Home Assistant directly; it emits YAML. `exportActiveChannelsYaml` (`src/server/channels.ts`) is the `createServerFn` wrapper used by the Channels page button.

@@ -1,0 +1,3836 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "iptvchannels",
+    "languages": [
+      "css",
+      "javascript",
+      "json",
+      "markdown",
+      "shell",
+      "sql",
+      "toml",
+      "txt",
+      "typescript",
+      "yaml"
+    ],
+    "frameworks": [
+      "React",
+      "TanStack Router",
+      "TanStack Start",
+      "React Query",
+      "Vite",
+      "Vitest",
+      "Tailwind CSS",
+      "Drizzle ORM",
+      "Nitro",
+      "Zod",
+      "Supabase"
+    ],
+    "description": "IPTV channel management system with Home Assistant and Kodi integration. Exports Home Assistant script YAML and M3U playlists from a TanStack Start + Drizzle ORM + PostgreSQL/Supabase backend.",
+    "analyzedAt": "2026-08-09T08:41:05.701Z",
+    "gitCommitHash": "987b1a22d431fcda697f807546a99c8535ff4a70"
+  },
+  "nodes": [
+    {
+      "id": "file:src/db/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "src/db/index.ts",
+      "summary": "Lazy-initializing Drizzle client behind a Proxy that defers DB connection until first access, plus barrel re-exports of schema, validators, and tables.",
+      "tags": [
+        "data-model",
+        "database",
+        "lazy-init",
+        "barrel"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Proxy defers postgres connection so the module is safe to import in SSR/client contexts."
+    },
+    {
+      "id": "file:src/lib/kodi-url.test.ts",
+      "type": "file",
+      "name": "kodi-url.test.ts",
+      "filePath": "src/lib/kodi-url.test.ts",
+      "summary": "Unit tests for Kodi connection resolution (KODI_URL vs HOST/PORT, auth header) and channel-name matching heuristics.",
+      "tags": [
+        "test",
+        "kodi",
+        "unit-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/kodi-url.ts",
+      "type": "file",
+      "name": "kodi-url.ts",
+      "filePath": "src/lib/kodi-url.ts",
+      "summary": "Pure helpers for resolving Kodi JSON-RPC endpoint/auth from env vars and matching DB channels to Kodi PVR labels (name then tvg_name, case-insensitive).",
+      "tags": [
+        "utility",
+        "kodi",
+        "integration",
+        "matching",
+        "tested"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/stream-url.ts",
+      "type": "file",
+      "name": "stream-url.ts",
+      "filePath": "src/lib/stream-url.ts",
+      "summary": "Normalizes stream URLs from STREAM_BASE_PATH / STREAM_BASE_PORT env config so seeded URLs resolve against the active server.",
+      "tags": [
+        "utility",
+        "streaming",
+        "config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/yaml-export.test.ts",
+      "type": "file",
+      "name": "yaml-export.test.ts",
+      "filePath": "src/lib/yaml-export.test.ts",
+      "summary": "Tests for Home Assistant YAML generation: active filtering, alias/content_id requirements, and empty-result shape.",
+      "tags": [
+        "test",
+        "yaml",
+        "export"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/yaml-export.ts",
+      "type": "file",
+      "name": "yaml-export.ts",
+      "filePath": "src/lib/yaml-export.ts",
+      "summary": "Generates a plain Home Assistant script YAML mapping (no script: wrapper) from active channels for !include consumption.",
+      "tags": [
+        "export",
+        "yaml",
+        "home-assistant",
+        "serialization",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/channels.$id.tsx",
+      "type": "file",
+      "name": "channels.$id.tsx",
+      "filePath": "src/routes/channels.$id.tsx",
+      "summary": "Channel detail route that loads a single channel and renders its edit/detail view.",
+      "tags": [
+        "route",
+        "channel",
+        "detail"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/movies.$id.tsx",
+      "type": "file",
+      "name": "movies.$id.tsx",
+      "filePath": "src/routes/movies.$id.tsx",
+      "summary": "Movie detail route that loads a single movie and renders its detail view.",
+      "tags": [
+        "route",
+        "movie",
+        "detail"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server.ts",
+      "type": "file",
+      "name": "server.ts",
+      "filePath": "src/server.ts",
+      "summary": "TanStack Start server entry: registers the /channels/m3u, /movies/m3u, and /channels/yaml API routes and exports createServerEntry for Nitro.",
+      "tags": [
+        "entry-point",
+        "server",
+        "api-handler",
+        "routing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/server/channels.test.ts",
+      "type": "file",
+      "name": "channels.test.ts",
+      "filePath": "src/server/channels.test.ts",
+      "summary": "Tests for channel query building, filtering (active/favourite/countries/groupTitleId), and CRUD server functions.",
+      "tags": [
+        "test",
+        "channel",
+        "server"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server/channels.ts",
+      "type": "file",
+      "name": "channels.ts",
+      "filePath": "src/server/channels.ts",
+      "summary": "Channel server-function barrel: re-exports CRUD, country-code lookup, YAML export, and Kodi sync createServerFn wrappers from shared/kodi/yaml.",
+      "tags": [
+        "server-function",
+        "channel",
+        "barrel",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server/kodi.ts",
+      "type": "file",
+      "name": "kodi.ts",
+      "filePath": "src/server/kodi.ts",
+      "summary": "runKodiSync server function: calls Kodi JSON-RPC PVR.GetChannels, matches labels via kodi-url helpers, and updates only channels.content_id.",
+      "tags": [
+        "service",
+        "kodi",
+        "integration",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/server/m3u.ts",
+      "type": "file",
+      "name": "m3u.ts",
+      "filePath": "src/server/m3u.ts",
+      "summary": "getActiveStreamsM3u server function returning active rows as an M3U playlist for the channel/movie export endpoints.",
+      "tags": [
+        "server-function",
+        "m3u",
+        "export"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server/movies.ts",
+      "type": "file",
+      "name": "movies.ts",
+      "filePath": "src/server/movies.ts",
+      "summary": "Movie server-function barrel re-exporting create/update movie logic from the shared stream layer.",
+      "tags": [
+        "server-function",
+        "movie",
+        "barrel"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server/shared.ts",
+      "type": "file",
+      "name": "shared.ts",
+      "filePath": "src/server/shared.ts",
+      "summary": "Core shared server logic: stream query options, paginated list, get-by-id, search, toggle-active, create/update stream logic, group-title upsert, and M3U export — the engine behind channels/movies/series.",
+      "tags": [
+        "server-function",
+        "data-model",
+        "shared",
+        "api-handler"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Single 374-line module backs three resource types via a generic stream abstraction."
+    },
+    {
+      "id": "file:src/server/yaml.ts",
+      "type": "file",
+      "name": "yaml.ts",
+      "filePath": "src/server/yaml.ts",
+      "summary": "getActiveChannelsYaml: emits the plain top-level Home Assistant script mapping for channels with both script_alias and content_id.",
+      "tags": [
+        "server-function",
+        "yaml",
+        "home-assistant",
+        "export"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/db/index.ts:initDb",
+      "type": "function",
+      "name": "initDb",
+      "filePath": "src/db/index.ts",
+      "summary": "Lazily constructs and caches the Drizzle postgres client on first access.",
+      "tags": [
+        "database",
+        "lazy-init"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        14,
+        32
+      ]
+    },
+    {
+      "id": "function:src/lib/kodi-url.ts:resolveKodiConnection",
+      "type": "function",
+      "name": "resolveKodiConnection",
+      "filePath": "src/lib/kodi-url.ts",
+      "summary": "Resolves the Kodi JSON-RPC URL and optional Basic-auth header from KODI_URL / KODI_HOST+PORT / KODI_USER env vars.",
+      "tags": [
+        "utility",
+        "kodi",
+        "config"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        26,
+        48
+      ]
+    },
+    {
+      "id": "function:src/lib/kodi-url.ts:matchKodiChannels",
+      "type": "function",
+      "name": "matchKodiChannels",
+      "filePath": "src/lib/kodi-url.ts",
+      "summary": "Matches DB channels to Kodi PVR channel labels by name then tvg_name (case- and whitespace-insensitive).",
+      "tags": [
+        "utility",
+        "kodi",
+        "matching"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        77,
+        104
+      ]
+    },
+    {
+      "id": "function:src/lib/stream-url.ts:buildStreamUrl",
+      "type": "function",
+      "name": "buildStreamUrl",
+      "filePath": "src/lib/stream-url.ts",
+      "summary": "Rebuilds a stream URL against the configured STREAM_BASE_PATH/PORT.",
+      "tags": [
+        "utility",
+        "streaming"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        1,
+        9
+      ]
+    },
+    {
+      "id": "function:src/lib/stream-url.ts:stripStreamBase",
+      "type": "function",
+      "name": "stripStreamBase",
+      "filePath": "src/lib/stream-url.ts",
+      "summary": "Strips the configured base path/port from a stream URL for normalization.",
+      "tags": [
+        "utility",
+        "streaming"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        11,
+        14
+      ]
+    },
+    {
+      "id": "function:src/lib/yaml-export.ts:generateHomeAssistantYaml",
+      "type": "function",
+      "name": "generateHomeAssistantYaml",
+      "filePath": "src/lib/yaml-export.ts",
+      "summary": "Builds the plain top-level Home Assistant script mapping (no script: wrapper) from active channels.",
+      "tags": [
+        "export",
+        "yaml",
+        "home-assistant"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        15,
+        61
+      ]
+    },
+    {
+      "id": "function:src/server.ts:createServerEntry",
+      "type": "function",
+      "name": "createServerEntry",
+      "filePath": "src/server.ts",
+      "summary": "Builds the TanStack Start/Nitro server entry, wiring the M3U and YAML API routes.",
+      "tags": [
+        "entry-point",
+        "server"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        42,
+        109
+      ]
+    },
+    {
+      "id": "function:src/server.ts:createM3uResponse",
+      "type": "function",
+      "name": "createM3uResponse",
+      "filePath": "src/server.ts",
+      "summary": "Builds an audio/x-mpegurl response for an M3U playlist endpoint.",
+      "tags": [
+        "api-handler",
+        "m3u"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        18,
+        30
+      ]
+    },
+    {
+      "id": "function:src/server.ts:createYamlResponse",
+      "type": "function",
+      "name": "createYamlResponse",
+      "filePath": "src/server.ts",
+      "summary": "Builds a text/yaml response (with sync-first stats header) for the channels YAML endpoint.",
+      "tags": [
+        "api-handler",
+        "yaml"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        32,
+        40
+      ]
+    },
+    {
+      "id": "function:src/server/kodi.ts:runKodiSync",
+      "type": "function",
+      "name": "runKodiSync",
+      "filePath": "src/server/kodi.ts",
+      "summary": "Queries Kodi PVR.GetChannels, matches DB channels, and updates content_id for changed rows.",
+      "tags": [
+        "service",
+        "kodi",
+        "sync"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        32,
+        146
+      ]
+    },
+    {
+      "id": "function:src/server/m3u.ts:getActiveStreamsM3u",
+      "type": "function",
+      "name": "getActiveStreamsM3u",
+      "filePath": "src/server/m3u.ts",
+      "summary": "Server function returning active streams formatted as an M3U playlist.",
+      "tags": [
+        "server-function",
+        "m3u",
+        "export"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        13,
+        49
+      ]
+    },
+    {
+      "id": "function:src/server/shared.ts:streamQueryOptions",
+      "type": "function",
+      "name": "streamQueryOptions",
+      "filePath": "src/server/shared.ts",
+      "summary": "Builds React Query options for a paginated, filtered stream list query.",
+      "tags": [
+        "react-query",
+        "query",
+        "shared"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        123,
+        161
+      ]
+    },
+    {
+      "id": "function:src/server/shared.ts:createStreamLogic",
+      "type": "function",
+      "name": "createStreamLogic",
+      "filePath": "src/server/shared.ts",
+      "summary": "Generic create handler: resolves group-title FK and inserts a new stream row.",
+      "tags": [
+        "server-function",
+        "create",
+        "shared"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        286,
+        324
+      ]
+    },
+    {
+      "id": "function:src/server/shared.ts:updateStreamLogic",
+      "type": "function",
+      "name": "updateStreamLogic",
+      "filePath": "src/server/shared.ts",
+      "summary": "Generic update handler: resolves group-title alias/FK and updates a stream row.",
+      "tags": [
+        "server-function",
+        "update",
+        "shared"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        222,
+        281
+      ]
+    },
+    {
+      "id": "function:src/server/shared.ts:resolveGroupTitleId",
+      "type": "function",
+      "name": "resolveGroupTitleId",
+      "filePath": "src/server/shared.ts",
+      "summary": "Upserts a group_titles row by name and returns its id for FK linking.",
+      "tags": [
+        "data-model",
+        "upsert",
+        "shared"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        352,
+        374
+      ]
+    },
+    {
+      "id": "function:src/server/yaml.ts:getActiveChannelsYaml",
+      "type": "function",
+      "name": "getActiveChannelsYaml",
+      "filePath": "src/server/yaml.ts",
+      "summary": "Returns the active-channel Home Assistant script YAML mapping string.",
+      "tags": [
+        "server-function",
+        "yaml",
+        "export"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        10,
+        24
+      ]
+    },
+    {
+      "id": "file:packages/ui/components/avatar.tsx",
+      "type": "file",
+      "name": "avatar.tsx",
+      "filePath": "packages/ui/components/avatar.tsx",
+      "summary": "shadcn/ui Avatar composite (Avatar, AvatarImage, AvatarFallback) for channel/media logos.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/components/button.tsx",
+      "type": "file",
+      "name": "button.tsx",
+      "filePath": "packages/ui/components/button.tsx",
+      "summary": "shadcn/ui Button with class-variance-authority variants and a buttonVariants helper.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/components/card.tsx",
+      "type": "file",
+      "name": "card.tsx",
+      "filePath": "packages/ui/components/card.tsx",
+      "summary": "shadcn/ui Card composite (Header, Title, Description, Action, Content, Footer).",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:packages/ui/components/checkbox.tsx",
+      "type": "file",
+      "name": "checkbox.tsx",
+      "filePath": "packages/ui/components/checkbox.tsx",
+      "summary": "shadcn/ui Checkbox built on Radix primitives.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/components/input.tsx",
+      "type": "file",
+      "name": "input.tsx",
+      "filePath": "packages/ui/components/input.tsx",
+      "summary": "shadcn/ui styled text Input.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/components/label.tsx",
+      "type": "file",
+      "name": "label.tsx",
+      "filePath": "packages/ui/components/label.tsx",
+      "summary": "shadcn/ui Label built on Radix Label.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/components/popover.tsx",
+      "type": "file",
+      "name": "popover.tsx",
+      "filePath": "packages/ui/components/popover.tsx",
+      "summary": "shadcn/ui Popover composite (Trigger, Content, Anchor, Header, Title, Description) on Radix Popover.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:packages/ui/components/select.tsx",
+      "type": "file",
+      "name": "select.tsx",
+      "filePath": "packages/ui/components/select.tsx",
+      "summary": "shadcn/ui Select composite with ten sub-components (Trigger, Content, Item, scroll buttons, etc.) on Radix Select.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:packages/ui/components/spinner.tsx",
+      "type": "file",
+      "name": "spinner.tsx",
+      "filePath": "packages/ui/components/spinner.tsx",
+      "summary": "shadcn/ui loading Spinner icon.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/lib/utils.ts",
+      "type": "file",
+      "name": "utils.ts",
+      "filePath": "packages/ui/lib/utils.ts",
+      "summary": "cn() helper merging Tailwind classes via clsx + tailwind-merge; the ubiquitous styling utility.",
+      "tags": [
+        "utility",
+        "styling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/ListStream.tsx",
+      "type": "file",
+      "name": "ListStream.tsx",
+      "filePath": "src/components/ListStream.tsx",
+      "summary": "Reusable table/list component rendering channels, movies, or series rows with active/favourite toggles and export actions.",
+      "tags": [
+        "component",
+        "list",
+        "stream",
+        "shared"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/MovieCombobox.tsx",
+      "type": "file",
+      "name": "MovieCombobox.tsx",
+      "filePath": "src/components/MovieCombobox.tsx",
+      "summary": "Searchable movie combobox with debounced filtering and custom display labels, used in series episode selection.",
+      "tags": [
+        "component",
+        "combobox",
+        "search"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/routes/channels.index.tsx",
+      "type": "file",
+      "name": "channels.index.tsx",
+      "filePath": "src/routes/channels.index.tsx",
+      "summary": "Channels page: server-filtered paginated list with group/country/active filters, Export M3U/YAML, and Sync Kodi actions.",
+      "tags": [
+        "route",
+        "channel",
+        "list",
+        "entry-point"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/routes/movies.index.tsx",
+      "type": "file",
+      "name": "movies.index.tsx",
+      "filePath": "src/routes/movies.index.tsx",
+      "summary": "Movies page: server-filtered paginated movie list with filters and Export M3U.",
+      "tags": [
+        "route",
+        "movie",
+        "list"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/routes/series.index.tsx",
+      "type": "file",
+      "name": "series.index.tsx",
+      "filePath": "src/routes/series.index.tsx",
+      "summary": "Series page: paginated series list with episode counts, active toggles, and Export M3U.",
+      "tags": [
+        "route",
+        "series",
+        "list"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:packages/ui/lib/utils.ts:cn",
+      "type": "function",
+      "name": "cn",
+      "filePath": "packages/ui/lib/utils.ts",
+      "summary": "Merges Tailwind class names via clsx and tailwind-merge; the shared styling helper.",
+      "tags": [
+        "utility",
+        "styling"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        4,
+        6
+      ]
+    },
+    {
+      "id": "function:src/components/ListStream.tsx:ListStream",
+      "type": "function",
+      "name": "ListStream",
+      "filePath": "src/components/ListStream.tsx",
+      "summary": "Generic table/list component rendering stream rows with toggles and actions.",
+      "tags": [
+        "component",
+        "list",
+        "shared"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        24,
+        78
+      ]
+    },
+    {
+      "id": "function:src/components/MovieCombobox.tsx:MovieCombobox",
+      "type": "function",
+      "name": "MovieCombobox",
+      "filePath": "src/components/MovieCombobox.tsx",
+      "summary": "Debounced searchable movie combobox for episode selection.",
+      "tags": [
+        "component",
+        "combobox",
+        "search"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        24,
+        106
+      ]
+    },
+    {
+      "id": "file:packages/ui/components/switch.tsx",
+      "type": "file",
+      "name": "switch.tsx",
+      "filePath": "packages/ui/components/switch.tsx",
+      "summary": "shadcn/ui Switch toggle built on Radix Switch.",
+      "tags": [
+        "component",
+        "shadcn",
+        "ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/ActiveSwitch.tsx",
+      "type": "file",
+      "name": "ActiveSwitch.tsx",
+      "filePath": "src/components/ActiveSwitch.tsx",
+      "summary": "Toggle switch wired to an optimistic active-state mutation via React Query setQueriesData.",
+      "tags": [
+        "component",
+        "toggle",
+        "mutation",
+        "optimistic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/components/ChannelForm.tsx",
+      "type": "file",
+      "name": "ChannelForm.tsx",
+      "filePath": "src/components/ChannelForm.tsx",
+      "summary": "Create/edit channel form bound to Zod validation, resolving group title and country code fields.",
+      "tags": [
+        "component",
+        "form",
+        "channel",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/components/MovieForm.tsx",
+      "type": "file",
+      "name": "MovieForm.tsx",
+      "filePath": "src/components/MovieForm.tsx",
+      "summary": "Create/edit movie form bound to Zod validation with group-title and media-type fields.",
+      "tags": [
+        "component",
+        "form",
+        "movie",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/db/schema.ts",
+      "type": "file",
+      "name": "schema.ts",
+      "filePath": "src/db/schema.ts",
+      "summary": "Drizzle ORM schema defining the group_titles, channels, media, and series tables plus their relations; the single source of truth for the data model.",
+      "tags": [
+        "data-model",
+        "database",
+        "schema",
+        "type-definition"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/db/validators.ts",
+      "type": "file",
+      "name": "validators.ts",
+      "filePath": "src/db/validators.ts",
+      "summary": "Zod validation schemas (channel/media/series create + update) and the COUNTRY_CODES ISO 3166-1 alpha-2 list.",
+      "tags": [
+        "validation",
+        "data-model",
+        "zod",
+        "type-definition"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/lib/m3u-export.test.ts",
+      "type": "file",
+      "name": "m3u-export.test.ts",
+      "filePath": "src/lib/m3u-export.test.ts",
+      "summary": "Tests for M3U export formatting: label rules, group-title resolution, active filtering.",
+      "tags": [
+        "test",
+        "m3u",
+        "export"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/m3u-export.ts",
+      "type": "file",
+      "name": "m3u-export.ts",
+      "filePath": "src/lib/m3u-export.ts",
+      "summary": "generateM3u: formats active DB rows into M3U playlist text with country-derived group titles.",
+      "tags": [
+        "export",
+        "m3u",
+        "serialization",
+        "tested"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/channels.new.tsx",
+      "type": "file",
+      "name": "channels.new.tsx",
+      "filePath": "src/routes/channels.new.tsx",
+      "summary": "Add Channel page rendering the ChannelForm for creation.",
+      "tags": [
+        "route",
+        "channel",
+        "create"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/edit-movie/$id.tsx",
+      "type": "file",
+      "name": "$id.tsx",
+      "filePath": "src/routes/edit-movie/$id.tsx",
+      "summary": "Edit Movie page loading an existing movie into MovieForm.",
+      "tags": [
+        "route",
+        "movie",
+        "edit"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/edit/$id.tsx",
+      "type": "file",
+      "name": "$id.tsx",
+      "filePath": "src/routes/edit/$id.tsx",
+      "summary": "Edit Channel page loading an existing channel into ChannelForm.",
+      "tags": [
+        "route",
+        "channel",
+        "edit"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/movies.new.tsx",
+      "type": "file",
+      "name": "movies.new.tsx",
+      "filePath": "src/routes/movies.new.tsx",
+      "summary": "Add Movie page rendering the MovieForm for creation.",
+      "tags": [
+        "route",
+        "movie",
+        "create"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:src/db/schema.ts:group_titles",
+      "type": "table",
+      "name": "group_titles",
+      "filePath": "src/db/schema.ts",
+      "summary": "Normalized group-title lookup (id, unique name, optional alias) shared by channels and media via FK.",
+      "tags": [
+        "database",
+        "data-model",
+        "table",
+        "lookup"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:src/db/schema.ts:channels",
+      "type": "table",
+      "name": "channels",
+      "filePath": "src/db/schema.ts",
+      "summary": "Live-TV channel rows: tvg metadata, group FK, stream URL, Kodi content_id, CMS display name, country, active/favourite flags.",
+      "tags": [
+        "database",
+        "data-model",
+        "table",
+        "channel"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:src/db/schema.ts:media",
+      "type": "table",
+      "name": "media",
+      "filePath": "src/db/schema.ts",
+      "summary": "Movie and series-episode rows: tvg metadata, group FK, stream URL, media_type, series FK, season/episode, year.",
+      "tags": [
+        "database",
+        "data-model",
+        "table",
+        "media"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:src/db/schema.ts:series",
+      "type": "table",
+      "name": "series",
+      "filePath": "src/db/schema.ts",
+      "summary": "Series grouping rows that media episodes reference via series_id FK.",
+      "tags": [
+        "database",
+        "data-model",
+        "table",
+        "series"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/components/ActiveSwitch.tsx:ActiveSwitch",
+      "type": "function",
+      "name": "ActiveSwitch",
+      "filePath": "src/components/ActiveSwitch.tsx",
+      "summary": "Toggle performing an optimistic active-state mutation.",
+      "tags": [
+        "component",
+        "toggle",
+        "optimistic"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        20,
+        91
+      ]
+    },
+    {
+      "id": "function:src/components/ChannelForm.tsx:ChannelForm",
+      "type": "function",
+      "name": "ChannelForm",
+      "filePath": "src/components/ChannelForm.tsx",
+      "summary": "Channel create/edit form component with Zod-driven validation and group/country fields.",
+      "tags": [
+        "component",
+        "form",
+        "channel"
+      ],
+      "complexity": "complex",
+      "lineRange": [
+        38,
+        317
+      ]
+    },
+    {
+      "id": "function:src/components/MovieForm.tsx:MovieForm",
+      "type": "function",
+      "name": "MovieForm",
+      "filePath": "src/components/MovieForm.tsx",
+      "summary": "Movie create/edit form component with Zod-driven validation.",
+      "tags": [
+        "component",
+        "form",
+        "movie"
+      ],
+      "complexity": "complex",
+      "lineRange": [
+        35,
+        282
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-export.ts:generateM3u",
+      "type": "function",
+      "name": "generateM3u",
+      "filePath": "src/lib/m3u-export.ts",
+      "summary": "Formats a list of active streams into M3U playlist text with country-derived group titles.",
+      "tags": [
+        "export",
+        "m3u",
+        "serialization"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        21,
+        43
+      ]
+    },
+    {
+      "id": "file:src/components/SeriesForm.tsx",
+      "type": "file",
+      "name": "SeriesForm.tsx",
+      "filePath": "src/components/SeriesForm.tsx",
+      "summary": "Create/edit series form with dynamic episode rows (movie selection, season/episode) and Zod validation.",
+      "tags": [
+        "component",
+        "form",
+        "series",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/routes/edit-series/$id.tsx",
+      "type": "file",
+      "name": "$id.tsx",
+      "filePath": "src/routes/edit-series/$id.tsx",
+      "summary": "Edit Series page loading an existing series with episodes into SeriesForm.",
+      "tags": [
+        "route",
+        "series",
+        "edit"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/series.$id.tsx",
+      "type": "file",
+      "name": "series.$id.tsx",
+      "filePath": "src/routes/series.$id.tsx",
+      "summary": "Series detail route rendering a single series and its episodes.",
+      "tags": [
+        "route",
+        "series",
+        "detail"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/routes/series.new.tsx",
+      "type": "file",
+      "name": "series.new.tsx",
+      "filePath": "src/routes/series.new.tsx",
+      "summary": "Add Series page rendering the SeriesForm for creation.",
+      "tags": [
+        "route",
+        "series",
+        "create"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/server/series.ts",
+      "type": "file",
+      "name": "series.ts",
+      "filePath": "src/server/series.ts",
+      "summary": "Series server functions: list, get-with-episodes, toggle, update, create, and active-series M3U export via createServerFn.",
+      "tags": [
+        "server-function",
+        "series",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/components/SeriesForm.tsx:SeriesForm",
+      "type": "function",
+      "name": "SeriesForm",
+      "filePath": "src/components/SeriesForm.tsx",
+      "summary": "Series create/edit form with dynamic episode rows.",
+      "tags": [
+        "component",
+        "form",
+        "series"
+      ],
+      "complexity": "complex",
+      "lineRange": [
+        79,
+        452
+      ]
+    },
+    {
+      "id": "function:src/components/SeriesForm.tsx:toEpisodeRows",
+      "type": "function",
+      "name": "toEpisodeRows",
+      "filePath": "src/components/SeriesForm.tsx",
+      "summary": "Converts series episode data into form row state.",
+      "tags": [
+        "utility",
+        "series",
+        "form"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        65,
+        77
+      ]
+    },
+    {
+      "id": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "function",
+      "name": "seriesQueryOptions",
+      "filePath": "src/server/series.ts",
+      "summary": "Builds React Query options for the paginated series-with-episodes list query.",
+      "tags": [
+        "react-query",
+        "query",
+        "series"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        79,
+        110
+      ]
+    },
+    {
+      "id": "file:src/components/DefaultCatchBoundary.tsx",
+      "type": "file",
+      "name": "DefaultCatchBoundary.tsx",
+      "filePath": "src/components/DefaultCatchBoundary.tsx",
+      "summary": "App-wide error boundary rendering a friendly error UI with a reload action.",
+      "tags": [
+        "component",
+        "error-boundary"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/components/NotFound.tsx",
+      "type": "file",
+      "name": "NotFound.tsx",
+      "filePath": "src/components/NotFound.tsx",
+      "summary": "404 not-found page component.",
+      "tags": [
+        "component",
+        "not-found"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/router.tsx",
+      "type": "file",
+      "name": "router.tsx",
+      "filePath": "src/router.tsx",
+      "summary": "Creates the TanStack Router instance with React Query SSR integration, custom array search serialization, and preload/scroll-restoration settings.",
+      "tags": [
+        "entry-point",
+        "router",
+        "ssr",
+        "react-query"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/routes/__root.tsx",
+      "type": "file",
+      "name": "__root.tsx",
+      "filePath": "src/routes/__root.tsx",
+      "summary": "Root document shell: <html>/<body> document, head meta/links, and global providers; the SSR layout every route renders into.",
+      "tags": [
+        "entry-point",
+        "layout",
+        "root"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/components/DefaultCatchBoundary.tsx:DefaultCatchBoundary",
+      "type": "function",
+      "name": "DefaultCatchBoundary",
+      "filePath": "src/components/DefaultCatchBoundary.tsx",
+      "summary": "App-wide error boundary component.",
+      "tags": [
+        "component",
+        "error-boundary"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        10,
+        53
+      ]
+    },
+    {
+      "id": "function:src/components/NotFound.tsx:NotFound",
+      "type": "function",
+      "name": "NotFound",
+      "filePath": "src/components/NotFound.tsx",
+      "summary": "404 not-found component.",
+      "tags": [
+        "component",
+        "not-found"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        3,
+        25
+      ]
+    },
+    {
+      "id": "function:src/router.tsx:getRouter",
+      "type": "function",
+      "name": "getRouter",
+      "filePath": "src/router.tsx",
+      "summary": "Creates the TanStack Router with SSR React Query integration and custom array search serialization.",
+      "tags": [
+        "entry-point",
+        "router",
+        "ssr"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        8,
+        56
+      ]
+    },
+    {
+      "id": "function:src/routes/__root.tsx:RootComponent",
+      "type": "function",
+      "name": "RootComponent",
+      "filePath": "src/routes/__root.tsx",
+      "summary": "Root layout component mounting the document and rendering routed content with devtools.",
+      "tags": [
+        "layout",
+        "root"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        74,
+        80
+      ]
+    },
+    {
+      "id": "function:src/routes/__root.tsx:RootDocument",
+      "type": "function",
+      "name": "RootDocument",
+      "filePath": "src/routes/__root.tsx",
+      "summary": "Renders the SSR <html> document shell including head, scripts, and the outlet.",
+      "tags": [
+        "ssr",
+        "document"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        82,
+        124
+      ]
+    },
+    {
+      "id": "table:supabase/migrations/0000_dusty_supreme_intelligence.sql",
+      "type": "table",
+      "name": "0000_dusty_supreme_intelligence.sql",
+      "filePath": "supabase/migrations/0000_dusty_supreme_intelligence.sql",
+      "summary": "Initial migration creating the channels table with its original M3U-derived columns.",
+      "tags": [
+        "database",
+        "migration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table:supabase/migrations/0001_elite_naoko.sql",
+      "type": "table",
+      "name": "0001_elite_naoko.sql",
+      "filePath": "supabase/migrations/0001_elite_naoko.sql",
+      "summary": "Adds the normalized group_titles lookup plus media and series tables with foreign keys to group_titles.",
+      "tags": [
+        "database",
+        "migration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "table:supabase/migrations/0001_performance_indexes.sql",
+      "type": "table",
+      "name": "0001_performance_indexes.sql",
+      "filePath": "supabase/migrations/0001_performance_indexes.sql",
+      "summary": "Adds trigram (pg_trgm) and btree indexes on media/series name and tvg_name columns to speed up search.",
+      "tags": [
+        "database",
+        "migration",
+        "indexes"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Authoritative AI-assistant context: directory structure, path aliases, TanStack Start wiring, server-function patterns, schema, and a catalog of common mistakes.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "context"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project overview: stack, structure, environment setup, database schema, M3U/YAML export rules, Kodi sync, and the full npm script reference.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "overview"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Root manifest: TanStack Start/Drizzle/Vite dependencies and the full db/dev/deploy script set (env-profile switching via dotenv-cli).",
+      "tags": [
+        "configuration",
+        "manifest",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:pnpm-workspace.yaml",
+      "type": "config",
+      "name": "pnpm-workspace.yaml",
+      "filePath": "pnpm-workspace.yaml",
+      "summary": "Declares the pnpm workspace including packages/* (the @iptvchannels/ui package).",
+      "tags": [
+        "configuration",
+        "workspace"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript config enabling strict mode and the ~ (src) and @ path aliases used across the app.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:vercel.json",
+      "type": "config",
+      "name": "vercel.json",
+      "filePath": "vercel.json",
+      "summary": "Vercel deployment config: build and install commands for the production build.",
+      "tags": [
+        "configuration",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:packages/ui/components.json",
+      "type": "config",
+      "name": "components.json",
+      "filePath": "packages/ui/components.json",
+      "summary": "shadcn CLI configuration for the @iptvchannels/ui package (aliases, style, registry).",
+      "tags": [
+        "configuration",
+        "shadcn"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:packages/ui/package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "packages/ui/package.json",
+      "summary": "@iptvchannels/ui package manifest declaring its React/Radix/Tailwind dependencies.",
+      "tags": [
+        "configuration",
+        "manifest"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:packages/ui/tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "packages/ui/tsconfig.json",
+      "summary": "TypeScript config for the UI package with its own path aliases.",
+      "tags": [
+        "configuration",
+        "typescript"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/migrate-stream-urls.sh",
+      "type": "file",
+      "name": "migrate-stream-urls.sh",
+      "filePath": "scripts/migrate-stream-urls.sh",
+      "summary": "One-off shell script that rewrites existing stream_url values against STREAM_BASE_PATH/PORT in PostgreSQL.",
+      "tags": [
+        "script",
+        "migration",
+        "shell"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/seed-channels.sh",
+      "type": "file",
+      "name": "seed-channels.sh",
+      "filePath": "scripts/seed-channels.sh",
+      "summary": "Imports live-TV channels from an M3U file into PostgreSQL via a staging-table + COPY + FK-join pattern (truncates first).",
+      "tags": [
+        "script",
+        "seeding",
+        "database",
+        "shell"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/seed-media.sh",
+      "type": "file",
+      "name": "seed-media.sh",
+      "filePath": "scripts/seed-media.sh",
+      "summary": "Imports movies and series episodes from an M3U file into PostgreSQL via staging + COPY, upserting shared group_titles (truncates first).",
+      "tags": [
+        "script",
+        "seeding",
+        "database",
+        "shell"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:supabase/migrations/meta/0000_snapshot.json",
+      "type": "config",
+      "name": "0000_snapshot.json",
+      "filePath": "supabase/migrations/meta/0000_snapshot.json",
+      "summary": "Drizzle migration snapshot capturing the full table state after migration 0000.",
+      "tags": [
+        "configuration",
+        "migration",
+        "snapshot"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:supabase/migrations/meta/0001_snapshot.json",
+      "type": "config",
+      "name": "0001_snapshot.json",
+      "filePath": "supabase/migrations/meta/0001_snapshot.json",
+      "summary": "Drizzle migration snapshot capturing table state after migration 0001 (group_titles, media, series).",
+      "tags": [
+        "configuration",
+        "migration",
+        "snapshot"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:supabase/migrations/meta/_journal.json",
+      "type": "config",
+      "name": "_journal.json",
+      "filePath": "supabase/migrations/meta/_journal.json",
+      "summary": "Drizzle Kit migration journal recording the ordered list of applied migrations.",
+      "tags": [
+        "configuration",
+        "migration",
+        "journal"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:drizzle.config.ts",
+      "type": "file",
+      "name": "drizzle.config.ts",
+      "filePath": "drizzle.config.ts",
+      "summary": "Drizzle Kit configuration: dialect, schema path, and env-driven schemaFilter (iptvchannels vs public).",
+      "tags": [
+        "configuration",
+        "database",
+        "drizzle"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:eslint.config.mjs",
+      "type": "file",
+      "name": "eslint.config.mjs",
+      "filePath": "eslint.config.mjs",
+      "summary": "ESLint flat config with typescript-eslint (no-explicit-any, no-unused-vars, prefer-type over interface).",
+      "tags": [
+        "configuration",
+        "linting"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:nitro.config.ts",
+      "type": "file",
+      "name": "nitro.config.ts",
+      "filePath": "nitro.config.ts",
+      "summary": "Nitro server preset configuration for the TanStack Start production output.",
+      "tags": [
+        "configuration",
+        "server",
+        "nitro"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/index.ts",
+      "type": "file",
+      "name": "index.ts",
+      "filePath": "packages/ui/index.ts",
+      "summary": "UI package barrel re-exporting cn and the component surface.",
+      "tags": [
+        "barrel",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:packages/ui/styles/globals.css",
+      "type": "file",
+      "name": "globals.css",
+      "filePath": "packages/ui/styles/globals.css",
+      "summary": "Tailwind v4 entry plus CSS custom-property theme tokens (colors, radius) consumed by shadcn components.",
+      "tags": [
+        "styling",
+        "theme",
+        "tailwind"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:public/robots.txt",
+      "type": "document",
+      "name": "robots.txt",
+      "filePath": "public/robots.txt",
+      "summary": "robots.txt controlling crawler access.",
+      "tags": [
+        "documentation",
+        "seo"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/db/reset.ts",
+      "type": "file",
+      "name": "reset.ts",
+      "filePath": "src/db/reset.ts",
+      "summary": "Database reset script that truncates all tables (run via tsx with the local/prod env profile).",
+      "tags": [
+        "script",
+        "database",
+        "reset"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/lib/m3u-parser.test.ts",
+      "type": "file",
+      "name": "m3u-parser.test.ts",
+      "filePath": "src/lib/m3u-parser.test.ts",
+      "summary": "Tests for the M3U parser: channel vs media splitting, series/season/episode and year extraction.",
+      "tags": [
+        "test",
+        "m3u",
+        "parser"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/lib/m3u-parser.ts",
+      "type": "file",
+      "name": "m3u-parser.ts",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "M3U parser: tokenizes #EXTINF lines, classifies entries as channel vs media, and extracts series base name, season/episode, year, and group title.",
+      "tags": [
+        "parser",
+        "m3u",
+        "utility",
+        "serialization",
+        "tested"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/routes/index.tsx",
+      "type": "file",
+      "name": "index.tsx",
+      "filePath": "src/routes/index.tsx",
+      "summary": "Home page: system overview and navigation explaining channels, movies, series, Kodi sync, and the M3U/YAML feeds.",
+      "tags": [
+        "route",
+        "home",
+        "entry-point"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:supabase/config.toml",
+      "type": "config",
+      "name": "config.toml",
+      "filePath": "supabase/config.toml",
+      "summary": "Supabase project configuration: database, auth, storage, realtime, and studio settings for the linked project.",
+      "tags": [
+        "configuration",
+        "supabase",
+        "infrastructure"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:vite.config.ts",
+      "type": "file",
+      "name": "vite.config.ts",
+      "filePath": "vite.config.ts",
+      "summary": "Vite plugin pipeline: tsConfigPaths, TanStack Start, Nitro, React, and Tailwind v4 — the build entrypoint.",
+      "tags": [
+        "configuration",
+        "build-system",
+        "vite"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/db/reset.ts:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "src/db/reset.ts",
+      "summary": "Entry point that truncates all application tables.",
+      "tags": [
+        "script",
+        "database",
+        "reset"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        12,
+        26
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseM3uContent",
+      "type": "function",
+      "name": "parseM3uContent",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Top-level entry: parses raw M3U text into channel and media entry lists.",
+      "tags": [
+        "parser",
+        "m3u",
+        "entry-point"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        161,
+        236
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseChannel",
+      "type": "function",
+      "name": "parseChannel",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Parses a single #EXTINF block into a channel entry.",
+      "tags": [
+        "parser",
+        "m3u"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        113,
+        122
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseMedia",
+      "type": "function",
+      "name": "parseMedia",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Parses a single #EXTINF block into a movie/series media entry, extracting season/episode/year.",
+      "tags": [
+        "parser",
+        "m3u",
+        "media"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        127,
+        147
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseExtInf",
+      "type": "function",
+      "name": "parseExtInf",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Tokenizes an #EXTINF line into its key=value attributes.",
+      "tags": [
+        "parser",
+        "m3u",
+        "utility"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        30,
+        42
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseSeriesBaseName",
+      "type": "function",
+      "name": "parseSeriesBaseName",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Derives a series base name from a media title.",
+      "tags": [
+        "parser",
+        "m3u",
+        "series"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        72,
+        74
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:parseSeasonEpisode",
+      "type": "function",
+      "name": "parseSeasonEpisode",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Extracts season and episode numbers from a media title.",
+      "tags": [
+        "parser",
+        "m3u",
+        "series"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        79,
+        91
+      ]
+    },
+    {
+      "id": "function:src/lib/m3u-parser.ts:isMediaUrl",
+      "type": "function",
+      "name": "isMediaUrl",
+      "filePath": "src/lib/m3u-parser.ts",
+      "summary": "Classifies a URL/stream line as media (mp4/mkv) vs live channel.",
+      "tags": [
+        "parser",
+        "m3u",
+        "classification"
+      ],
+      "complexity": "simple",
+      "lineRange": [
+        47,
+        49
+      ]
+    },
+    {
+      "id": "function:src/routes/index.tsx:Home",
+      "type": "function",
+      "name": "Home",
+      "filePath": "src/routes/index.tsx",
+      "summary": "Home page component rendering the system overview and navigation.",
+      "tags": [
+        "route",
+        "home"
+      ],
+      "complexity": "moderate",
+      "lineRange": [
+        142,
+        204
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/db/index.ts",
+      "target": "function:src/db/index.ts:initDb",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/index.ts",
+      "target": "function:src/db/index.ts:initDb",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/kodi-url.ts",
+      "target": "function:src/lib/kodi-url.ts:resolveKodiConnection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/kodi-url.ts",
+      "target": "function:src/lib/kodi-url.ts:resolveKodiConnection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/kodi-url.ts",
+      "target": "function:src/lib/kodi-url.ts:matchKodiChannels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/kodi-url.ts",
+      "target": "function:src/lib/kodi-url.ts:matchKodiChannels",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/stream-url.ts",
+      "target": "function:src/lib/stream-url.ts:buildStreamUrl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/stream-url.ts",
+      "target": "function:src/lib/stream-url.ts:buildStreamUrl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/stream-url.ts",
+      "target": "function:src/lib/stream-url.ts:stripStreamBase",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/stream-url.ts",
+      "target": "function:src/lib/stream-url.ts:stripStreamBase",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/yaml-export.ts",
+      "target": "function:src/lib/yaml-export.ts:generateHomeAssistantYaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/yaml-export.ts",
+      "target": "function:src/lib/yaml-export.ts:generateHomeAssistantYaml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createServerEntry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createServerEntry",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createM3uResponse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createM3uResponse",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createYamlResponse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createYamlResponse",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/kodi.ts",
+      "target": "function:src/server/kodi.ts:runKodiSync",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/kodi.ts",
+      "target": "function:src/server/kodi.ts:runKodiSync",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/m3u.ts",
+      "target": "function:src/server/m3u.ts:getActiveStreamsM3u",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/m3u.ts",
+      "target": "function:src/server/m3u.ts:getActiveStreamsM3u",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:streamQueryOptions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:streamQueryOptions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:createStreamLogic",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:createStreamLogic",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:updateStreamLogic",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:updateStreamLogic",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:resolveGroupTitleId",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "function:src/server/shared.ts:resolveGroupTitleId",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/yaml.ts",
+      "target": "function:src/server/yaml.ts:getActiveChannelsYaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/yaml.ts",
+      "target": "function:src/server/yaml.ts:getActiveChannelsYaml",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/index.ts",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/kodi-url.test.ts",
+      "target": "file:src/lib/kodi-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/yaml-export.test.ts",
+      "target": "file:src/lib/yaml-export.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.$id.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.$id.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/kodi.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/m3u.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/yaml.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.test.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.test.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.ts",
+      "target": "file:src/server/kodi.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/channels.ts",
+      "target": "file:src/server/yaml.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/kodi.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/kodi.ts",
+      "target": "file:src/lib/kodi-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/m3u.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/m3u.ts",
+      "target": "file:src/lib/m3u-export.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/m3u.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/movies.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/movies.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/shared.ts",
+      "target": "file:src/server/m3u.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/yaml.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/yaml.ts",
+      "target": "file:src/lib/yaml-export.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/kodi-url.ts",
+      "target": "file:src/lib/kodi-url.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/lib/yaml-export.ts",
+      "target": "file:src/lib/yaml-export.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/server/channels.ts",
+      "target": "file:src/server/channels.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:packages/ui/lib/utils.ts",
+      "target": "function:packages/ui/lib/utils.ts:cn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:packages/ui/lib/utils.ts",
+      "target": "function:packages/ui/lib/utils.ts:cn",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/ListStream.tsx",
+      "target": "function:src/components/ListStream.tsx:ListStream",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/ListStream.tsx",
+      "target": "function:src/components/ListStream.tsx:ListStream",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "function:src/components/MovieCombobox.tsx:MovieCombobox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "function:src/components/MovieCombobox.tsx:MovieCombobox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:packages/ui/components/avatar.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/button.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/card.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/checkbox.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/input.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/label.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/popover.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/select.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:packages/ui/components/spinner.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ListStream.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ListStream.tsx",
+      "target": "file:src/components/ActiveSwitch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "file:packages/ui/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "file:packages/ui/components/popover.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieCombobox.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:packages/ui/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:packages/ui/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:packages/ui/components/spinner.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:src/components/ListStream.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:src/server/channels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.index.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:packages/ui/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:packages/ui/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:packages/ui/components/spinner.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:src/components/ListStream.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:src/components/MovieCombobox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.index.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:packages/ui/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:packages/ui/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:packages/ui/components/spinner.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:src/components/ListStream.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ActiveSwitch.tsx",
+      "target": "function:src/components/ActiveSwitch.tsx:ActiveSwitch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/ActiveSwitch.tsx",
+      "target": "function:src/components/ActiveSwitch.tsx:ActiveSwitch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "function:src/components/ChannelForm.tsx:ChannelForm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "function:src/components/ChannelForm.tsx:ChannelForm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "function:src/components/MovieForm.tsx:MovieForm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "function:src/components/MovieForm.tsx:MovieForm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-export.ts",
+      "target": "function:src/lib/m3u-export.ts:generateM3u",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-export.ts",
+      "target": "function:src/lib/m3u-export.ts:generateM3u",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:group_titles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:group_titles",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:channels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:channels",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:media",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:media",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:series",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "table:src/db/schema.ts:series",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:packages/ui/components/switch.tsx",
+      "target": "file:packages/ui/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ActiveSwitch.tsx",
+      "target": "file:packages/ui/components/spinner.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ActiveSwitch.tsx",
+      "target": "file:packages/ui/components/switch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ActiveSwitch.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:packages/ui/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:packages/ui/components/switch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:src/db/validators.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/ChannelForm.tsx",
+      "target": "file:src/server/channels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:packages/ui/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:packages/ui/components/switch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/MovieForm.tsx",
+      "target": "file:src/server/movies.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/db/validators.ts",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/m3u-export.test.ts",
+      "target": "file:src/lib/m3u-export.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/m3u-export.ts",
+      "target": "file:src/db/validators.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/channels.new.tsx",
+      "target": "file:src/components/ChannelForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit-movie/$id.tsx",
+      "target": "file:src/components/MovieForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit-movie/$id.tsx",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit-movie/$id.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit/$id.tsx",
+      "target": "file:src/components/ChannelForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit/$id.tsx",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit/$id.tsx",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/movies.new.tsx",
+      "target": "file:src/components/MovieForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/m3u-export.ts",
+      "target": "file:src/lib/m3u-export.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "file:src/db/validators.ts",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/db/schema.ts",
+      "target": "file:src/db/index.ts",
+      "type": "defines_schema",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "function:src/components/SeriesForm.tsx:SeriesForm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "function:src/components/SeriesForm.tsx:SeriesForm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "function:src/components/SeriesForm.tsx:toEpisodeRows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "function:src/components/SeriesForm.tsx:toEpisodeRows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:packages/ui/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:packages/ui/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:packages/ui/components/switch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:src/db/schema.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit-series/$id.tsx",
+      "target": "file:src/components/SeriesForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/edit-series/$id.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.$id.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/series.new.tsx",
+      "target": "file:src/components/SeriesForm.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/db/validators.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/components/DefaultCatchBoundary.tsx",
+      "target": "function:src/components/DefaultCatchBoundary.tsx:DefaultCatchBoundary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/DefaultCatchBoundary.tsx",
+      "target": "function:src/components/DefaultCatchBoundary.tsx:DefaultCatchBoundary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/NotFound.tsx",
+      "target": "function:src/components/NotFound.tsx:NotFound",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/components/NotFound.tsx",
+      "target": "function:src/components/NotFound.tsx:NotFound",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/router.tsx",
+      "target": "function:src/router.tsx:getRouter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/router.tsx",
+      "target": "function:src/router.tsx:getRouter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootComponent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootComponent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/router.tsx",
+      "target": "file:src/components/DefaultCatchBoundary.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/router.tsx",
+      "target": "file:src/components/NotFound.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "file:src/components/DefaultCatchBoundary.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "file:src/components/NotFound.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0000_dusty_supreme_intelligence.sql",
+      "target": "table:src/db/schema.ts:channels",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0001_elite_naoko.sql",
+      "target": "table:src/db/schema.ts:group_titles",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0001_elite_naoko.sql",
+      "target": "table:src/db/schema.ts:media",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0001_elite_naoko.sql",
+      "target": "table:src/db/schema.ts:series",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0001_performance_indexes.sql",
+      "target": "table:src/db/schema.ts:media",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "table:supabase/migrations/0001_performance_indexes.sql",
+      "target": "table:src/db/schema.ts:series",
+      "type": "migrates",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:src/router.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:vite.config.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:vercel.json",
+      "target": "file:src/server.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:pnpm-workspace.yaml",
+      "target": "config:packages/ui/package.json",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:src/routes/index.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:src/server.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:src/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/router.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:CLAUDE.md",
+      "target": "file:src/db/schema.ts",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/seed-channels.sh",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/seed-media.sh",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:package.json",
+      "target": "file:scripts/migrate-stream-urls.sh",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:packages/ui/components.json",
+      "target": "file:packages/ui/components/button.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:packages/ui/package.json",
+      "target": "file:packages/ui/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:packages/ui/tsconfig.json",
+      "target": "file:packages/ui/index.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:scripts/seed-channels.sh",
+      "target": "table:src/db/schema.ts:channels",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/seed-media.sh",
+      "target": "table:src/db/schema.ts:media",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/seed-media.sh",
+      "target": "table:src/db/schema.ts:series",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/seed-media.sh",
+      "target": "table:src/db/schema.ts:group_titles",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:scripts/seed-channels.sh",
+      "target": "table:src/db/schema.ts:group_titles",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:supabase/migrations/meta/0000_snapshot.json",
+      "target": "table:supabase/migrations/0000_dusty_supreme_intelligence.sql",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:supabase/migrations/meta/0001_snapshot.json",
+      "target": "table:supabase/migrations/0001_elite_naoko.sql",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:supabase/migrations/meta/_journal.json",
+      "target": "table:supabase/migrations/0001_elite_naoko.sql",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:src/db/reset.ts",
+      "target": "function:src/db/reset.ts:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/db/reset.ts",
+      "target": "function:src/db/reset.ts:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseM3uContent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseM3uContent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseChannel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseChannel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseMedia",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseMedia",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseExtInf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseExtInf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseSeriesBaseName",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseSeriesBaseName",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseSeasonEpisode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:parseSeasonEpisode",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:isMediaUrl",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "function:src/lib/m3u-parser.ts:isMediaUrl",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/routes/index.tsx",
+      "target": "function:src/routes/index.tsx:Home",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/routes/index.tsx",
+      "target": "function:src/routes/index.tsx:Home",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/lib/m3u-parser.test.ts",
+      "target": "file:src/lib/m3u-parser.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/lib/m3u-parser.ts",
+      "target": "file:src/lib/m3u-parser.test.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:eslint.config.mjs",
+      "target": "file:src/router.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:drizzle.config.ts",
+      "target": "file:src/db/schema.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:supabase/config.toml",
+      "target": "file:src/db/schema.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:nitro.config.ts",
+      "target": "file:src/server.ts",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:vite.config.ts",
+      "target": "file:src/routes/__root.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:packages/ui/styles/globals.css",
+      "target": "file:src/routes/__root.tsx",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:routes-ui",
+      "name": "Routes & Components",
+      "description": "TanStack Router file-based pages, the root document shell/router, and React presentation components (forms, lists, toggles, boundaries).",
+      "nodeIds": [
+        "file:src/components/ActiveSwitch.tsx",
+        "file:src/components/ChannelForm.tsx",
+        "file:src/components/DefaultCatchBoundary.tsx",
+        "file:src/components/ListStream.tsx",
+        "file:src/components/MovieCombobox.tsx",
+        "file:src/components/MovieForm.tsx",
+        "file:src/components/NotFound.tsx",
+        "file:src/components/SeriesForm.tsx",
+        "file:src/router.tsx",
+        "file:src/routes/__root.tsx",
+        "file:src/routes/channels.$id.tsx",
+        "file:src/routes/channels.index.tsx",
+        "file:src/routes/channels.new.tsx",
+        "file:src/routes/edit-movie/$id.tsx",
+        "file:src/routes/edit-series/$id.tsx",
+        "file:src/routes/edit/$id.tsx",
+        "file:src/routes/index.tsx",
+        "file:src/routes/movies.$id.tsx",
+        "file:src/routes/movies.index.tsx",
+        "file:src/routes/movies.new.tsx",
+        "file:src/routes/series.$id.tsx",
+        "file:src/routes/series.index.tsx",
+        "file:src/routes/series.new.tsx"
+      ]
+    },
+    {
+      "id": "layer:server",
+      "name": "Server Functions & API",
+      "description": "createServerFn CRUD/export handlers for channels, movies, and series, plus the Nitro server entry wiring the M3U and YAML API routes.",
+      "nodeIds": [
+        "file:src/server.ts",
+        "file:src/server/channels.test.ts",
+        "file:src/server/channels.ts",
+        "file:src/server/kodi.ts",
+        "file:src/server/m3u.ts",
+        "file:src/server/movies.ts",
+        "file:src/server/series.ts",
+        "file:src/server/shared.ts",
+        "file:src/server/yaml.ts"
+      ]
+    },
+    {
+      "id": "layer:data",
+      "name": "Data Model & Migrations",
+      "description": "Drizzle ORM schema, Zod validators, lazy DB client, table definitions, and the SQL migrations + Drizzle migration metadata.",
+      "nodeIds": [
+        "config:supabase/migrations/meta/0000_snapshot.json",
+        "config:supabase/migrations/meta/0001_snapshot.json",
+        "config:supabase/migrations/meta/_journal.json",
+        "file:src/db/index.ts",
+        "file:src/db/reset.ts",
+        "file:src/db/schema.ts",
+        "file:src/db/validators.ts",
+        "table:src/db/schema.ts:channels",
+        "table:src/db/schema.ts:group_titles",
+        "table:src/db/schema.ts:media",
+        "table:src/db/schema.ts:series",
+        "table:supabase/migrations/0000_dusty_supreme_intelligence.sql",
+        "table:supabase/migrations/0001_elite_naoko.sql",
+        "table:supabase/migrations/0001_performance_indexes.sql"
+      ]
+    },
+    {
+      "id": "layer:lib",
+      "name": "Domain Utilities",
+      "description": "Pure library logic: M3U parsing/export, Home Assistant YAML generation, and Kodi/stream-URL helpers, with their unit tests.",
+      "nodeIds": [
+        "file:src/lib/kodi-url.test.ts",
+        "file:src/lib/kodi-url.ts",
+        "file:src/lib/m3u-export.test.ts",
+        "file:src/lib/m3u-export.ts",
+        "file:src/lib/m3u-parser.test.ts",
+        "file:src/lib/m3u-parser.ts",
+        "file:src/lib/stream-url.ts",
+        "file:src/lib/yaml-export.test.ts",
+        "file:src/lib/yaml-export.ts"
+      ]
+    },
+    {
+      "id": "layer:ui-package",
+      "name": "Shared UI Package",
+      "description": "The @iptvchannels/ui workspace: shadcn/ui components, the cn() helper, global theme stylesheet, and the package config.",
+      "nodeIds": [
+        "config:packages/ui/components.json",
+        "config:packages/ui/package.json",
+        "config:packages/ui/tsconfig.json",
+        "file:packages/ui/components/avatar.tsx",
+        "file:packages/ui/components/button.tsx",
+        "file:packages/ui/components/card.tsx",
+        "file:packages/ui/components/checkbox.tsx",
+        "file:packages/ui/components/input.tsx",
+        "file:packages/ui/components/label.tsx",
+        "file:packages/ui/components/popover.tsx",
+        "file:packages/ui/components/select.tsx",
+        "file:packages/ui/components/spinner.tsx",
+        "file:packages/ui/components/switch.tsx",
+        "file:packages/ui/index.ts",
+        "file:packages/ui/lib/utils.ts",
+        "file:packages/ui/styles/globals.css"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration & Build",
+      "description": "Root project config and build tooling: Vite/Nitro/Drizzle/ESLint configs, manifests, Vercel/Supabase project settings.",
+      "nodeIds": [
+        "config:package.json",
+        "config:pnpm-workspace.yaml",
+        "config:supabase/config.toml",
+        "config:tsconfig.json",
+        "config:vercel.json",
+        "file:drizzle.config.ts",
+        "file:eslint.config.mjs",
+        "file:nitro.config.ts",
+        "file:vite.config.ts"
+      ]
+    },
+    {
+      "id": "layer:scripts",
+      "name": "Database Scripts",
+      "description": "Shell seeders that import channels and media from M3U via PostgreSQL COPY, plus the stream-URL migration helper.",
+      "nodeIds": [
+        "file:scripts/migrate-stream-urls.sh",
+        "file:scripts/seed-channels.sh",
+        "file:scripts/seed-media.sh"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project documentation: the README overview, the CLAUDE.md AI-assistant context, and the static robots.txt.",
+      "nodeIds": [
+        "document:CLAUDE.md",
+        "document:README.md",
+        "document:public/robots.txt"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Project Overview",
+      "nodeIds": [
+        "document:README.md",
+        "document:CLAUDE.md"
+      ],
+      "description": "Start with the README and CLAUDE.md to understand what iptvchannels is: an IPTV channel manager that exports Home Assistant YAML and M3U playlists, backed by TanStack Start + Drizzle ORM + Supabase.",
+      "languageLesson": "CLAUDE.md is an \"AI context file\" — a project-specific brief that gives assistants the authoritative architecture, patterns, and gotchas before they touch code."
+    },
+    {
+      "order": 2,
+      "title": "Application Bootstrap & Routing",
+      "nodeIds": [
+        "file:src/router.tsx",
+        "file:src/routes/__root.tsx"
+      ],
+      "description": "See how the app boots: router.tsx builds the TanStack Router with React Query SSR integration and custom array-based search serialization, while __root.tsx provides the SSR document shell every route renders into."
+    },
+    {
+      "order": 3,
+      "title": "Home & System Map",
+      "nodeIds": [
+        "file:src/routes/index.tsx"
+      ],
+      "description": "The home page explains the navigation and how channels, movies, series, Kodi sync, and the M3U/YAML feeds fit together — a guided map of the whole system."
+    },
+    {
+      "order": 4,
+      "title": "The Data Model",
+      "nodeIds": [
+        "file:src/db/schema.ts",
+        "table:src/db/schema.ts:group_titles",
+        "table:src/db/schema.ts:channels",
+        "table:src/db/schema.ts:media",
+        "table:src/db/schema.ts:series"
+      ],
+      "description": "The heart of the system: the Drizzle schema defines the normalized group_titles lookup shared by channels, media, and series via foreign keys — changing a group alias propagates to every linked row.",
+      "languageLesson": "Normalizing a free-text field (group_title) into its own lookup table is the pattern that lets one alias edit update hundreds of rows — a classic foreign-key tradeoff."
+    },
+    {
+      "order": 5,
+      "title": "DB Client & Validation",
+      "nodeIds": [
+        "file:src/db/index.ts",
+        "file:src/db/validators.ts"
+      ],
+      "description": "src/db/index.ts lazily initializes the Drizzle client behind a Proxy so the module is safe to import in SSR/client contexts, and validators.ts holds the Zod schemas plus the ISO country-code list."
+    },
+    {
+      "order": 6,
+      "title": "The Shared Server Engine",
+      "nodeIds": [
+        "file:src/server/shared.ts",
+        "function:src/server/shared.ts:createStreamLogic",
+        "function:src/server/shared.ts:resolveGroupTitleId"
+      ],
+      "description": "shared.ts is the generic engine behind channels, movies, and series: paginated queries, CRUD logic, and group-title FK upsert — one stream abstraction serving three resource types."
+    },
+    {
+      "order": 7,
+      "title": "Server Functions & API Routes",
+      "nodeIds": [
+        "file:src/server/channels.ts",
+        "file:src/server/movies.ts",
+        "file:src/server/series.ts",
+        "file:src/server.ts"
+      ],
+      "description": "These createServerFn wrappers expose CRUD and exports; src/server.ts registers the /channels/m3u, /movies/m3u, and /channels/yaml API routes served by Nitro."
+    },
+    {
+      "order": 8,
+      "title": "The Channels Page",
+      "nodeIds": [
+        "file:src/routes/channels.index.tsx",
+        "file:src/components/ListStream.tsx",
+        "file:src/components/ActiveSwitch.tsx"
+      ],
+      "description": "The channels page wires server-filtered pagination with group/country/active filters and export actions; ListStream renders the rows and ActiveSwitch performs optimistic active-state toggles via React Query."
+    },
+    {
+      "order": 9,
+      "title": "Forms & Validation",
+      "nodeIds": [
+        "file:src/components/ChannelForm.tsx",
+        "file:src/components/SeriesForm.tsx"
+      ],
+      "description": "The resource forms bind to the Zod validators, resolving group titles and country codes; SeriesForm adds dynamic episode rows for series-with-episodes management."
+    },
+    {
+      "order": 10,
+      "title": "M3U Pipeline — Parse & Export",
+      "nodeIds": [
+        "file:src/lib/m3u-parser.ts",
+        "file:src/lib/m3u-export.ts",
+        "file:src/server/m3u.ts",
+        "function:src/lib/m3u-parser.ts:parseM3uContent",
+        "function:src/lib/m3u-export.ts:generateM3u"
+      ],
+      "description": "Trace the M3U lifecycle: parseM3uContent ingests seed files (splitting live channels vs movies/series), and generateM3u emits active rows back as a playlist served by the m3u server function."
+    },
+    {
+      "order": 11,
+      "title": "Home Assistant YAML Export",
+      "nodeIds": [
+        "file:src/lib/yaml-export.ts",
+        "file:src/server/yaml.ts",
+        "function:src/lib/yaml-export.ts:generateHomeAssistantYaml"
+      ],
+      "description": "generateHomeAssistantYaml emits the plain top-level script mapping (no script: wrapper) meant for !include; the YAML endpoint runs a Kodi sync first and prefixes a stats/skip-reason header."
+    },
+    {
+      "order": 12,
+      "title": "Kodi Sync Integration",
+      "nodeIds": [
+        "file:src/server/kodi.ts",
+        "file:src/lib/kodi-url.ts",
+        "function:src/server/kodi.ts:runKodiSync",
+        "function:src/lib/kodi-url.ts:matchKodiChannels"
+      ],
+      "description": "runKodiSync queries Kodi JSON-RPC PVR.GetChannels, matchKodiChannels resolves labels by name then tvg_name (case-insensitive), and only content_id is written back — feeding the YAML export."
+    },
+    {
+      "order": 13,
+      "title": "Shared UI Package",
+      "nodeIds": [
+        "file:packages/ui/lib/utils.ts",
+        "file:packages/ui/components/button.tsx",
+        "file:packages/ui/components/select.tsx"
+      ],
+      "description": "The @iptvchannels/ui workspace: cn() merges Tailwind classes and the shadcn/ui components (Button, Select, …) form the consistent design system used across every form and list."
+    },
+    {
+      "order": 14,
+      "title": "Database Scripts & Migrations",
+      "nodeIds": [
+        "file:scripts/seed-channels.sh",
+        "table:supabase/migrations/0001_elite_naoko.sql",
+        "file:drizzle.config.ts"
+      ],
+      "description": "How data gets in: seed-channels.sh imports M3U via PostgreSQL COPY with a staging-table + FK-join pattern, the SQL migrations establish the normalized schema, and drizzle.config.ts drives env-aware schema pushes."
+    }
+  ]
+}
