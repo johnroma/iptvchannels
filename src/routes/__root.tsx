@@ -42,6 +42,7 @@ const navGroups: NavItem[][] = [
   [
     { href: "/series", label: "Series", icon: Clapperboard },
     { href: "/series/new", label: "Add Series", icon: Plus },
+    { href: "/series/m3u", label: "Series Feed", icon: Rss },
   ],
 ]
 

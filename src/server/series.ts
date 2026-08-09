@@ -12,7 +12,8 @@ import { createServerFn } from "@tanstack/react-start"
 import { db, series, media, groupTitles } from "~/db"
 import { seriesSchema, seriesUpdateSchema } from "~/db/validators"
 import { resolveGroupTitleId } from "./shared"
-import { stripStreamBase } from "~/lib/stream-url"
+import { buildStreamUrl, stripStreamBase } from "~/lib/stream-url"
+import { generateM3u } from "~/lib/m3u-export"
 
 // ─── List Series ────────────────────────────────────────────
 
@@ -334,34 +335,34 @@ export const createSeries = createServerFn({ method: "POST" })
 
 // ─── Export Active Series M3U ───────────────────────────────
 
-export const exportActiveSeriesM3u = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { generateM3u } = await import("~/lib/m3u-export")
-    const { buildStreamUrl } = await import("~/lib/stream-url")
+export async function getActiveSeriesM3u() {
+  // Get all episodes of active series
+  const episodes = await db
+    .select({
+      tvgId: media.tvgId,
+      tvgName: media.tvgName,
+      tvgLogo: media.tvgLogo,
+      streamUrl: media.streamUrl,
+      name: media.name,
+      groupTitle: series.name,
+    })
+    .from(media)
+    .innerJoin(series, eq(media.seriesId, series.id))
+    .where(eq(series.active, true))
+    .orderBy(asc(series.name), asc(media.season), asc(media.episode))
 
-    // Get all episodes of active series
-    const episodes = await db
-      .select({
-        tvgId: media.tvgId,
-        tvgName: media.tvgName,
-        tvgLogo: media.tvgLogo,
-        streamUrl: media.streamUrl,
-        name: media.name,
-        groupTitle: series.name,
-      })
-      .from(media)
-      .innerJoin(series, eq(media.seriesId, series.id))
-      .where(eq(series.active, true))
-      .orderBy(asc(series.name), asc(media.season), asc(media.episode))
+  const m3u = generateM3u(
+    episodes.map((ep) => ({
+      ...ep,
+      streamUrl: buildStreamUrl(ep.streamUrl),
+    })),
+  )
+  return { m3u, count: episodes.filter((e) => e.streamUrl).length }
+}
 
-    const m3u = generateM3u(
-      episodes.map((ep) => ({
-        ...ep,
-        streamUrl: buildStreamUrl(ep.streamUrl),
-      })),
-    )
-    return { m3u, count: episodes.filter((e) => e.streamUrl).length }
-  })
+export const exportActiveSeriesM3u = createServerFn({ method: "GET" }).handler(
+  async () => getActiveSeriesM3u(),
+)
 
 // ─── Group Titles for Series ────────────────────────────────
 

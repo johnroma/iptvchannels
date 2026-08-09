@@ -135,6 +135,14 @@ const sections: { heading: string; cards: NavCard[] }[] = [
           "Create a new series entry and define the episode set that belongs to it.",
         accent: "text-amber-500",
       },
+      {
+        href: "/series/m3u",
+        icon: Rss,
+        title: "Series Feed",
+        description:
+          "Direct live playlist at /series/m3u for episodes of active series only.",
+        accent: "text-amber-500",
+      },
     ],
   },
 ]
