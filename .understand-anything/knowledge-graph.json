@@ -28,8 +28,8 @@
       "Supabase"
     ],
     "description": "IPTV channel management system with Home Assistant and Kodi integration. Exports Home Assistant script YAML and M3U playlists from a TanStack Start + Drizzle ORM + PostgreSQL/Supabase backend.",
-    "analyzedAt": "2026-08-09T08:41:05.701Z",
-    "gitCommitHash": "987b1a22d431fcda697f807546a99c8535ff4a70"
+    "analyzedAt": "2026-08-09T10:36:34.083Z",
+    "gitCommitHash": "4866e253e1db1f4ac4f9959d565b4dde07912397"
   },
   "nodes": [
     {
@@ -143,20 +143,6 @@
       "complexity": "simple"
     },
     {
-      "id": "file:src/server.ts",
-      "type": "file",
-      "name": "server.ts",
-      "filePath": "src/server.ts",
-      "summary": "TanStack Start server entry: registers the /channels/m3u, /movies/m3u, and /channels/yaml API routes and exports createServerEntry for Nitro.",
-      "tags": [
-        "entry-point",
-        "server",
-        "api-handler",
-        "routing"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "file:src/server/channels.test.ts",
       "type": "file",
       "name": "channels.test.ts",
@@ -228,7 +214,7 @@
       "type": "file",
       "name": "shared.ts",
       "filePath": "src/server/shared.ts",
-      "summary": "Core shared server logic: stream query options, paginated list, get-by-id, search, toggle-active, create/update stream logic, group-title upsert, and M3U export — the engine behind channels/movies/series.",
+      "summary": "Core shared server logic: stream query options, paginated list, get-by-id, search, toggle-active, create/update stream logic, group-title upsert, and M3U export \u2014 the engine behind channels/movies/series.",
       "tags": [
         "server-function",
         "data-model",
@@ -349,54 +335,6 @@
       "lineRange": [
         15,
         61
-      ]
-    },
-    {
-      "id": "function:src/server.ts:createServerEntry",
-      "type": "function",
-      "name": "createServerEntry",
-      "filePath": "src/server.ts",
-      "summary": "Builds the TanStack Start/Nitro server entry, wiring the M3U and YAML API routes.",
-      "tags": [
-        "entry-point",
-        "server"
-      ],
-      "complexity": "moderate",
-      "lineRange": [
-        42,
-        109
-      ]
-    },
-    {
-      "id": "function:src/server.ts:createM3uResponse",
-      "type": "function",
-      "name": "createM3uResponse",
-      "filePath": "src/server.ts",
-      "summary": "Builds an audio/x-mpegurl response for an M3U playlist endpoint.",
-      "tags": [
-        "api-handler",
-        "m3u"
-      ],
-      "complexity": "simple",
-      "lineRange": [
-        18,
-        30
-      ]
-    },
-    {
-      "id": "function:src/server.ts:createYamlResponse",
-      "type": "function",
-      "name": "createYamlResponse",
-      "filePath": "src/server.ts",
-      "summary": "Builds a text/yaml response (with sync-first stats header) for the channels YAML endpoint.",
-      "tags": [
-        "api-handler",
-        "yaml"
-      ],
-      "complexity": "simple",
-      "lineRange": [
-        32,
-        40
       ]
     },
     {
@@ -1104,19 +1042,6 @@
       "complexity": "simple"
     },
     {
-      "id": "file:src/server/series.ts",
-      "type": "file",
-      "name": "series.ts",
-      "filePath": "src/server/series.ts",
-      "summary": "Series server functions: list, get-with-episodes, toggle, update, create, and active-series M3U export via createServerFn.",
-      "tags": [
-        "server-function",
-        "series",
-        "api-handler"
-      ],
-      "complexity": "complex"
-    },
-    {
       "id": "function:src/components/SeriesForm.tsx:SeriesForm",
       "type": "function",
       "name": "SeriesForm",
@@ -1148,23 +1073,6 @@
       "lineRange": [
         65,
         77
-      ]
-    },
-    {
-      "id": "function:src/server/series.ts:seriesQueryOptions",
-      "type": "function",
-      "name": "seriesQueryOptions",
-      "filePath": "src/server/series.ts",
-      "summary": "Builds React Query options for the paginated series-with-episodes list query.",
-      "tags": [
-        "react-query",
-        "query",
-        "series"
-      ],
-      "complexity": "moderate",
-      "lineRange": [
-        79,
-        110
       ]
     },
     {
@@ -1202,19 +1110,6 @@
         "router",
         "ssr",
         "react-query"
-      ],
-      "complexity": "moderate"
-    },
-    {
-      "id": "file:src/routes/__root.tsx",
-      "type": "file",
-      "name": "__root.tsx",
-      "filePath": "src/routes/__root.tsx",
-      "summary": "Root document shell: <html>/<body> document, head meta/links, and global providers; the SSR layout every route renders into.",
-      "tags": [
-        "entry-point",
-        "layout",
-        "root"
       ],
       "complexity": "moderate"
     },
@@ -1265,38 +1160,6 @@
       "lineRange": [
         8,
         56
-      ]
-    },
-    {
-      "id": "function:src/routes/__root.tsx:RootComponent",
-      "type": "function",
-      "name": "RootComponent",
-      "filePath": "src/routes/__root.tsx",
-      "summary": "Root layout component mounting the document and rendering routed content with devtools.",
-      "tags": [
-        "layout",
-        "root"
-      ],
-      "complexity": "moderate",
-      "lineRange": [
-        74,
-        80
-      ]
-    },
-    {
-      "id": "function:src/routes/__root.tsx:RootDocument",
-      "type": "function",
-      "name": "RootDocument",
-      "filePath": "src/routes/__root.tsx",
-      "summary": "Renders the SSR <html> document shell including head, scripts, and the outlet.",
-      "tags": [
-        "ssr",
-        "document"
-      ],
-      "complexity": "moderate",
-      "lineRange": [
-        82,
-        124
       ]
     },
     {
@@ -1645,19 +1508,6 @@
       "complexity": "complex"
     },
     {
-      "id": "file:src/routes/index.tsx",
-      "type": "file",
-      "name": "index.tsx",
-      "filePath": "src/routes/index.tsx",
-      "summary": "Home page: system overview and navigation explaining channels, movies, series, Kodi sync, and the M3U/YAML feeds.",
-      "tags": [
-        "route",
-        "home",
-        "entry-point"
-      ],
-      "complexity": "moderate"
-    },
-    {
       "id": "config:supabase/config.toml",
       "type": "config",
       "name": "config.toml",
@@ -1675,7 +1525,7 @@
       "type": "file",
       "name": "vite.config.ts",
       "filePath": "vite.config.ts",
-      "summary": "Vite plugin pipeline: tsConfigPaths, TanStack Start, Nitro, React, and Tailwind v4 — the build entrypoint.",
+      "summary": "Vite plugin pipeline: tsConfigPaths, TanStack Start, Nitro, React, and Tailwind v4 \u2014 the build entrypoint.",
       "tags": [
         "configuration",
         "build-system",
@@ -1819,20 +1669,194 @@
       ]
     },
     {
+      "id": "file:src/routes/__root.tsx",
+      "type": "file",
+      "name": "__root.tsx",
+      "filePath": "src/routes/__root.tsx",
+      "summary": "Root layout route: defines the document shell (html/head/body), global nav grouped by content type (Home, Channels, Movies, Series), and wires error/not-found boundaries plus dev tools. Nav now includes a 'Series Feed' link to /series/m3u alongside the existing Channels/Movies feed links.",
+      "tags": [
+        "entry-point",
+        "layout",
+        "navigation",
+        "root-route"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/routes/index.tsx",
+      "type": "file",
+      "name": "index.tsx",
+      "filePath": "src/routes/index.tsx",
+      "summary": "Home page route rendering a system overview with highlight cards and per-section (Live TV, Movies, Series) navigation cards; the Series section now includes a 'Series Feed' card linking to /series/m3u.",
+      "tags": [
+        "component",
+        "home-page",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/server.ts",
+      "type": "file",
+      "name": "server.ts",
+      "filePath": "src/server.ts",
+      "summary": "Custom Nitro/TanStack Start server entry that intercepts specific GET routes (/channels/m3u, /channels/yaml, /movies/m3u, /series/m3u, /play/:table/:id) before delegating to the default SSR handler; builds M3U and YAML responses and runs a Kodi sync ahead of the YAML feed.",
+      "tags": [
+        "entry-point",
+        "server",
+        "routing",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/server/series.ts",
+      "type": "file",
+      "name": "series.ts",
+      "filePath": "src/server/series.ts",
+      "summary": "Server functions for series CRUD, listing, and episode management, plus the active-series M3U export. The export now groups by the series' own custom name (series.name) rather than the underlying group-title lookup, and the query logic is exposed as a standalone getActiveSeriesM3u() function reused directly by the /series/m3u server route.",
+      "tags": [
+        "service",
+        "api-handler",
+        "data-model",
+        "m3u-export"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/routes/__root.tsx:RootComponent",
+      "type": "function",
+      "name": "RootComponent",
+      "filePath": "src/routes/__root.tsx",
+      "lineRange": [
+        75,
+        81
+      ],
+      "summary": "Root route component that wraps the router Outlet in the shared RootDocument shell.",
+      "tags": [
+        "component",
+        "layout"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/routes/__root.tsx:RootDocument",
+      "type": "function",
+      "name": "RootDocument",
+      "filePath": "src/routes/__root.tsx",
+      "lineRange": [
+        83,
+        125
+      ],
+      "summary": "Renders the full HTML document shell including the grouped navigation bar (built from navGroups, now including the Series Feed link) and dev tool overlays.",
+      "tags": [
+        "component",
+        "layout",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
       "id": "function:src/routes/index.tsx:Home",
       "type": "function",
       "name": "Home",
       "filePath": "src/routes/index.tsx",
-      "summary": "Home page component rendering the system overview and navigation.",
-      "tags": [
-        "route",
-        "home"
-      ],
-      "complexity": "moderate",
       "lineRange": [
-        142,
-        204
-      ]
+        150,
+        212
+      ],
+      "summary": "Renders the home page: a feature-highlight grid followed by per-section navigation card groups (Live TV, Movies, Series), the Series group now including a Series Feed card.",
+      "tags": [
+        "component",
+        "home-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/server.ts:createM3uResponse",
+      "type": "function",
+      "name": "createM3uResponse",
+      "filePath": "src/server.ts",
+      "lineRange": [
+        19,
+        31
+      ],
+      "summary": "Builds an M3U playlist HTTP Response with the correct audio/x-mpegurl content type and content-disposition header.",
+      "tags": [
+        "utility",
+        "http-response",
+        "m3u"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/server.ts:createYamlResponse",
+      "type": "function",
+      "name": "createYamlResponse",
+      "filePath": "src/server.ts",
+      "lineRange": [
+        33,
+        41
+      ],
+      "summary": "Builds a YAML HTTP Response with text/yaml content type for the Home Assistant script export.",
+      "tags": [
+        "utility",
+        "http-response",
+        "yaml"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/server.ts:createServerEntry",
+      "type": "function",
+      "name": "createServerEntry",
+      "filePath": "src/server.ts",
+      "lineRange": [
+        43,
+        115
+      ],
+      "summary": "Wraps the TanStack Start fetch handler to intercept /channels/m3u, /channels/yaml (with a preceding Kodi sync that fails hard on error), /movies/m3u, the new /series/m3u feed, and /play/:table/:id direct-stream links, falling back to the default SSR handler for everything else.",
+      "tags": [
+        "api-handler",
+        "routing",
+        "server",
+        "entry-point"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "function",
+      "name": "seriesQueryOptions",
+      "filePath": "src/server/series.ts",
+      "lineRange": [
+        79,
+        110
+      ],
+      "summary": "Builds a React Query queryOptions object (query key + queryFn) for the paginated, filterable series list, wrapping listSeries.",
+      "tags": [
+        "query-options",
+        "react-query",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/server/series.ts:getActiveSeriesM3u",
+      "type": "function",
+      "name": "getActiveSeriesM3u",
+      "filePath": "src/server/series.ts",
+      "lineRange": [
+        338,
+        361
+      ],
+      "summary": "Fetches all episodes belonging to active series (joined on media.seriesId = series.id), using series.name as the group-title, resolves stream URLs, and generates the M3U playlist text. Extracted as a standalone exported function so both the exportActiveSeriesM3u server fn and the /series/m3u route in src/server.ts can call it directly.",
+      "tags": [
+        "m3u-export",
+        "database",
+        "service"
+      ],
+      "complexity": "moderate"
     }
   ],
   "edges": [
@@ -1916,48 +1940,6 @@
     {
       "source": "file:src/lib/yaml-export.ts",
       "target": "function:src/lib/yaml-export.ts:generateHomeAssistantYaml",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createServerEntry",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createServerEntry",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createM3uResponse",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createM3uResponse",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createYamlResponse",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "function:src/server.ts:createYamlResponse",
       "type": "exports",
       "direction": "forward",
       "weight": 0.8
@@ -2091,41 +2073,6 @@
     {
       "source": "file:src/routes/movies.$id.tsx",
       "target": "file:src/server/shared.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "file:src/db/index.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "file:src/lib/stream-url.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "file:src/server/kodi.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "file:src/server/m3u.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server.ts",
-      "target": "file:src/server/yaml.ts",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7
@@ -2579,13 +2526,6 @@
       "weight": 0.7
     },
     {
-      "source": "file:src/routes/series.index.tsx",
-      "target": "file:src/server/series.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
       "source": "file:src/components/ActiveSwitch.tsx",
       "target": "function:src/components/ActiveSwitch.tsx:ActiveSwitch",
       "type": "contains",
@@ -2950,20 +2890,6 @@
       "weight": 0.8
     },
     {
-      "source": "file:src/server/series.ts",
-      "target": "function:src/server/series.ts:seriesQueryOptions",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/server/series.ts",
-      "target": "function:src/server/series.ts:seriesQueryOptions",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
       "source": "file:src/components/SeriesForm.tsx",
       "target": "file:packages/ui/components/button.tsx",
       "type": "imports",
@@ -2999,29 +2925,8 @@
       "weight": 0.7
     },
     {
-      "source": "file:src/components/SeriesForm.tsx",
-      "target": "file:src/server/series.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
       "source": "file:src/routes/edit-series/$id.tsx",
       "target": "file:src/components/SeriesForm.tsx",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/routes/edit-series/$id.tsx",
-      "target": "file:src/server/series.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/routes/series.$id.tsx",
-      "target": "file:src/server/series.ts",
       "type": "imports",
       "direction": "forward",
       "weight": 0.7
@@ -3034,34 +2939,6 @@
       "weight": 0.7
     },
     {
-      "source": "file:src/server/series.ts",
-      "target": "file:src/db/index.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server/series.ts",
-      "target": "file:src/db/validators.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server/series.ts",
-      "target": "file:src/lib/stream-url.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/server/series.ts",
-      "target": "file:src/server/shared.ts",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
       "source": "file:src/components/DefaultCatchBoundary.tsx",
       "target": "function:src/components/DefaultCatchBoundary.tsx:DefaultCatchBoundary",
       "type": "contains",
@@ -3104,34 +2981,6 @@
       "weight": 0.8
     },
     {
-      "source": "file:src/routes/__root.tsx",
-      "target": "function:src/routes/__root.tsx:RootComponent",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/routes/__root.tsx",
-      "target": "function:src/routes/__root.tsx:RootComponent",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
-      "source": "file:src/routes/__root.tsx",
-      "target": "function:src/routes/__root.tsx:RootDocument",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/routes/__root.tsx",
-      "target": "function:src/routes/__root.tsx:RootDocument",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
       "source": "file:src/router.tsx",
       "target": "file:src/components/DefaultCatchBoundary.tsx",
       "type": "imports",
@@ -3140,20 +2989,6 @@
     },
     {
       "source": "file:src/router.tsx",
-      "target": "file:src/components/NotFound.tsx",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/routes/__root.tsx",
-      "target": "file:src/components/DefaultCatchBoundary.tsx",
-      "type": "imports",
-      "direction": "forward",
-      "weight": 0.7
-    },
-    {
-      "source": "file:src/routes/__root.tsx",
       "target": "file:src/components/NotFound.tsx",
       "type": "imports",
       "direction": "forward",
@@ -3216,32 +3051,11 @@
       "weight": 0.6
     },
     {
-      "source": "config:vercel.json",
-      "target": "file:src/server.ts",
-      "type": "configures",
-      "direction": "forward",
-      "weight": 0.6
-    },
-    {
       "source": "config:pnpm-workspace.yaml",
       "target": "config:packages/ui/package.json",
       "type": "configures",
       "direction": "forward",
       "weight": 0.6
-    },
-    {
-      "source": "document:README.md",
-      "target": "file:src/routes/index.tsx",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
-    },
-    {
-      "source": "document:README.md",
-      "target": "file:src/server.ts",
-      "type": "documents",
-      "direction": "forward",
-      "weight": 0.5
     },
     {
       "source": "document:README.md",
@@ -3475,20 +3289,6 @@
       "weight": 0.8
     },
     {
-      "source": "file:src/routes/index.tsx",
-      "target": "function:src/routes/index.tsx:Home",
-      "type": "contains",
-      "direction": "forward",
-      "weight": 1
-    },
-    {
-      "source": "file:src/routes/index.tsx",
-      "target": "function:src/routes/index.tsx:Home",
-      "type": "exports",
-      "direction": "forward",
-      "weight": 0.8
-    },
-    {
       "source": "file:src/lib/m3u-parser.test.ts",
       "target": "file:src/lib/m3u-parser.ts",
       "type": "imports",
@@ -3524,93 +3324,301 @@
       "weight": 0.6
     },
     {
-      "source": "file:nitro.config.ts",
-      "target": "file:src/server.ts",
-      "type": "configures",
+      "source": "file:src/routes/__root.tsx",
+      "target": "file:src/components/DefaultCatchBoundary.tsx",
+      "type": "imports",
       "direction": "forward",
-      "weight": 0.6
+      "weight": 0.7
     },
     {
-      "source": "file:vite.config.ts",
-      "target": "file:src/routes/__root.tsx",
-      "type": "configures",
+      "source": "file:src/routes/__root.tsx",
+      "target": "file:src/components/NotFound.tsx",
+      "type": "imports",
       "direction": "forward",
-      "weight": 0.6
+      "weight": 0.7
     },
     {
-      "source": "file:packages/ui/styles/globals.css",
-      "target": "file:src/routes/__root.tsx",
-      "type": "related",
+      "source": "file:src/routes/__root.tsx",
+      "target": "file:packages/ui/styles/globals.css",
+      "type": "imports",
       "direction": "forward",
-      "weight": 0.5
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootComponent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/routes/__root.tsx",
+      "target": "function:src/routes/__root.tsx:RootDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/routes/index.tsx",
+      "target": "function:src/routes/index.tsx:Home",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/m3u.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/yaml.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/server/kodi.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createM3uResponse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createYamlResponse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createServerEntry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server.ts",
+      "target": "function:src/server.ts:createServerEntry",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/server.ts:createServerEntry",
+      "target": "function:src/server/series.ts:getActiveSeriesM3u",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/server.ts:createServerEntry",
+      "target": "function:src/server.ts:createM3uResponse",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/server.ts:createServerEntry",
+      "target": "function:src/server.ts:createYamlResponse",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/db/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/db/validators.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/server/shared.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/lib/stream-url.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "file:src/lib/m3u-export.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:getActiveSeriesM3u",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:seriesQueryOptions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/server/series.ts",
+      "target": "function:src/server/series.ts:getActiveSeriesM3u",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/components/SeriesForm.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/routes/edit-series/$id.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/routes/series.$id.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/routes/series.index.tsx",
+      "target": "file:src/server/series.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
     }
   ],
   "layers": [
     {
       "id": "layer:routes-ui",
       "name": "Routes & Components",
-      "description": "TanStack Router file-based pages, the root document shell/router, and React presentation components (forms, lists, toggles, boundaries).",
+      "description": "TanStack Router file-based pages (channels/movies/series list, detail, create, edit, plus the root document shell and the router instance) and the React presentation components (forms, lists, toggles, comboboxes, error/not-found boundaries) they render, including the new Series Feed nav links.",
       "nodeIds": [
-        "file:src/components/ActiveSwitch.tsx",
-        "file:src/components/ChannelForm.tsx",
-        "file:src/components/DefaultCatchBoundary.tsx",
+        "file:src/routes/channels.$id.tsx",
+        "file:src/routes/movies.$id.tsx",
         "file:src/components/ListStream.tsx",
         "file:src/components/MovieCombobox.tsx",
-        "file:src/components/MovieForm.tsx",
-        "file:src/components/NotFound.tsx",
-        "file:src/components/SeriesForm.tsx",
-        "file:src/router.tsx",
-        "file:src/routes/__root.tsx",
-        "file:src/routes/channels.$id.tsx",
         "file:src/routes/channels.index.tsx",
+        "file:src/routes/movies.index.tsx",
+        "file:src/routes/series.index.tsx",
+        "file:src/components/ActiveSwitch.tsx",
+        "file:src/components/ChannelForm.tsx",
+        "file:src/components/MovieForm.tsx",
         "file:src/routes/channels.new.tsx",
         "file:src/routes/edit-movie/$id.tsx",
-        "file:src/routes/edit-series/$id.tsx",
         "file:src/routes/edit/$id.tsx",
-        "file:src/routes/index.tsx",
-        "file:src/routes/movies.$id.tsx",
-        "file:src/routes/movies.index.tsx",
         "file:src/routes/movies.new.tsx",
+        "file:src/components/SeriesForm.tsx",
+        "file:src/routes/edit-series/$id.tsx",
         "file:src/routes/series.$id.tsx",
-        "file:src/routes/series.index.tsx",
-        "file:src/routes/series.new.tsx"
+        "file:src/routes/series.new.tsx",
+        "file:src/components/DefaultCatchBoundary.tsx",
+        "file:src/components/NotFound.tsx",
+        "file:src/router.tsx",
+        "file:src/routes/__root.tsx",
+        "file:src/routes/index.tsx"
       ]
     },
     {
       "id": "layer:server",
       "name": "Server Functions & API",
-      "description": "createServerFn CRUD/export handlers for channels, movies, and series, plus the Nitro server entry wiring the M3U and YAML API routes.",
+      "description": "createServerFn CRUD/export handlers for channels, movies, and series (including the series M3U feed logic), plus the Nitro server entry that wires the /channels, /movies, and /series M3U/YAML API routes.",
       "nodeIds": [
-        "file:src/server.ts",
         "file:src/server/channels.test.ts",
         "file:src/server/channels.ts",
         "file:src/server/kodi.ts",
         "file:src/server/m3u.ts",
         "file:src/server/movies.ts",
-        "file:src/server/series.ts",
         "file:src/server/shared.ts",
-        "file:src/server/yaml.ts"
+        "file:src/server/yaml.ts",
+        "file:src/server.ts",
+        "file:src/server/series.ts"
       ]
     },
     {
       "id": "layer:data",
       "name": "Data Model & Migrations",
-      "description": "Drizzle ORM schema, Zod validators, lazy DB client, table definitions, and the SQL migrations + Drizzle migration metadata.",
+      "description": "Drizzle ORM schema and table definitions, Zod validators, the lazy DB client and reset script, plus the SQL migrations, Drizzle migration metadata, and the Supabase project configuration behind them.",
       "nodeIds": [
-        "config:supabase/migrations/meta/0000_snapshot.json",
-        "config:supabase/migrations/meta/0001_snapshot.json",
-        "config:supabase/migrations/meta/_journal.json",
         "file:src/db/index.ts",
-        "file:src/db/reset.ts",
         "file:src/db/schema.ts",
         "file:src/db/validators.ts",
-        "table:src/db/schema.ts:channels",
+        "file:src/db/reset.ts",
         "table:src/db/schema.ts:group_titles",
+        "table:src/db/schema.ts:channels",
         "table:src/db/schema.ts:media",
         "table:src/db/schema.ts:series",
         "table:supabase/migrations/0000_dusty_supreme_intelligence.sql",
         "table:supabase/migrations/0001_elite_naoko.sql",
-        "table:supabase/migrations/0001_performance_indexes.sql"
+        "table:supabase/migrations/0001_performance_indexes.sql",
+        "config:supabase/migrations/meta/0000_snapshot.json",
+        "config:supabase/migrations/meta/0001_snapshot.json",
+        "config:supabase/migrations/meta/_journal.json",
+        "config:supabase/config.toml"
       ]
     },
     {
@@ -3620,23 +3628,20 @@
       "nodeIds": [
         "file:src/lib/kodi-url.test.ts",
         "file:src/lib/kodi-url.ts",
+        "file:src/lib/stream-url.ts",
+        "file:src/lib/yaml-export.test.ts",
+        "file:src/lib/yaml-export.ts",
         "file:src/lib/m3u-export.test.ts",
         "file:src/lib/m3u-export.ts",
         "file:src/lib/m3u-parser.test.ts",
-        "file:src/lib/m3u-parser.ts",
-        "file:src/lib/stream-url.ts",
-        "file:src/lib/yaml-export.test.ts",
-        "file:src/lib/yaml-export.ts"
+        "file:src/lib/m3u-parser.ts"
       ]
     },
     {
       "id": "layer:ui-package",
       "name": "Shared UI Package",
-      "description": "The @iptvchannels/ui workspace: shadcn/ui components, the cn() helper, global theme stylesheet, and the package config.",
+      "description": "The @iptvchannels/ui workspace: shadcn/ui components, the cn() helper, global theme stylesheet, and the package's own config/manifest files.",
       "nodeIds": [
-        "config:packages/ui/components.json",
-        "config:packages/ui/package.json",
-        "config:packages/ui/tsconfig.json",
         "file:packages/ui/components/avatar.tsx",
         "file:packages/ui/components/button.tsx",
         "file:packages/ui/components/card.tsx",
@@ -3646,20 +3651,22 @@
         "file:packages/ui/components/popover.tsx",
         "file:packages/ui/components/select.tsx",
         "file:packages/ui/components/spinner.tsx",
-        "file:packages/ui/components/switch.tsx",
-        "file:packages/ui/index.ts",
         "file:packages/ui/lib/utils.ts",
+        "file:packages/ui/components/switch.tsx",
+        "config:packages/ui/components.json",
+        "config:packages/ui/package.json",
+        "config:packages/ui/tsconfig.json",
+        "file:packages/ui/index.ts",
         "file:packages/ui/styles/globals.css"
       ]
     },
     {
       "id": "layer:config",
       "name": "Configuration & Build",
-      "description": "Root project config and build tooling: Vite/Nitro/Drizzle/ESLint configs, manifests, Vercel/Supabase project settings.",
+      "description": "Root project configuration and build tooling: package/workspace manifests, TypeScript config, ESLint, Vite/Nitro/Drizzle build pipeline, and Vercel deployment settings.",
       "nodeIds": [
         "config:package.json",
         "config:pnpm-workspace.yaml",
-        "config:supabase/config.toml",
         "config:tsconfig.json",
         "config:vercel.json",
         "file:drizzle.config.ts",
@@ -3693,33 +3700,34 @@
     {
       "order": 1,
       "title": "Project Overview",
+      "description": "Start with README.md and CLAUDE.md to understand what this system does: manage IPTV channels, movies, and series, then feed them out to Home Assistant (YAML scripts) and Kodi (via JSON-RPC sync) and to any M3U-compatible player. README.md covers the stack, directory layout, and npm scripts, while CLAUDE.md is the authoritative, more detailed reference for framework wiring, server-function conventions, and the current database schema. Both agree on the same three-resource shape \u2014 channels, movies, series \u2014 that the rest of the tour builds on.",
       "nodeIds": [
         "document:README.md",
         "document:CLAUDE.md"
-      ],
-      "description": "Start with the README and CLAUDE.md to understand what iptvchannels is: an IPTV channel manager that exports Home Assistant YAML and M3U playlists, backed by TanStack Start + Drizzle ORM + Supabase.",
-      "languageLesson": "CLAUDE.md is an \"AI context file\" — a project-specific brief that gives assistants the authoritative architecture, patterns, and gotchas before they touch code."
+      ]
     },
     {
       "order": 2,
       "title": "Application Bootstrap & Routing",
+      "description": "router.tsx creates the TanStack Router instance, wires React Query's SSR integration so loader data hydrates cleanly on the client, and defines a custom search-param serializer so filter arrays (like `?countries=GR&countries=IR`) round-trip correctly. __root.tsx is the document shell: it renders the `<html>/<body>` scaffold, mounts the global navigation grouped by content type, and now includes a new 'Series Feed' link to `/series/m3u` alongside the existing Channels/Movies feed links. Together these two files are the only entry points TanStack Start requires \u2014 no app.tsx or ssr.tsx needed.",
       "nodeIds": [
         "file:src/router.tsx",
         "file:src/routes/__root.tsx"
       ],
-      "description": "See how the app boots: router.tsx builds the TanStack Router with React Query SSR integration and custom array-based search serialization, while __root.tsx provides the SSR document shell every route renders into."
+      "languageLesson": "TanStack Router's `Register` type must be declared with `interface`, not `type` \u2014 TypeScript's declaration merging (used here to attach the router type globally) only works on interfaces. This is a documented exception to the project's usual 'prefer type over interface' ESLint rule."
     },
     {
       "order": 3,
       "title": "Home & System Map",
+      "description": "The home page renders a system overview with highlight cards and per-section navigation for Live TV, Movies, and Series. Like __root.tsx, the Series section has just gained a 'Series Feed' card that links directly to `/series/m3u`, giving this page the same three-feed symmetry (Channels M3U/YAML, Movies M3U, Series M3U) you'll see formalized in the server routes later in the tour. Treat this page as a map: every card here corresponds to a route and server function you'll visit in upcoming steps.",
       "nodeIds": [
         "file:src/routes/index.tsx"
-      ],
-      "description": "The home page explains the navigation and how channels, movies, series, Kodi sync, and the M3U/YAML feeds fit together — a guided map of the whole system."
+      ]
     },
     {
       "order": 4,
       "title": "The Data Model",
+      "description": "schema.ts is the single source of truth for the database: a normalized `group_titles` lookup table shared by `channels`, `media`, and `series` via foreign key, so renaming a group's alias propagates everywhere it's used. `channels` holds live-TV rows with Kodi's `content_id`; `media` holds both movies and series episodes (distinguished by `media_type`, with `series_id` null for movies); `series` holds the grouping rows that episodes reference. This file has the highest fan-out in the whole codebase \u2014 nearly everything downstream, from Zod validators to server queries to forms, is generated from or references these table definitions.",
       "nodeIds": [
         "file:src/db/schema.ts",
         "table:src/db/schema.ts:group_titles",
@@ -3727,110 +3735,107 @@
         "table:src/db/schema.ts:media",
         "table:src/db/schema.ts:series"
       ],
-      "description": "The heart of the system: the Drizzle schema defines the normalized group_titles lookup shared by channels, media, and series via foreign keys — changing a group alias propagates to every linked row.",
-      "languageLesson": "Normalizing a free-text field (group_title) into its own lookup table is the pattern that lets one alias edit update hundreds of rows — a classic foreign-key tradeoff."
+      "languageLesson": "Drizzle ORM defines tables as plain TypeScript objects and derives row types via `typeof table.$inferSelect`, so the schema file is both the runtime table definition and the compile-time type source \u2014 there's no separate interface to keep in sync."
     },
     {
       "order": 5,
       "title": "DB Client & Validation",
+      "description": "src/db/index.ts wraps the Drizzle client in a Proxy that lazily connects on first property access \u2014 this is what lets server-only code import `db` without breaking client-side bundling during SSR. src/db/validators.ts holds the Zod schemas (channel/media/series create + update) that every form and server function validates against, plus the ISO 3166-1 country-code list used for channel filtering. Both files sit directly on top of schema.ts from the previous step: validators.ts imports the table shapes, and index.ts re-exports them as one convenient barrel.",
       "nodeIds": [
         "file:src/db/index.ts",
         "file:src/db/validators.ts"
       ],
-      "description": "src/db/index.ts lazily initializes the Drizzle client behind a Proxy so the module is safe to import in SSR/client contexts, and validators.ts holds the Zod schemas plus the ISO country-code list."
+      "languageLesson": "The Proxy pattern here intercepts property access (`get` trap) to defer `initDb()` until the first real use, avoiding a top-level side effect that would otherwise run during module import \u2014 a common trick for isomorphic code that must not touch a database connection on the client."
     },
     {
       "order": 6,
       "title": "The Shared Server Engine",
+      "description": "shared.ts has the highest fan-in of any file in the project (13 incoming references) \u2014 it's the generic engine that channels.ts, movies.ts, and series.ts all build on. It centralizes paginated list queries, get-by-id, search, toggle-active, create/update logic, and the group-title upsert (resolving a string like 'US| ENTERTAINMENT' to a `group_titles` foreign key). Rather than duplicating CRUD logic three times for three resource types, each resource-specific file is a thin wrapper that calls into this shared layer with different table/schema parameters.",
       "nodeIds": [
-        "file:src/server/shared.ts",
-        "function:src/server/shared.ts:createStreamLogic",
-        "function:src/server/shared.ts:resolveGroupTitleId"
+        "file:src/server/shared.ts"
       ],
-      "description": "shared.ts is the generic engine behind channels, movies, and series: paginated queries, CRUD logic, and group-title FK upsert — one stream abstraction serving three resource types."
+      "languageLesson": "This is a parameterized-engine pattern: rather than TypeScript generics over the table type, the functions here take the Drizzle table object as a runtime parameter and rely on Drizzle's own type inference to keep each call site type-safe \u2014 a pragmatic middle ground when full generic typing over ORM tables gets unwieldy."
     },
     {
       "order": 7,
       "title": "Server Functions & API Routes",
+      "description": "channels.ts and movies.ts are barrels that re-export CRUD, export, and sync wrappers built on shared.ts. series.ts goes further: it now exposes a standalone `getActiveSeriesM3u()` function that groups active series by the series' own custom name (not the group-titles lookup), and that same function is called from two places \u2014 the `exportActiveSeriesM3u` createServerFn used by the UI, and a brand-new `GET /series/m3u` route in server.ts. server.ts is the custom Nitro entry that intercepts `/channels/m3u`, `/channels/yaml`, `/movies/m3u`, `/series/m3u`, and `/play/:table/:id` ahead of the default SSR handler, building M3U/YAML responses directly \u2014 the project now exposes three parallel direct-feed URLs (channels, movies, series) plus the Home Assistant YAML feed, all before falling through to page rendering.",
       "nodeIds": [
         "file:src/server/channels.ts",
         "file:src/server/movies.ts",
         "file:src/server/series.ts",
         "file:src/server.ts"
-      ],
-      "description": "These createServerFn wrappers expose CRUD and exports; src/server.ts registers the /channels/m3u, /movies/m3u, and /channels/yaml API routes served by Nitro."
+      ]
     },
     {
       "order": 8,
       "title": "The Channels Page",
+      "description": "channels.index.tsx is the highest-fan-out route in the app: it composes the reusable ListStream table, several shadcn/ui primitives, and server functions from channels.ts and shared.ts into a fully server-filtered, paginated channel list with Export M3U/YAML and Sync Kodi actions. ListStream.tsx itself is reused across the Channels, Movies, and Series pages \u2014 the same table renders three different resource types by taking column/action config as props. ActiveSwitch.tsx wires each row's active toggle to an optimistic React Query mutation via `setQueriesData`, so the UI updates instantly before the server confirms.",
       "nodeIds": [
         "file:src/routes/channels.index.tsx",
         "file:src/components/ListStream.tsx",
         "file:src/components/ActiveSwitch.tsx"
-      ],
-      "description": "The channels page wires server-filtered pagination with group/country/active filters and export actions; ListStream renders the rows and ActiveSwitch performs optimistic active-state toggles via React Query."
+      ]
     },
     {
       "order": 9,
       "title": "Forms & Validation",
+      "description": "ChannelForm.tsx and SeriesForm.tsx are the create/edit forms bound to the Zod schemas from validators.ts (Step 5). ChannelForm resolves the group-title and country-code fields against schema.ts and calls into channels.ts on submit; SeriesForm is more involved, managing dynamic episode rows that each reference a movie via MovieCombobox, plus season/episode numbers, and it calls the standalone series.ts server functions directly. Both forms show the same end-to-end path: UI form -> Zod validation -> server function -> shared.ts engine -> database.",
       "nodeIds": [
         "file:src/components/ChannelForm.tsx",
         "file:src/components/SeriesForm.tsx"
-      ],
-      "description": "The resource forms bind to the Zod validators, resolving group titles and country codes; SeriesForm adds dynamic episode rows for series-with-episodes management."
+      ]
     },
     {
       "order": 10,
-      "title": "M3U Pipeline — Parse & Export",
+      "title": "M3U Pipeline",
+      "description": "m3u-parser.ts is the ingestion side: it tokenizes `#EXTINF` lines from an imported M3U file and classifies each entry as a channel or media item, extracting series base name, season/episode, and year along the way. m3u-export.ts is the output side: `generateM3u` formats active DB rows back into M3U playlist text, preferring a country-derived group title over the raw group_titles value. server/m3u.ts wraps `generateM3u` as the createServerFn behind `/channels/m3u` and `/movies/m3u`, while the parallel `/series/m3u` route from Step 7 reuses the same `generateM3u` formatter through series.ts's `getActiveSeriesM3u` \u2014 one export function, three feeds.",
       "nodeIds": [
         "file:src/lib/m3u-parser.ts",
         "file:src/lib/m3u-export.ts",
-        "file:src/server/m3u.ts",
-        "function:src/lib/m3u-parser.ts:parseM3uContent",
-        "function:src/lib/m3u-export.ts:generateM3u"
-      ],
-      "description": "Trace the M3U lifecycle: parseM3uContent ingests seed files (splitting live channels vs movies/series), and generateM3u emits active rows back as a playlist served by the m3u server function."
+        "file:src/server/m3u.ts"
+      ]
     },
     {
       "order": 11,
       "title": "Home Assistant YAML Export",
+      "description": "yaml-export.ts generates a plain top-level YAML mapping of scripts \u2014 deliberately without a `script:` wrapper key \u2014 because the output file is consumed via `script: !include channels.yaml` in a Home Assistant configuration. Only channels with both a `scriptAlias` and a Kodi-synced `contentId` are included; an empty result is `{}` rather than null so the `!include` still yields a valid mapping. server/yaml.ts wraps this as `getActiveChannelsYaml`, which server.ts's `/channels/yaml` route calls only after running a Kodi sync first \u2014 serving a 502 if that sync fails, to avoid publishing stale content IDs.",
       "nodeIds": [
         "file:src/lib/yaml-export.ts",
-        "file:src/server/yaml.ts",
-        "function:src/lib/yaml-export.ts:generateHomeAssistantYaml"
+        "file:src/server/yaml.ts"
       ],
-      "description": "generateHomeAssistantYaml emits the plain top-level script mapping (no script: wrapper) meant for !include; the YAML endpoint runs a Kodi sync first and prefixes a stats/skip-reason header."
+      "languageLesson": "YAML's `!include` directive (a Home Assistant-specific tag) expects the included file's top level to already be the right shape for its context \u2014 hence generating a bare mapping instead of nesting it under a `script:` key, which would double-wrap it when included under an existing `script:` block."
     },
     {
       "order": 12,
       "title": "Kodi Sync Integration",
+      "description": "runKodiSync (kodi.ts) calls Kodi's JSON-RPC `PVR.GetChannels` method and updates only the `content_id` column on matching channel rows \u2014 nothing else. The actual matching logic lives in the pure, independently-testable `matchKodiChannels` in kodi-url.ts: it tries the channel's `name` field before `tvgName` against Kodi's `label`, case- and whitespace-insensitively, because Kodi labels are CMS display names ('CNN') while the raw M3U `tvgName` is often something like 'US| CNN FHD'. The companion `resolveKodiConnection` helper builds the JSON-RPC endpoint URL and optional HTTP Basic auth header from `KODI_URL`/`KODI_HOST`/`KODI_PORT`/`KODI_USER`/`KODI_PASSWORD` env vars, which must be set in both dev and prod env profiles.",
       "nodeIds": [
         "file:src/server/kodi.ts",
-        "file:src/lib/kodi-url.ts",
-        "function:src/server/kodi.ts:runKodiSync",
-        "function:src/lib/kodi-url.ts:matchKodiChannels"
-      ],
-      "description": "runKodiSync queries Kodi JSON-RPC PVR.GetChannels, matchKodiChannels resolves labels by name then tvg_name (case-insensitive), and only content_id is written back — feeding the YAML export."
+        "file:src/lib/kodi-url.ts"
+      ]
     },
     {
       "order": 13,
       "title": "Shared UI Package",
+      "description": "The @iptvchannels/ui workspace package supplies the shadcn/ui component layer every route and form in this app builds on. utils.ts's `cn()` helper \u2014 merging Tailwind classes via clsx + tailwind-merge \u2014 has the highest fan-in of any UI-layer file, since virtually every styled component calls it. button.tsx (built on class-variance-authority) and select.tsx (a ten-part composite over Radix Select) show the two dominant shadcn patterns you'll see repeated across the package: variant-driven primitives and multi-part composites.",
       "nodeIds": [
         "file:packages/ui/lib/utils.ts",
         "file:packages/ui/components/button.tsx",
         "file:packages/ui/components/select.tsx"
       ],
-      "description": "The @iptvchannels/ui workspace: cn() merges Tailwind classes and the shadcn/ui components (Button, Select, …) form the consistent design system used across every form and list."
+      "languageLesson": "class-variance-authority (cva) defines component style variants as a typed config object, then `cn()` merges the resulting class string with any caller-supplied `className` \u2014 Tailwind-merge resolves conflicting utility classes (e.g. two different `px-*` values) by keeping the last one, which is what lets consumers safely override styles."
     },
     {
       "order": 14,
       "title": "Database Scripts & Migrations",
+      "description": "seed-channels.sh imports channels from an M3U file using a staging-table-plus-COPY pattern for bulk-insert speed, then joins against group_titles by FK. The 0001_elite_naoko.sql migration is where the normalized group_titles lookup, plus the media and series tables, were introduced with foreign keys back to it \u2014 the schema.ts model from Step 4 made physical. drizzle.config.ts ties it all together with an env-driven `schemaFilter` that targets either the shared `iptvchannels` Postgres schema locally or `public` in backward-compatible environments.",
       "nodeIds": [
         "file:scripts/seed-channels.sh",
         "table:supabase/migrations/0001_elite_naoko.sql",
         "file:drizzle.config.ts"
       ],
-      "description": "How data gets in: seed-channels.sh imports M3U via PostgreSQL COPY with a staging-table + FK-join pattern, the SQL migrations establish the normalized schema, and drizzle.config.ts drives env-aware schema pushes."
+      "languageLesson": "SQL migrations should be idempotent and strictly ordered \u2014 Drizzle Kit tracks applied migrations in a journal file (`_journal.json`) so `db:migrate` only ever runs forward, never re-applying a migration that's already landed."
     }
   ]
 }
