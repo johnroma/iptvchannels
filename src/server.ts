@@ -7,6 +7,7 @@ import type { Register } from "@tanstack/react-router"
 import { eq } from "drizzle-orm"
 import { db, channels, media } from "~/db"
 import { getActiveStreamsM3u } from "~/server/m3u"
+import { getActiveSeriesM3u } from "~/server/series"
 import { getActiveChannelsYaml } from "~/server/yaml"
 import { runKodiSync } from "~/server/kodi"
 import { buildStreamUrl } from "~/lib/stream-url"
@@ -80,6 +81,11 @@ export function createServerEntry(entry: ServerEntry): ServerEntry {
       if (request.method === "GET" && pathname === "/movies/m3u") {
         const { m3u } = await getActiveStreamsM3u("media")
         return createM3uResponse(m3u, "movies.m3u")
+      }
+
+      if (request.method === "GET" && pathname === "/series/m3u") {
+        const { m3u } = await getActiveSeriesM3u()
+        return createM3uResponse(m3u, "series.m3u")
       }
 
       const playMatch = pathname.match(/^\/play\/(channels|media)\/([^/]+)$/)

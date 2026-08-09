@@ -3,7 +3,7 @@
  * Parses M3U entries into channel or media objects
  */
 
-export interface ParsedChannel {
+export type ParsedChannel = {
   tvgId: string | null
   tvgName: string
   tvgLogo: string | null
@@ -11,7 +11,7 @@ export interface ParsedChannel {
   streamUrl: string
 }
 
-export interface ParsedMedia extends ParsedChannel {
+export type ParsedMedia = ParsedChannel & {
   mediaType: "movie" | "series" | null
   year: number | null
   season: number | null
@@ -19,7 +19,7 @@ export interface ParsedMedia extends ParsedChannel {
   seriesBaseName: string | null
 }
 
-export interface M3uEntry {
+export type M3uEntry = {
   extinf: string
   url: string
 }
@@ -146,7 +146,7 @@ export function parseMedia(entry: M3uEntry): ParsedMedia | null {
   }
 }
 
-export interface ParseResult {
+export type ParseResult = {
   channels: ParsedChannel[]
   media: ParsedMedia[]
   skipped: number

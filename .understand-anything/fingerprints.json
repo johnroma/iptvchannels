@@ -1,16 +1,26 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "987b1a22d431fcda697f807546a99c8535ff4a70",
-  "generatedAt": "2026-08-09T08:41:49.477Z",
+  "gitCommitHash": "4866e253e1db1f4ac4f9959d565b4dde07912397",
+  "generatedAt": "2026-08-09T10:47:17.615Z",
   "files": {
     "CLAUDE.md": {
       "filePath": "CLAUDE.md",
-      "contentHash": "8eccef7eb3e4eae3b1b11354e3cb2643ce9a65614372550dc3b1740080765e46",
+      "contentHash": "a862b67b3ce1a4736e3c0a8b0e3abb2ba03403ba4e9e1b957aa968990b181bfe",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 381,
+      "totalLines": 409,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "022e40dc8dcb3e127cfb334af3e4eb2c80d315ddc8b752c977a859ebb94657a8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 512,
       "hasStructuralAnalysis": true
     },
     "drizzle.config.ts": {
@@ -78,7 +88,7 @@
     },
     "package.json": {
       "filePath": "package.json",
-      "contentHash": "a7a4de48d8886eb9c9171c15a726b10e991a211126fce96534b10a0d822222d0",
+      "contentHash": "adcd5638e11e73142cee57b171974bf6081dcace8e12dff862d696df7ecd5bb6",
       "functions": [],
       "classes": [],
       "imports": [],
@@ -803,16 +813,6 @@
       "exports": [],
       "totalLines": 2,
       "hasStructuralAnalysis": false
-    },
-    "README.md": {
-      "filePath": "README.md",
-      "contentHash": "09f4d3e35df047a5b3e7573c695722f76975145dd1017913e51f7af28a2b9ff6",
-      "functions": [],
-      "classes": [],
-      "imports": [],
-      "exports": [],
-      "totalLines": 460,
-      "hasStructuralAnalysis": true
     },
     "scripts/migrate-stream-urls.sh": {
       "filePath": "scripts/migrate-stream-urls.sh",
@@ -1868,7 +1868,7 @@
     },
     "src/routes/__root.tsx": {
       "filePath": "src/routes/__root.tsx",
-      "contentHash": "0aca0f44060fc9d539204db84abeb37c1f28c428e0f4ebf5f2d20e20c5a83226",
+      "contentHash": "2917250137d242c68acd0042d74e8f311f4743b90210a20a4c5b69709a8bde56",
       "functions": [
         {
           "name": "RootComponent",
@@ -1960,7 +1960,7 @@
       "exports": [
         "Route"
       ],
-      "totalLines": 125,
+      "totalLines": 126,
       "hasStructuralAnalysis": true
     },
     "src/routes/channels.$id.tsx": {
@@ -2308,7 +2308,7 @@
     },
     "src/routes/index.tsx": {
       "filePath": "src/routes/index.tsx",
-      "contentHash": "4236c15cbd504af40b75e6101a20ae7d23e6382534f134f616ace91ffa139bea",
+      "contentHash": "92521c3167c869766baf78dbfbe485419e5332ccd0212df343c627a7dfc1601d",
       "functions": [
         {
           "name": "Home",
@@ -2347,7 +2347,7 @@
       "exports": [
         "Route"
       ],
-      "totalLines": 205,
+      "totalLines": 213,
       "hasStructuralAnalysis": true
     },
     "src/routes/movies.$id.tsx": {
@@ -2730,7 +2730,7 @@
     },
     "src/server.ts": {
       "filePath": "src/server.ts",
-      "contentHash": "9904b36f91a2ab384bf388c3e32258f65c30b1eaf71d29692ba7a016a5b35336",
+      "contentHash": "617d28133afa2585136748228f4a7cae67aebd0cf449ee55d57f2e28e84e2b2a",
       "functions": [
         {
           "name": "createM3uResponse",
@@ -2758,7 +2758,7 @@
           ],
           "returnType": "ServerEntry",
           "exported": true,
-          "lineCount": 68
+          "lineCount": 73
         }
       ],
       "classes": [],
@@ -2798,6 +2798,12 @@
           ]
         },
         {
+          "source": "~/server/series",
+          "specifiers": [
+            "getActiveSeriesM3u"
+          ]
+        },
+        {
           "source": "~/server/yaml",
           "specifiers": [
             "getActiveChannelsYaml"
@@ -2819,7 +2825,7 @@
       "exports": [
         "createServerEntry"
       ],
-      "totalLines": 112,
+      "totalLines": 118,
       "hasStructuralAnalysis": true
     },
     "src/server/channels.test.ts": {
@@ -3058,7 +3064,7 @@
     },
     "src/server/series.ts": {
       "filePath": "src/server/series.ts",
-      "contentHash": "f5da9fb08b13f0bfa81fd5d799643f0983b835aee4ca61697f8d4ea9ab4c73f6",
+      "contentHash": "712d8723eadac5b4251cf1404198c9e2c05065309f5770101fe756ae3c122522",
       "functions": [
         {
           "name": "seriesQueryOptions",
@@ -3067,6 +3073,12 @@
           ],
           "exported": true,
           "lineCount": 32
+        },
+        {
+          "name": "getActiveSeriesM3u",
+          "params": [],
+          "exported": true,
+          "lineCount": 24
         }
       ],
       "classes": [],
@@ -3085,7 +3097,6 @@
             "desc",
             "and",
             "count",
-            "sql",
             "getTableColumns"
           ]
         },
@@ -3126,7 +3137,14 @@
         {
           "source": "~/lib/stream-url",
           "specifiers": [
+            "buildStreamUrl",
             "stripStreamBase"
+          ]
+        },
+        {
+          "source": "~/lib/m3u-export",
+          "specifiers": [
+            "generateM3u"
           ]
         }
       ],
@@ -3137,10 +3155,11 @@
         "toggleSeriesActive",
         "updateSeries",
         "createSeries",
+        "getActiveSeriesM3u",
         "exportActiveSeriesM3u",
         "getSeriesGroupTitles"
       ],
-      "totalLines": 385,
+      "totalLines": 382,
       "hasStructuralAnalysis": true
     },
     "src/server/shared.ts": {
@@ -3346,16 +3365,6 @@
       "totalLines": 57,
       "hasStructuralAnalysis": true
     },
-    "supabase/migrations/meta/_journal.json": {
-      "filePath": "supabase/migrations/meta/_journal.json",
-      "contentHash": "ed47615ac1be5ef3ba11cfb3e02c72eba693ced91bfaf694463dfe4a16df334c",
-      "functions": [],
-      "classes": [],
-      "imports": [],
-      "exports": [],
-      "totalLines": 20,
-      "hasStructuralAnalysis": true
-    },
     "supabase/migrations/meta/0000_snapshot.json": {
       "filePath": "supabase/migrations/meta/0000_snapshot.json",
       "contentHash": "d01c1196305bab1954a245e6b9ee2e8680ff3ad01f975040ff4e1f5ac562fc50",
@@ -3374,6 +3383,16 @@
       "imports": [],
       "exports": [],
       "totalLines": 430,
+      "hasStructuralAnalysis": true
+    },
+    "supabase/migrations/meta/_journal.json": {
+      "filePath": "supabase/migrations/meta/_journal.json",
+      "contentHash": "ed47615ac1be5ef3ba11cfb3e02c72eba693ced91bfaf694463dfe4a16df334c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
       "hasStructuralAnalysis": true
     },
     "tsconfig.json": {
