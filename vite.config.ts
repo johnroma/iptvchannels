@@ -47,13 +47,27 @@ export default defineConfig({
       projects: ["./tsconfig.json", "./packages/ui/tsconfig.json"],
     }),
     tanstackStart(),
-    nitro(nitroOutputDir ? { output: { dir: nitroOutputDir } } : {}),
+    nitro({
+      // The built runtime (srv/.output) runs standalone via `node` with no
+      // resolvable node_modules, so Nitro must bundle server deps instead of
+      // leaving them as external imports. postgres (drizzle-orm's driver) is
+      // externalized by the node-server preset by default and must be inlined
+      // for the self-contained output to work.
+      ...(nitroOutputDir ? { output: { dir: nitroOutputDir } } : {}),
+      noExternals: ["postgres"],
+    }),
     viteReact(),
     tailwindcss(),
   ],
-  build: {
-    rollupOptions: {
-      external: ["postgres"],
+  environments: {
+    client: {
+      build: {
+        rollupOptions: {
+          // Keep postgres out of the browser bundle without forcing Nitro's
+          // server build to externalize it from the standalone runtime.
+          external: ["postgres"],
+        },
+      },
     },
   },
 })
