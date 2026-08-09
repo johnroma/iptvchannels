@@ -1,6 +1,6 @@
 import { COUNTRY_CODES } from "~/db/validators"
 
-export interface M3uChannel {
+export type M3uChannel = {
   tvgId?: string | null
   tvgName: string
   tvgLogo?: string | null

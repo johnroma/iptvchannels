@@ -11,8 +11,17 @@ export default [
     {
         rules: {
             "@typescript-eslint/no-explicit-any": "error",
-            "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+            "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
             "@typescript-eslint/consistent-type-definitions": ["error", "type"]
+        }
+    },
+    {
+        // Test files mock third-party ORM builder chains whose generic types
+        // aren't worth reproducing structurally — `any` is the pragmatic
+        // boundary here, not a real type gap.
+        files: ["**/*.test.{ts,tsx}"],
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off"
         }
     }
 ];
