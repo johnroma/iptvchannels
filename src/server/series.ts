@@ -5,7 +5,6 @@ import {
   desc,
   and,
   count,
-  sql,
   getTableColumns,
 } from "drizzle-orm"
 import { queryOptions } from "@tanstack/react-query"
@@ -348,13 +347,10 @@ export const exportActiveSeriesM3u = createServerFn({ method: "GET" })
         tvgLogo: media.tvgLogo,
         streamUrl: media.streamUrl,
         name: media.name,
-        groupTitle: sql<
-          string | null
-        >`COALESCE(${groupTitles.alias}, ${groupTitles.name})`,
+        groupTitle: series.name,
       })
       .from(media)
       .innerJoin(series, eq(media.seriesId, series.id))
-      .leftJoin(groupTitles, eq(series.groupTitleId, groupTitles.id))
       .where(eq(series.active, true))
       .orderBy(asc(series.name), asc(media.season), asc(media.episode))
 
