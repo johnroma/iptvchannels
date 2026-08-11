@@ -189,6 +189,15 @@ export const updateSeries = createServerFn({ method: "POST" })
         .where(eq(groupTitles.id, groupTitleId))
     }
 
+    // Read the current active state before writing, so the cascade below can
+    // fire only on an actual change — an unrelated edit (name, logo, group)
+    // must not clobber per-episode active state.
+    const [previous] = await db
+      .select({ active: series.active })
+      .from(series)
+      .where(eq(series.id, id))
+      .limit(1)
+
     // Update series record
     const result = await db
       .update(series)
@@ -203,6 +212,23 @@ export const updateSeries = createServerFn({ method: "POST" })
 
     const updated = result[0]
     if (!updated) return undefined
+
+    // Cascade an active change down to the episodes, mirroring
+    // toggleSeriesActive. The STRM generator and the M3U exports read
+    // media.active — series.active alone publishes nothing, so without this a
+    // series activated from the edit form yields an empty library.
+    // Runs before the episode upsert below so explicit per-episode values win.
+    const nextActive = updateData.active
+    if (
+      nextActive !== undefined &&
+      nextActive !== null &&
+      previous?.active !== nextActive
+    ) {
+      await db
+        .update(media)
+        .set({ active: nextActive, updatedAt: new Date() })
+        .where(eq(media.seriesId, id))
+    }
 
     // Bulk episode upsert
     if (episodes) {

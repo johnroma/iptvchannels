@@ -21,7 +21,6 @@ BACKUP_DIR="$PROJECT_ROOT/../data/backups"
 
 ENV_NAME="${1:-local}"
 M3U_FILE="${2:-$HOME/uploads/updatechannels.m3u}"
-STAMP="$(date +%Y%m%d-%H%M%S)"
 
 if [[ "$ENV_NAME" == "prod" ]]; then
   source "$ENV_ROOT/prod.env"
@@ -99,7 +98,7 @@ echo ""
 # ─── 1. Back up ─────────────────────────────────────────────
 
 if [[ "${SKIP_DUMP:-}" != "1" ]]; then
-  DUMP_FILE="$BACKUP_DIR/iptvchannels-preupdate-$STAMP.dump"
+  DUMP_FILE="$BACKUP_DIR/iptvchannels-preupdate.dump"
   echo "💾 Dumping schema to $(basename "$DUMP_FILE")..."
   pg_dump "$DATABASE_URL" -n "${DB_SCHEMA:-public}" -Fc -f "$DUMP_FILE"
   echo "   $(du -h "$DUMP_FILE" | cut -f1)"
@@ -108,9 +107,8 @@ else
 fi
 
 # Snapshot hand-curated CMS state. The seeds truncate, so this has to happen
-# first. Kept per-run so a failed refresh cannot overwrite a good snapshot with
-# an empty one taken from already-truncated tables.
-SNAP_DIR="$BACKUP_DIR/curation-$STAMP"
+# first. One snapshot, overwritten each run — no history is kept.
+SNAP_DIR="$BACKUP_DIR/curation"
 mkdir -p "$SNAP_DIR"
 echo "📋 Snapshotting curated state to $(basename "$SNAP_DIR")/..."
 psql "$DATABASE_URL" -q -v ON_ERROR_STOP=1 \
@@ -132,26 +130,6 @@ SNAP_ROWS=$(( $(csv_rows "$SNAP_DIR/channels-curation.csv") \
             + $(csv_rows "$SNAP_DIR/media-curation.csv") \
             + $(csv_rows "$SNAP_DIR/series-curation.csv") ))
 echo "   $SNAP_ROWS curated rows"
-
-# If this snapshot is empty, a previous run probably truncated and then failed
-# before replaying. Fall back to the newest non-empty snapshot rather than
-# "restoring" nothing over the fresh import.
-RESTORE_FROM="$SNAP_DIR"
-if [[ "$SNAP_ROWS" -eq 0 ]]; then
-  for prev in $(ls -d "$BACKUP_DIR"/curation-* 2>/dev/null | sort -r); do
-    [[ "$prev" == "$SNAP_DIR" ]] && continue
-    prev_rows=$(( $(csv_rows "$prev/channels-curation.csv") \
-                + $(csv_rows "$prev/media-curation.csv") \
-                + $(csv_rows "$prev/series-curation.csv") ))
-    if [[ "$prev_rows" -gt 0 ]]; then
-      RESTORE_FROM="$prev"
-      echo "⚠️  Nothing curated in the database right now."
-      echo "   Falling back to $(basename "$prev") ($prev_rows rows) — looks like an"
-      echo "   earlier refresh truncated and did not finish."
-      break
-    fi
-  done
-fi
 echo ""
 
 # ─── 2. Reseed ──────────────────────────────────────────────
@@ -210,17 +188,17 @@ echo ""
 if [[ "${SKIP_RESTORE:-}" == "1" ]]; then
   echo "⏭️  SKIP_RESTORE=1 — everything left inactive"
   echo "   Snapshot kept at $SNAP_DIR"
-elif [[ "$SNAP_ROWS" -eq 0 && "$RESTORE_FROM" == "$SNAP_DIR" ]]; then
+elif [[ "$SNAP_ROWS" -eq 0 ]]; then
   echo "⏭️  Nothing curated to replay"
 else
-  echo "♻️  Replaying curation from $(basename "$RESTORE_FROM")/..."
+  echo "♻️  Replaying curation from $(basename "$SNAP_DIR")/..."
   psql "$DATABASE_URL" -q -v ON_ERROR_STOP=1 \
    -c "CREATE TEMP TABLE ch_cur (stream_url text, tvg_name text, name text, country_code text, favourite bool, active bool, script_alias text, content_id int);" \
-   -c "\COPY ch_cur FROM '$RESTORE_FROM/channels-curation.csv' CSV HEADER" \
+   -c "\COPY ch_cur FROM '$SNAP_DIR/channels-curation.csv' CSV HEADER" \
    -c "CREATE TEMP TABLE md_cur (stream_url text, tvg_name text, name text, favourite bool, active bool);" \
-   -c "\COPY md_cur FROM '$RESTORE_FROM/media-curation.csv' CSV HEADER" \
+   -c "\COPY md_cur FROM '$SNAP_DIR/media-curation.csv' CSV HEADER" \
    -c "CREATE TEMP TABLE sr_cur (tvg_name text, name text, favourite bool, active bool);" \
-   -c "\COPY sr_cur FROM '$RESTORE_FROM/series-curation.csv' CSV HEADER" \
+   -c "\COPY sr_cur FROM '$SNAP_DIR/series-curation.csv' CSV HEADER" \
    -c "UPDATE channels c SET active = k.active, favourite = k.favourite,
          country_code = k.country_code, script_alias = k.script_alias,
          content_id = k.content_id,
@@ -239,14 +217,14 @@ else
        SELECT k.tvg_name, k.name, k.active, k.script_alias, k.content_id
        FROM ch_cur k
        WHERE NOT EXISTS (SELECT 1 FROM channels c WHERE c.stream_url = k.stream_url);" \
-   -c "\COPY (SELECT * FROM dropped) TO '$RESTORE_FROM/dropped-channels.csv' CSV HEADER" \
+   -c "\COPY (SELECT * FROM dropped) TO '$SNAP_DIR/dropped-channels.csv' CSV HEADER" \
    -c "SELECT tvg_name, name, script_alias, content_id FROM dropped;"
 
-  DROPPED=$(( $(csv_rows "$RESTORE_FROM/dropped-channels.csv") ))
+  DROPPED=$(( $(csv_rows "$SNAP_DIR/dropped-channels.csv") ))
   if [[ "$DROPPED" -gt 0 ]]; then
     echo "⚠️  $DROPPED curated channel(s) are gone from the new playlist (listed above)."
     echo "   Their Home Assistant scripts are now dangling."
-    echo "   Saved to $(basename "$RESTORE_FROM")/dropped-channels.csv"
+    echo "   Saved to $(basename "$SNAP_DIR")/dropped-channels.csv"
   fi
 fi
 echo ""
