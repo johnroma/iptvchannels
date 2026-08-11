@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@ui/components/select"
 import { ListStream } from "~/components/ListStream"
-import { MovieCombobox } from "~/components/MovieCombobox"
+import { StreamCombobox } from "~/components/StreamCombobox"
 import {
   ChevronLeft,
   ChevronRight,
@@ -227,7 +227,11 @@ function RouteComponent() {
           </Select>
         </div>
 
-        <MovieCombobox />
+        <StreamCombobox
+          table="media"
+          noun="movie"
+          editHref={(id) => `/edit-movie/${id}`}
+        />
 
         <div className="flex items-center space-x-2 border-l pl-4">
           <Button

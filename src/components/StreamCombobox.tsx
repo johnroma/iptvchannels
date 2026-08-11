@@ -17,19 +17,35 @@ type SearchResult = {
   tvgName: string
 }
 
+type StreamComboboxProps = {
+  /** Which table to search. `media` excludes series episodes server-side. */
+  table: "channels" | "media" | "series"
+  /** Where selecting a result navigates to. */
+  editHref: (id: string) => string
+  /** Noun used in the trigger, placeholder and empty state, e.g. "movie". */
+  noun: string
+  /** Plural for the trigger label. Defaults to `${noun}s`. */
+  nounPlural?: string
+}
+
 function displayLabel(item: SearchResult): string {
   return item.name || item.tvgName
 }
 
-export function MovieCombobox() {
+export function StreamCombobox({
+  table,
+  editHref,
+  noun,
+  nounPlural,
+}: StreamComboboxProps) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
+  const plural = nounPlural ?? `${noun}s`
 
   const { data: results = [], isFetching } = useQuery({
-    queryKey: ["search", "media", query],
-    queryFn: () =>
-      searchStreams({ data: { table: "media", query, limit: 30 } }),
+    queryKey: ["search", table, query],
+    queryFn: () => searchStreams({ data: { table, query, limit: 30 } }),
     enabled: query.trim().length >= 2,
     staleTime: 30_000,
   })
@@ -37,7 +53,7 @@ export function MovieCombobox() {
   function handleSelect(id: string) {
     setOpen(false)
     setQuery("")
-    navigate({ to: `/edit-movie/${id}` })
+    navigate({ to: editHref(id) })
   }
 
   return (
@@ -55,14 +71,14 @@ export function MovieCombobox() {
           }
         >
           <Search className="mr-1 h-4 w-4 shrink-0 text-muted-foreground" />
-          Search movies...
+          Search {plural}...
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </PopoverTrigger>
         <PopoverContent className="w-72 p-0" align="start">
           <div className="flex h-9 items-center gap-2 border-b px-3">
             <Search className="size-4 shrink-0 opacity-50" />
             <Input
-              placeholder="Type a movie name..."
+              placeholder={`Type a ${noun} name...`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="h-8 w-full border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
@@ -79,7 +95,7 @@ export function MovieCombobox() {
               </div>
             ) : results.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
-                No movies found.
+                No {plural} found.
               </div>
             ) : (
               results.map((item) => (

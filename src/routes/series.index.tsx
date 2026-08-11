@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@ui/components/select"
 import { ListStream } from "~/components/ListStream"
+import { StreamCombobox } from "~/components/StreamCombobox"
 import {
   ChevronLeft,
   ChevronRight,
@@ -232,6 +233,13 @@ function RouteComponent() {
             </SelectContent>
           </Select>
         </div>
+
+        <StreamCombobox
+          table="series"
+          noun="series"
+          nounPlural="series"
+          editHref={(id) => `/edit-series/${id}`}
+        />
 
         <div className="flex items-center space-x-2 border-l pl-4">
           <Button

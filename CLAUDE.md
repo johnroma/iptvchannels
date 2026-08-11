@@ -34,7 +34,7 @@ iptvchannels/
 │   │   ├── ChannelForm.tsx / MovieForm.tsx / SeriesForm.tsx  # Zod-validated create/edit forms
 │   │   ├── ListStream.tsx        # Reusable paginated table for all resource types
 │   │   ├── ActiveSwitch.tsx      # Optimistic active-state toggle
-│   │   ├── MovieCombobox.tsx     # Searchable movie picker (episode selection)
+│   │   ├── StreamCombobox.tsx    # Searchable picker for any table (movies, series)
 │   │   └── DefaultCatchBoundary.tsx / NotFound.tsx
 │   ├── lib/             # Pure utilities (+ unit tests)
 │   │   ├── m3u-parser.ts(.test.ts)   # Parse M3U → channels vs media (series/season/episode/year)
@@ -388,7 +388,7 @@ Known local runtime split:
 - `Movies` - movie management from the `media` table, excluding series episodes
 - `Movies M3U URL` - direct active-movie playlist at `/movies/m3u`
 - `Add Movie` - create a new movie
-- `Series` - series management and episode collections
+- `Series` - series management and episode collections, with name search (series level, not episodes)
 - `Add Series` - create a new series with episodes
 
 ## Common Mistakes to Avoid
