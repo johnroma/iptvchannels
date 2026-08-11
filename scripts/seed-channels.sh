@@ -1,5 +1,5 @@
 #!/bin/bash
-# Seed TV channels from M3U (stops at first .mp4/.mkv)
+# Seed TV channels from M3U (stops at first VOD entry — see MEDIA_EXT below)
 # Uses staging table pattern for normalized group_titles FK
 # Usage: ./scripts/seed-channels.sh [local|prod] [m3u-file]
 
@@ -36,18 +36,25 @@ if [[ ! -f "$M3U_FILE" ]]; then
 fi
 
 echo "🔄 Parsing channels from $M3U_FILE..."
-echo "   (stopping at first .mp4/.mkv entry)"
+echo "   (stopping at first VOD entry)"
 
 # Parse M3U with awk - validates pairs before processing
 # Only accepts: #EXTINF line followed by http URL line
 awk '
 BEGIN {
   FS="\""
+  # VOD containers used by the provider. Live channels carry no extension,
+  # so the extension is what separates movies/series from channels.
+  MEDIA_EXT = "\\.(mp4|mkv|avi|ts|m4v|flv|mpg|mp3)$"
   print "tvg_id\ttvg_name\ttvg_logo\tgroup_title\tstream_url"
   has_extinf = 0
   skipped = 0
   count = 0
 }
+
+# Playlists ship with CRLF line endings; strip CR so $-anchored matches work
+# and no \r ends up inside stream_url.
+{ sub(/\r$/, "") }
 
 /^#EXTINF:/ {
   # If we had a pending EXTINF without a valid URL, skip it
@@ -78,7 +85,7 @@ BEGIN {
   url = $0
 
   # Check if this is a media file - stop processing
-  if (url ~ /\.(mp4|mkv)$/) {
+  if (url ~ MEDIA_EXT) {
     print "⚡ Stopped at line " NR " (first media entry)" > "/dev/stderr"
     print "📊 Channels: " count ", Skipped invalid: " skipped > "/dev/stderr"
     exit

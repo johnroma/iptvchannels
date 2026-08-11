@@ -1,5 +1,5 @@
 #!/bin/bash
-# Seed movies/series from M3U (.mp4/.mkv entries only)
+# Seed movies/series from M3U (VOD entries only — see MEDIA_EXT below)
 # Uses staging table pattern for normalized group_titles FK
 # Creates series records and links episodes via series_id FK
 # Usage: ./scripts/seed-media.sh [local|prod] [m3u-file]
@@ -37,21 +37,28 @@ if [[ ! -f "$M3U_FILE" ]]; then
 fi
 
 echo "🔄 Parsing media from $M3U_FILE..."
-echo "   (processing .mp4/.mkv entries only - this may take a while)"
+echo "   (processing VOD entries only - this may take a while)"
 
 # Parse M3U with awk - validates pairs before processing
-# Only accepts: #EXTINF line followed by http URL ending in .mp4/.mkv
+# Only accepts: #EXTINF line followed by http URL with a VOD extension
 # Compatible with BSD awk (macOS)
 # Now also extracts series_base_name (tvg_name with SXX EXX stripped)
 awk '
 BEGIN {
   FS="\""
+  # VOD containers used by the provider. Live channels carry no extension,
+  # so the extension is what separates movies/series from channels.
+  MEDIA_EXT = "\\.(mp4|mkv|avi|ts|m4v|flv|mpg|mp3)$"
   print "tvg_id\ttvg_name\ttvg_logo\tgroup_title\tstream_url\tmedia_type\tyear\tseason\tepisode\tseries_base_name"
   has_extinf = 0
   skipped = 0
   count = 0
   started = 0
 }
+
+# Playlists ship with CRLF line endings; strip CR so $-anchored matches work
+# and no \r ends up inside stream_url.
+{ sub(/\r$/, "") }
 
 /^#EXTINF:/ {
   # If we had a pending EXTINF without a valid URL, skip it
@@ -79,8 +86,8 @@ BEGIN {
 
   url = $0
 
-  # Only process media files (.mp4/.mkv)
-  if (url !~ /\.(mp4|mkv)$/) {
+  # Only process media files
+  if (url !~ MEDIA_EXT) {
     has_extinf = 0
     next
   }

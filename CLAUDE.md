@@ -62,6 +62,7 @@ iptvchannels/
 │   └── components.json  # shadcn CLI config
 ├── (uses ../env-profiles/)  # Environment files live one level above this repo (not committed)
 ├── scripts/             # Database seeding/migration scripts (bash)
+│   ├── refresh-playlist.sh    # Full playlist refresh (backup → both seeds → repairs → curation replay)
 │   ├── seed-channels.sh       # Import TV channels from M3U (PostgreSQL COPY)
 │   ├── seed-media.sh          # Import movies/series from M3U (PostgreSQL COPY)
 │   └── migrate-stream-urls.sh # Rewrite stream_url against STREAM_BASE_PATH/PORT
@@ -329,6 +330,11 @@ pnpm db:migrate       # Run migrations (local)
 pnpm db:migrate:prod  # Run migrations (Supabase)
 pnpm db:studio        # Drizzle Studio (local)
 pnpm db:studio:prod   # Drizzle Studio (Supabase)
+
+# Full playlist refresh — the normal way to reload from a new updatechannels.m3u.
+# Wraps both seeds with a pg_dump, a curation snapshot/replay, and post-seed
+# repairs. See ../README.md for the manual equivalent and the reasoning.
+./scripts/refresh-playlist.sh local ~/uploads/updatechannels.m3u
 
 # Database seeding (truncates table first, then imports via PostgreSQL COPY)
 pnpm db:seed:channels      # Import TV channels from M3U (local)
