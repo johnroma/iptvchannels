@@ -17,7 +17,6 @@ import {
   exportActiveChannelsYaml,
   syncKodiContentIds,
 } from "~/server/channels"
-import { publishStrmLibrary } from "~/server/strm"
 import { Checkbox } from "@ui/components/checkbox"
 import { Label } from "@ui/components/label"
 import { Button } from "@ui/components/button"
@@ -174,28 +173,6 @@ function RouteComponent() {
     },
   })
 
-  const publishStrmMutation = useMutation({
-    mutationFn: publishStrmLibrary,
-    onSuccess: (result) => {
-      if (!result.ok) {
-        alert(`STRM publish failed: ${result.message}`)
-        return
-      }
-      const s = result.stats
-      alert(
-        s
-          ? `STRM library published to the Samba share.\n\n` +
-              `Fetched: ${s.fetched} active rows → ${s.files} .strm files\n` +
-              `Written: ${s.written}\nUnchanged: ${s.unchanged}\nRemoved: ${s.removed}`
-          : "STRM library published, but stats could not be parsed.\n\n" +
-              result.output,
-      )
-    },
-    onError: (error) => {
-      alert(`STRM publish failed: ${error.message}`)
-    },
-  })
-
   const syncKodiMutation = useMutation({
     mutationFn: syncKodiContentIds,
     onSuccess: (result) => {
@@ -330,21 +307,6 @@ function RouteComponent() {
               </>
             ) : (
               "Export M3U"
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => publishStrmMutation.mutate(undefined)}
-            disabled={publishStrmMutation.isPending}
-          >
-            {publishStrmMutation.isPending ? (
-              <>
-                <Spinner className="mr-2" />
-                Publishing...
-              </>
-            ) : (
-              "Publish STRM"
             )}
           </Button>
           <Button
