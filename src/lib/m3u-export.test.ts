@@ -101,6 +101,20 @@ describe("generateM3u", () => {
     )
   })
 
+  it.each(["ZZ", "us", "", null, undefined])(
+    "keeps the existing group for an unrecognized country code (%s)",
+    (countryCode) => {
+      const result = generateM3u([{
+        tvgName: "News",
+        groupTitle: "Original Group",
+        countryCode,
+        streamUrl: "http://example.com/news",
+      }])
+
+      expect(result).toContain('group-title="Original Group"')
+    },
+  )
+
   it("returns only header for empty array", () => {
     const result = generateM3u([])
     expect(result).toBe("#EXTM3U\n")

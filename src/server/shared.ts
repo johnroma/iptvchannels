@@ -100,7 +100,8 @@ export const listStreams = createServerFn({ method: "GET" })
       .limit(data.limit)
       .offset(data.cursor)
 
-    const rows = result.map((row) => ({
+    // Series rows have no stream URL; the existing mapper accepts undefined.
+    const rows = result.map((row: (typeof result)[number] & { streamUrl?: string | null }) => ({
       ...row,
       playUrl: buildStreamUrl(row.streamUrl),
     }))
