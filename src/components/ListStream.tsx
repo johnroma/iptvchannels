@@ -8,7 +8,7 @@ export type Stream = {
   tvgName: string
   name: string | null
   active: boolean | null
-  playUrl: string | null
+  playUrl?: string | null
 }
 
 type ListStreamProps = {

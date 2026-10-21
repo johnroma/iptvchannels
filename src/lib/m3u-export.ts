@@ -11,7 +11,7 @@ export type M3uChannel = {
 }
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-const countryNameByCode = new Map(
+const countryNameByCode = new Map<string, string>(
   COUNTRY_CODES.map((countryCode) => [
     countryCode,
     regionNames.of(countryCode) ?? countryCode,

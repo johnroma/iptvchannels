@@ -1,6 +1,7 @@
 import {
   pgSchema,
   pgTable,
+  type PgTableFn,
   text,
   boolean,
   integer,
@@ -12,11 +13,11 @@ import {
 import { relations, sql } from "drizzle-orm"
 
 const configuredSchema = process.env.DB_SCHEMA?.trim()
-const useNamedSchema = Boolean(
-  configuredSchema && configuredSchema.toLowerCase() !== "public",
-)
-const makeTable = useNamedSchema
-  ? pgSchema(configuredSchema as string).table
+const useNamedSchema =
+  configuredSchema && configuredSchema.toLowerCase() !== "public"
+// One generic callable preserves column inference for either runtime namespace.
+const makeTable: PgTableFn<string | undefined> = useNamedSchema
+  ? pgSchema(configuredSchema).table
   : pgTable
 
 // Group titles lookup table - normalized from channels/media

@@ -1,9 +1,8 @@
 import { defineConfig } from "drizzle-kit";
 
 const configuredSchema = process.env.DB_SCHEMA?.trim();
-const useNamedSchema = Boolean(
-  configuredSchema && configuredSchema.toLowerCase() !== "public",
-);
+const useNamedSchema =
+  configuredSchema && configuredSchema.toLowerCase() !== "public";
 
 export default defineConfig({
   dialect: "postgresql",
