@@ -1,7 +1,6 @@
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { defineConfig, type Plugin } from "vite"
-import tsConfigPaths from "vite-tsconfig-paths"
 import { tanstackStart } from "@tanstack/react-start/plugin/vite"
 import tailwindcss from "@tailwindcss/vite"
 import viteReact from "@vitejs/plugin-react"
@@ -36,6 +35,7 @@ const fixJsonDevServe: Plugin = {
 }
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   server: {
     host,
     port,
@@ -43,9 +43,6 @@ export default defineConfig({
   },
   plugins: [
     fixJsonDevServe,
-    tsConfigPaths({
-      projects: ["./tsconfig.json", "./packages/ui/tsconfig.json"],
-    }),
     tanstackStart(),
     nitro({
       // The built runtime (srv/.output) runs standalone via `node` with no

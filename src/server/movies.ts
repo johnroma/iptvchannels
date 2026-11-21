@@ -5,11 +5,11 @@ import { updateStreamLogic, createStreamLogic } from "./shared"
 // ─── Movie CRUD (validation wrappers) ───────────────────────
 
 export const updateMovieForId = createServerFn({ method: "POST" })
-  .inputValidator(mediaUpdateSchema)
+  .validator(mediaUpdateSchema)
   .handler(async ({ data }) => updateStreamLogic("media", data))
 
 export const createMovie = createServerFn({ method: "POST" })
-  .inputValidator(mediaSchema)
+  .validator(mediaSchema)
   .handler(async ({ data }) =>
     createStreamLogic("media", { ...data, mediaType: "movie", seriesId: null }),
   )

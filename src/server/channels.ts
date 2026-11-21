@@ -8,11 +8,11 @@ import { getActiveChannelsYaml } from "./yaml"
 // ─── Channel CRUD (validation wrappers) ─────────────────────
 
 export const updateChannelForId = createServerFn({ method: "POST" })
-  .inputValidator(channelUpdateSchema)
+  .validator(channelUpdateSchema)
   .handler(async ({ data }) => updateStreamLogic("channels", data))
 
 export const createChannel = createServerFn({ method: "POST" })
-  .inputValidator(channelSchema)
+  .validator(channelSchema)
   .handler(async ({ data }) => createStreamLogic("channels", data))
 
 // ─── Country Codes ──────────────────────────────────────────

@@ -26,7 +26,7 @@ export type TableKey = keyof typeof tables
 // ─── Toggle Active ──────────────────────────────────────────
 
 export const toggleActive = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; active: boolean; table: TableKey }) => data)
+  .validator((data: { id: string; active: boolean; table: TableKey }) => data)
   .handler(async ({ data }) => {
     const table = tables[data.table]
     const result = await db
@@ -39,7 +39,7 @@ export const toggleActive = createServerFn({ method: "POST" })
 
 // ─── List Streams ───────────────────────────────────────────
 
-const listStreamSchema = z.object({
+export const listStreamSchema = z.object({
   table: z.enum(["channels", "media", "series"]),
   cursor: z.number().optional().default(0),
   limit: z.number().optional().default(100),
@@ -52,7 +52,7 @@ const listStreamSchema = z.object({
 })
 
 export const listStreams = createServerFn({ method: "GET" })
-  .inputValidator(listStreamSchema)
+  .validator(listStreamSchema)
   .handler(async ({ data }) => {
     const table = tables[data.table]
 
@@ -164,7 +164,7 @@ export const streamQueryOptions = (
 // ─── Get By ID ──────────────────────────────────────────────
 
 export const getStreamById = createServerFn({ method: "GET" })
-  .inputValidator((data: { id: string; table: TableKey }) => data)
+  .validator((data: { id: string; table: TableKey }) => data)
   .handler(async ({ data }) => {
     const table = tables[data.table]
     const result = await db
@@ -190,7 +190,7 @@ const searchStreamSchema = z.object({
 })
 
 export const searchStreams = createServerFn({ method: "GET" })
-  .inputValidator(searchStreamSchema)
+  .validator(searchStreamSchema)
   .handler(async ({ data }) => {
     const table = tables[data.table]
     const pattern = `%${data.query}%`
@@ -327,13 +327,13 @@ export async function createStreamLogic(tableKey: TableKey, data: any) {
 // ─── Export M3U ─────────────────────────────────────────────
 
 export const exportActiveStreamsM3u = createServerFn({ method: "GET" })
-  .inputValidator((data: { table: "channels" | "media" }) => data)
+  .validator((data: { table: "channels" | "media" }) => data)
   .handler(async ({ data }) => getActiveStreamsM3u(data.table))
 
 // ─── Group Titles ───────────────────────────────────────────
 
 export const getGroupTitles = createServerFn({ method: "GET" })
-  .inputValidator((data: { table: TableKey }) => data)
+  .validator((data: { table: TableKey }) => data)
   .handler(async ({ data }) => {
     const table = tables[data.table]
     const result = await db

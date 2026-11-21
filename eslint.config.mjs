@@ -6,6 +6,7 @@ export default [
     { ignores: ["dist", ".output", "node_modules", ".tanstack", "routeTree.gen.ts"] },
     { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
     { languageOptions: { globals: globals.browser } },
+    { files: ["**/*.{mjs,cjs}"], languageOptions: { globals: globals.node } },
     pluginJs.configs.recommended,
     ...tseslint.configs.recommended,
     {

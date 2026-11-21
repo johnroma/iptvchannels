@@ -1,5 +1,23 @@
 # CLAUDE.md - Project Context for AI Assistants
 
+Dependency maintenance: follow `docs/dependency-maintenance.md` for current
+supported APIs, full isolated gates, SemVer and production-deploying main pushes.
+
+## Hard rule: SemVer on every merge to main
+
+**Do not merge a PR into `main` in John's workspaces unless that same PR bumps
+`version` in the applicable JavaScript/TypeScript app or release `package.json`.**
+Use patch for fixes and maintenance (including docs, tests, CI, and internal
+changes), minor for backward-compatible features, and major for breaking changes.
+Use the latest remote `main` as the baseline and recalculate if it advances.
+Keep affected lockfile metadata in sync; don't bump unrelated packages or runtime
+copies. No applicable manifest means no bump is needed.
+
+If a separate release PR or a post-merge release workflow conflicts with this
+rule, stop the merge and reconcile it with John first. Don't bypass checks or
+bump twice. This rule does not authorize tagging, publishing, or deployment.
+See `~/projects/STRUCTURE.md` for the full workspace policy.
+
 ## Project Overview
 
 IPTV Channel Management system with:
@@ -92,7 +110,6 @@ Tailwind v4 uses the Vite plugin (no config file):
 ```ts
 // vite.config.ts
 plugins: [
-  tsConfigPaths(),
   tanstackStart(),
   nitro(),
   viteReact(),
@@ -191,7 +208,7 @@ const listChannelsSchema = z.object({
 })
 
 export const listChannels = createServerFn({ method: "GET" })
-  .inputValidator(listChannelsSchema)
+  .validator(listChannelsSchema)
   .handler(async ({ data: { cursor, limit, ... } }) => {
     // Uses explicit .select() with LEFT JOIN to group_titles
     // COALESCE(alias, name) resolves group title display name
@@ -200,7 +217,7 @@ export const listChannels = createServerFn({ method: "GET" })
 
 // Get by ID (UUID string) — JOIN to resolve group title
 export const getChannelById = createServerFn({ method: "GET" })
-  .inputValidator((data: string) => typeof data === "string" ? data : null)
+  .validator((data: string) => typeof data === "string" ? data : null)
   .handler(async ({ data }) => {
     if (data === null) return null
     // Uses .select() with LEFT JOIN to get groupTitle + groupTitleAlias

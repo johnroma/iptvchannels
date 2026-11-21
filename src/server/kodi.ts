@@ -52,6 +52,7 @@ export async function runKodiSync(): Promise<KodiSyncResult> {
       `Failed to connect to Kodi JSON-RPC at ${url}. ` +
         `Set KODI_URL (preferred) or KODI_HOST/KODI_PORT, and ensure Kodi's web server is enabled. ` +
         `Underlying error: ${message}`,
+      { cause: error },
     )
   }
 

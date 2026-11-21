@@ -28,7 +28,7 @@ const listSeriesSchema = z.object({
 })
 
 export const listSeries = createServerFn({ method: "GET" })
-  .inputValidator(listSeriesSchema)
+  .validator(listSeriesSchema)
   .handler(async ({ data }) => {
     const filters = []
     if (data.active !== undefined) filters.push(eq(series.active, data.active))
@@ -112,7 +112,7 @@ export const seriesQueryOptions = (options: SeriesQueryOpts = {}) => {
 // ─── Get Series With Episodes ───────────────────────────────
 
 export const getSeriesWithEpisodes = createServerFn({ method: "GET" })
-  .inputValidator((data: string) => (typeof data === "string" ? data : null))
+  .validator((data: string) => (typeof data === "string" ? data : null))
   .handler(async ({ data: id }) => {
     if (!id) return null
 
@@ -142,7 +142,7 @@ export const getSeriesWithEpisodes = createServerFn({ method: "GET" })
 // ─── Toggle Series Active (cascade) ────────────────────────
 
 export const toggleSeriesActive = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string; active: boolean }) => data)
+  .validator((data: { id: string; active: boolean }) => data)
   .handler(async ({ data }) => {
     const result = await db
       .update(series)
@@ -162,7 +162,7 @@ export const toggleSeriesActive = createServerFn({ method: "POST" })
 // ─── Update Series ──────────────────────────────────────────
 
 export const updateSeries = createServerFn({ method: "POST" })
-  .inputValidator(seriesUpdateSchema)
+  .validator(seriesUpdateSchema)
   .handler(async ({ data }) => {
     const {
       id,
@@ -320,7 +320,7 @@ export const updateSeries = createServerFn({ method: "POST" })
 // ─── Create Series ──────────────────────────────────────────
 
 export const createSeries = createServerFn({ method: "POST" })
-  .inputValidator(seriesSchema)
+  .validator(seriesSchema)
   .handler(async ({ data }) => {
     const { groupTitle, groupTitleId: inputGroupId, ...insertData } = data
 
