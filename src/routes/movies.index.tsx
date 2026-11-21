@@ -304,6 +304,7 @@ function RouteComponent() {
               editHref={`/edit-movie/${item.id}`}
               playHref={`/play/media/${item.id}`}
               queryKey="media"
+              showDownload
             />
           ))}
         </ul>

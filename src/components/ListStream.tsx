@@ -1,5 +1,5 @@
 import { type ReactNode } from "react"
-import { Pencil, Play } from "lucide-react"
+import { Download, Pencil, Play } from "lucide-react"
 import { Button } from "@ui/components/button"
 import { ActiveSwitch } from "./ActiveSwitch"
 
@@ -17,6 +17,7 @@ type ListStreamProps = {
   playHref?: string
   queryKey: string
   hidePlay?: boolean
+  showDownload?: boolean
   onToggle?: (id: string, active: boolean) => Promise<unknown>
   children?: ReactNode
 }
@@ -27,6 +28,7 @@ export function ListStream({
   playHref,
   queryKey,
   hidePlay = false,
+  showDownload = false,
   onToggle,
   children,
 }: Readonly<ListStreamProps>) {
@@ -69,6 +71,19 @@ export function ListStream({
             >
               <Play />
               Play
+            </a>
+          </Button>
+        )}
+        {showDownload && item.playUrl && (
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href={item.playUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`Download ${item.name ?? item.tvgName}`}
+            >
+              <Download />
+              Download
             </a>
           </Button>
         )}
