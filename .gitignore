@@ -52,3 +52,6 @@ dist
 
 # Understand-Anything: transient working dir (graph outputs ARE committed)
 .understand-anything/tmp/
+
+# Machine-local Claude Code permissions (keep shared .claude files tracked).
+/.claude/settings.local.json
